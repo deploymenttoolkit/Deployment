@@ -54,7 +54,7 @@ namespace DeploymentToolkit.Deployment
         {
             try
             {
-                Logging.LogManager.Initialize();
+                Logging.LogManager.Initialize("Deployment");
             }
             catch(Exception ex)
             {
