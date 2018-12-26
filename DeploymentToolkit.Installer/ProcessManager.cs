@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 
@@ -13,7 +14,9 @@ namespace DeploymentToolkit.Installer
         [return: MarshalAs(UnmanagedType.Bool)]
         static extern bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
 
+        // We probably need to extend this to 64 bit and 32 bit registry. Depending if the process is started as 64 bit or 32 bit the key is created on a differen position (WOW64Node shit)
         private string _blockExecutionSubKey = @"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options";
+        private string _debuggerPath = Path.Combine(Settings.Environment.GetDeploymentToolkitInstallPath, "DeploymentToolkit.Debugger.exe");
 
         public bool CheckPrograms(out List<string> openProcesses)
         {
@@ -128,7 +131,7 @@ namespace DeploymentToolkit.Installer
                         _logger.Trace($"Blocking execution of {executableName}");
 
                         var subKey = registry.CreateSubKey(executableName);
-                        subKey.SetValue("Debugger", ""); // TODO: Add debugger
+                        subKey.SetValue("Debugger", _debuggerPath);
 
                         registry.Flush();
                     }
