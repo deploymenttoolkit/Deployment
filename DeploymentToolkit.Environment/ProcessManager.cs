@@ -6,29 +6,29 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 
-namespace DeploymentToolkit.Installer
+namespace DeploymentToolkit.Environment
 {
-    public partial class Installer
+    public partial class DTEnvironment
     {
         [DllImport("user32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         static extern bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
 
         // We probably need to extend this to 64 bit and 32 bit registry. Depending if the process is started as 64 bit or 32 bit the key is created on a differen position (WOW64Node shit)
-        private string _blockExecutionSubKey = @"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options";
-        private string _debuggerPath = Path.Combine(Settings.Environment.GetDeploymentToolkitInstallPath, "DeploymentToolkit.Debugger.exe");
+        private static string _blockExecutionSubKey = @"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options";
+        private static string _debuggerPath = Path.Combine(DeploymentToolkitInstallPath, "DeploymentToolkit.Debugger.exe");
 
-        public bool CheckPrograms(out List<string> openProcesses)
+        public static bool CheckPrograms(string[] applications, out List<string> openProcesses)
         {
             openProcesses = new List<string>();
 
-            if (InstallSettings.CloseProgramsSettings.Close.Length == 0)
+            if (applications.Length == 0)
             {
                 _logger.Trace("No executables specified to close");
                 return false;
             }
 
-            foreach (var executable in InstallSettings.CloseProgramsSettings.Close)
+            foreach (var executable in applications)
             {
                 var executableName = executable.ToLower();
                 if (executable.EndsWith(".exe"))
@@ -49,15 +49,15 @@ namespace DeploymentToolkit.Installer
             return false;
         }
 
-        public bool ClosePrograms()
+        public static bool ClosePrograms(string[] applications)
         {
-            if (InstallSettings.CloseProgramsSettings.Close.Length == 0)
+            if (applications.Length == 0)
             {
                 _logger.Trace("No executables specified to close");
                 return true;
             }
 
-            foreach (var executable in InstallSettings.CloseProgramsSettings.Close)
+            foreach (var executable in applications)
             {
                 try
                 {
@@ -92,15 +92,9 @@ namespace DeploymentToolkit.Installer
             return true;
         }
 
-        public bool BlockExecution()
+        public static bool BlockExecution(string[] applications)
         {
-            if (!InstallSettings.CloseProgramsSettings.DisableStartDuringInstallation)
-            {
-                _logger.Trace("CloseProgramsSettings->DisableStartDuringInstallation disabled");
-                return true;
-            }
-
-            if (InstallSettings.CloseProgramsSettings.Close.Length == 0)
+            if (applications.Length == 0)
             {
                 _logger.Trace("No executables specified to block");
                 return true;
@@ -119,7 +113,7 @@ namespace DeploymentToolkit.Installer
                 var subKeys = registry.GetSubKeyNames();
                 var subKeysLowered = subKeys.ToList().ConvertAll(key => key.ToLower());
 
-                var executableNames = InstallSettings.CloseProgramsSettings.Close.Distinct();
+                var executableNames = applications.Distinct();
                 foreach (var executable in executableNames)
                 {
                     try
@@ -150,15 +144,9 @@ namespace DeploymentToolkit.Installer
             }
         }
 
-        public bool UnblockExecution()
+        public static bool UnblockExecution(string[] applications)
         {
-            if (!InstallSettings.CloseProgramsSettings.DisableStartDuringInstallation)
-            {
-                _logger.Trace("CloseProgramsSettings->DisableStartDuringInstallation disabled");
-                return true;
-            }
-
-            if (InstallSettings.CloseProgramsSettings.Close.Length == 0)
+            if (applications.Length == 0)
             {
                 _logger.Trace("No executables specified to block");
                 return true;
@@ -177,7 +165,7 @@ namespace DeploymentToolkit.Installer
                 var subKeys = registry.GetSubKeyNames();
                 var subKeysLowered = subKeys.ToList().ConvertAll(key => key.ToLower());
 
-                var executableNames = InstallSettings.CloseProgramsSettings.Close.Distinct();
+                var executableNames = applications.Distinct();
                 foreach (var executable in executableNames)
                 {
                     try

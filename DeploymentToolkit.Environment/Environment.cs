@@ -1,12 +1,16 @@
-﻿using System;
+﻿using DeploymentToolkit.Environment.Exceptions;
+using NLog;
+using System;
 using System.IO;
 
-namespace DeploymentToolkit.Settings
+namespace DeploymentToolkit.Environment
 {
-    public static class Environment
+    public static partial class DTEnvironment
     {
+        private static Logger _logger = LogManager.GetCurrentClassLogger();
+
         private static string _deploymentToolkitInstallPath = null;
-        public static string GetDeploymentToolkitInstallPath
+        public static string DeploymentToolkitInstallPath
         {
             get
             {
@@ -17,16 +21,16 @@ namespace DeploymentToolkit.Settings
                 if (installPath == null)
                 {
                     var currentDirectory = Directory.GetCurrentDirectory();
-                    var debuggerPath = Path.Combine(currentDirectory, "DeploymentToolkit.Debugger.exe");
+                    var debuggerPath = Path.Combine(currentDirectory, "DeploymentToolkit.Deployment.exe"); //We should check here for all exe files (e.g. DeploymentToolkit.Debugger.exe)
                     if (File.Exists(debuggerPath))
                     {
-                        installPath = debuggerPath;
+                        installPath = currentDirectory;
                     }
                     else
                     {
                         // Maybe add more options later??
                         // Like a registry entry with the install path other than an EnvironmentVariable
-                        throw new Exception("DeploymentToolkit installation path could not be found");
+                        throw new DeploymentToolkitInstallPathNotFoundException("DeploymentToolkit installation path could not be found", "DeploymentToolkit.Deployment.exe");
                     }
                 }
 

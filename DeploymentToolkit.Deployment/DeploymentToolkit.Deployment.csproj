@@ -67,6 +67,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExitCode.cs" />
+    <Compile Include="MainSequence.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -89,6 +90,10 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DeploymentToolkit.Environment\DeploymentToolkit.Environment.csproj">
+      <Project>{94c074c7-cae2-423e-84b7-80d5b74602bb}</Project>
+      <Name>DeploymentToolkit.Environment</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DeploymentToolkit.Installer.MSI\DeploymentToolkit.Installer.MSI.csproj">
       <Project>{6f6770f5-a209-4a26-a6fb-9cb5122f4108}</Project>
       <Name>DeploymentToolkit.Installer.MSI</Name>
@@ -96,6 +101,14 @@
     <ProjectReference Include="..\DeploymentToolkit.Installer\DeploymentToolkit.Installer.csproj">
       <Project>{d823dfad-3522-434b-b1a8-91232a1169e6}</Project>
       <Name>DeploymentToolkit.Installer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DeploymentToolkit.Messaging\DeploymentToolkit.Messaging.csproj">
+      <Project>{65AC59C5-F17A-4F96-97B2-B0ECB4304C3B}</Project>
+      <Name>DeploymentToolkit.Messaging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DeploymentToolkit.Modals\DeploymentToolkit.Modals.csproj">
+      <Project>{EC3FEDB7-4FC0-4DCF-A08F-F1DE2DC49E00}</Project>
+      <Name>DeploymentToolkit.Modals</Name>
     </ProjectReference>
     <ProjectReference Include="..\DeploymentToolkit.Settings\DeploymentToolkit.Settings.csproj">
       <Project>{b33801ae-9ed8-4b65-b69d-b8d0365c9427}</Project>
