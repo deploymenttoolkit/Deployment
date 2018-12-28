@@ -18,16 +18,23 @@ namespace DeploymentToolkit.Deployment
 
         public MainSequence(IInstallUninstallSequence subSequence)
         {
+            _logger.Trace("Sequence initializing...");
             SubSequence = subSequence;
+            _logger.Trace($"Sequence is {(subSequence is Installer.Installer ? "Install" : "Uninstall")}");
 
+            _logger.Trace("Setting event...");
             SubSequence.OnInstallCompleted += OnSubSequenceInstallCompleted;
 
+            _logger.Trace("Preparing environment...");
             CheckRunningInTaskSequence();
 
             if (DTEnvironment.GUIEnabled)
             {
+                _logger.Info("GUI mode is enabled");
                 PrepareCommunicationWithTrayApps();
             }
+
+            _logger.Trace("Sequence initiated");
         }
 
         public void SequenceBegin()
@@ -78,9 +85,11 @@ namespace DeploymentToolkit.Deployment
 
         private void PrepareCommunicationWithTrayApps()
         {
+            _logger.Trace("Preparing communication with tray apps...");
             try
             {
                 _pipeClient = new PipeClient();
+                _logger.Info("Successfully prepared communication with tray apps");
             }
             catch (Exception ex)
             {
@@ -90,6 +99,8 @@ namespace DeploymentToolkit.Deployment
 
         private void CheckRunningInTaskSequence()
         {
+            _logger.Trace("Checking if running in TaskSequence...");
+
             var tsEnvironment = Type.GetTypeFromProgID("Microsoft.SMS.TSEnvironment");
             if (tsEnvironment == null)
             {

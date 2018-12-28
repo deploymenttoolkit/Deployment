@@ -31,7 +31,7 @@ namespace DeploymentToolkit.Messaging
             var processes = Process.GetProcessesByName(TrayAppExeNameWithoutExtension);
             if(processes.Length == 0)
             {
-                _logger.Info("There is currently no tray app running");
+                _logger.Info("There is currently no tray app running on this system");
             }
             else
             {

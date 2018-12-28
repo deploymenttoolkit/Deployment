@@ -98,7 +98,7 @@ namespace DeploymentToolkit.Messaging
             WaitForClient();
         }
 
-        private async void ProcessMessage(string data)
+        private void ProcessMessage(string data)
         {
             _logger.Trace($"Starting processing message ({data})");
             try
