@@ -8,7 +8,7 @@ namespace DeploymentToolkit.Installer
     public abstract partial class Installer : IInstallUninstallSequence
     {
         public abstract InstallerType InstallerType { get; }
-        public event EventHandler<InstallCompletedEventArgs> OnInstallCompleted;
+        public abstract event EventHandler<SequenceCompletedEventArgs> OnSequenceCompleted;
 
         public InstallSettings InstallSettings { get; set; }
         public CloseProgramsSettings CloseProgramsSettings { get => InstallSettings.CloseProgramsSettings; }
@@ -25,14 +25,8 @@ namespace DeploymentToolkit.Installer
             InstallSettings = installSettings;
         }
 
-        public void SequenceBegin()
-        {
+        public abstract void SequenceBegin();
 
-        }
-
-        public void SequenceEnd()
-        {
-
-        }
+        public abstract void SequenceEnd();
     }
 }

@@ -11,7 +11,7 @@ namespace DeploymentToolkit.Deployment
     {
         public IInstallUninstallSequence SubSequence { get; }
 
-        public event EventHandler<InstallCompletedEventArgs> OnInstallCompleted;
+        public event EventHandler<SequenceCompletedEventArgs> OnSequenceCompleted;
 
         private PipeClient _pipeClient;
         private Logger _logger = LogManager.GetCurrentClassLogger();
@@ -23,7 +23,7 @@ namespace DeploymentToolkit.Deployment
             _logger.Trace($"Sequence is {(subSequence is Installer.Installer ? "Install" : "Uninstall")}");
 
             _logger.Trace("Setting event...");
-            SubSequence.OnInstallCompleted += OnSubSequenceInstallCompleted;
+            SubSequence.OnSequenceCompleted += OnSubSequenceInstallCompleted;
 
             _logger.Trace("Preparing environment...");
             CheckRunningInTaskSequence();
@@ -50,6 +50,10 @@ namespace DeploymentToolkit.Deployment
                     };
                     _pipeClient.SendMessage(message);
                 }
+#if DEBUG //&& DEBUG_GUI
+                _logger.Trace("GUI DEBUG PAUSE 5000");
+                System.Threading.Thread.Sleep(5000);
+#endif
             }
 
             try
@@ -69,18 +73,44 @@ namespace DeploymentToolkit.Deployment
             SubSequence.SequenceEnd();
         }
 
-        private void OnSubSequenceInstallCompleted(object sender, InstallCompletedEventArgs e)
+        private void OnSubSequenceInstallCompleted(object sender, SequenceCompletedEventArgs e)
         {
             if(e.InstallSuccessful)
             {
-                _logger.Info("Successfully installed");
+                _logger.Info("Sequence reported a successful install");
             }
             else
             {
-                _logger.Error("Errors during installation");
+                _logger.Error("Sequence reported errors during installation");
             }
 
-            OnInstallCompleted?.Invoke(sender, e);
+            if(e.CountErrors > 0)
+            {
+                _logger.Error("=================================================");
+                _logger.Error($"{e.CountErrors} error reported");
+                foreach (var error in e.SequenceErrors)
+                {
+                    _logger.Error("=================================================");
+                    _logger.Error(error.Message);
+                    _logger.Error(error.StackTrace);
+                }
+                _logger.Error("=================================================");
+            }
+
+            if (e.CountWarnings > 0)
+            {
+                _logger.Warn("=================================================");
+                _logger.Warn($"{e.CountWarnings} error reported");
+                foreach (var warnings in e.SequenceWarnings)
+                {
+                    _logger.Warn("=================================================");
+                    _logger.Warn(warnings.Message);
+                    _logger.Warn(warnings.StackTrace);
+                }
+                _logger.Warn("=================================================");
+            }
+
+            OnSequenceCompleted?.Invoke(sender, e);
         }
 
         private void PrepareCommunicationWithTrayApps()

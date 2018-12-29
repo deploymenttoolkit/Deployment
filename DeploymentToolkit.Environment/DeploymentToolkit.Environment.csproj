@@ -48,6 +48,7 @@
     <Compile Include="Environment.cs" />
     <Compile Include="Exceptions\DeploymentToolkitInstallPathNotFoundException.cs" />
     <Compile Include="GUI.cs" />
+    <Compile Include="MSI.cs" />
     <Compile Include="ProcessManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

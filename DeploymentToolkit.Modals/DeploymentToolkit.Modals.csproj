@@ -43,7 +43,7 @@
   <ItemGroup>
     <Compile Include="App.cs" />
     <Compile Include="IInstallUninstallSequence.cs" />
-    <Compile Include="InstallCompletedEventArgs.cs" />
+    <Compile Include="SequenceCompletedEventArgs.cs" />
     <Compile Include="ISequence.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

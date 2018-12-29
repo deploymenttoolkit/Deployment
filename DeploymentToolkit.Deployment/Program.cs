@@ -16,6 +16,8 @@ namespace DeploymentToolkit.Deployment
 {
     class Program
     {
+        public static int GlobalExitCode = (int)ExitCode.ExitOK;
+
         public static Configuration Configuration;
         public static InstallSettings InstallSettings;
 
@@ -64,9 +66,10 @@ namespace DeploymentToolkit.Deployment
         }
 
         private static MainSequence _mainSequence;
-        private static Thread BackgroundThread;
 
         private static Logger _logger = LogManager.GetCurrentClassLogger();
+
+        private static bool _sequenceCompleted = false;
 
         static void Main(string[] args)
         {
@@ -133,7 +136,7 @@ namespace DeploymentToolkit.Deployment
             }
 
             _logger.Info($"Ended {Namespace} v{Version}");
-            System.Environment.Exit((int)ExitCode.ExitOK);
+            System.Environment.Exit(GlobalExitCode);
         }
 
         private static T ReadXml<T>(string fileName)
@@ -234,28 +237,41 @@ namespace DeploymentToolkit.Deployment
                 }
 
                 _mainSequence = new MainSequence(sequence);
-                _mainSequence.OnInstallCompleted += OnInstallationCompleted;
-                BackgroundThread = new Thread(delegate ()
-                {
-                    _mainSequence.SequenceBegin();
-                });
-                BackgroundThread.Start();
+                _mainSequence.OnSequenceCompleted += OnSequenceCompleted;
+                _mainSequence.SequenceBegin();
 
                 do
                 {
                     Thread.Sleep(1000);
                 }
-                while (BackgroundThread.ThreadState == ThreadState.Running);
+                while (!_sequenceCompleted);
             }
             catch (Exception ex)
             {
                 ExitInstallation(ex, "Error during installation", ExitCode.ErrorDuringInstallation);
             }
+
+            _logger.Info("Install sequence completed");
         }
 
-        private static void OnInstallationCompleted(object sender, InstallCompletedEventArgs e)
+        private static void OnSequenceCompleted(object sender, SequenceCompletedEventArgs e)
         {
-            throw new NotImplementedException();
+            try
+            {
+                _logger.Info($"Exit code {e.ReturnCode}");
+                GlobalExitCode = e.ReturnCode;
+
+                _logger.Info("Sequence completed. Cleaning up...");
+                // TODO: Cleanup tasks??
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Error during validation of sequence completion");
+            }
+            finally
+            {
+                _sequenceCompleted = true;
+            }
         }
     }
 }

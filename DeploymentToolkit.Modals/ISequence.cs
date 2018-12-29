@@ -4,7 +4,7 @@ namespace DeploymentToolkit.Modals
 {
     public interface ISequence
     {
-        event EventHandler<InstallCompletedEventArgs> OnInstallCompleted;
+        event EventHandler<SequenceCompletedEventArgs> OnSequenceCompleted;
 
         IInstallUninstallSequence SubSequence { get; }
         void SequenceBegin();

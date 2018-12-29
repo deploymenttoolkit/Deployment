@@ -33,7 +33,11 @@
   <ItemGroup>
     <Reference Include="Microsoft.Deployment.WindowsInstaller, Version=3.0.0.0, Culture=neutral, PublicKeyToken=ce35f76fcda82bad, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Microsoft.Deployment.WindowsInstaller.dll</HintPath>
+      <HintPath>Libs\Microsoft.Deployment.WindowsInstaller.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Deployment.WindowsInstaller.Linq, Version=3.0.0.0, Culture=neutral, PublicKeyToken=ce35f76fcda82bad, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Libs\Microsoft.Deployment.WindowsInstaller.Linq.dll</HintPath>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -50,12 +54,21 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MSIInstaller.cs" />
+    <Compile Include="MSIReturnCode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DeploymentToolkit.Environment\DeploymentToolkit.Environment.csproj">
+      <Project>{94C074C7-CAE2-423E-84B7-80D5B74602BB}</Project>
+      <Name>DeploymentToolkit.Environment</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DeploymentToolkit.Installer\DeploymentToolkit.Installer.csproj">
       <Project>{d823dfad-3522-434b-b1a8-91232a1169e6}</Project>
       <Name>DeploymentToolkit.Installer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DeploymentToolkit.Modals\DeploymentToolkit.Modals.csproj">
+      <Project>{EC3FEDB7-4FC0-4DCF-A08F-F1DE2DC49E00}</Project>
+      <Name>DeploymentToolkit.Modals</Name>
     </ProjectReference>
     <ProjectReference Include="..\DeploymentToolkit.Settings\DeploymentToolkit.Settings.csproj">
       <Project>{b33801ae-9ed8-4b65-b69d-b8d0365c9427}</Project>
