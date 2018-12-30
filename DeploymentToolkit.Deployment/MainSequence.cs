@@ -13,7 +13,7 @@ namespace DeploymentToolkit.Deployment
 
         public event EventHandler<SequenceCompletedEventArgs> OnSequenceCompleted;
 
-        private PipeClient _pipeClient;
+        private PipeClientManager _pipeClient;
         private Logger _logger = LogManager.GetCurrentClassLogger();
 
         public MainSequence(IInstallUninstallSequence subSequence)
@@ -121,7 +121,7 @@ namespace DeploymentToolkit.Deployment
             _logger.Trace("Preparing communication with tray apps...");
             try
             {
-                _pipeClient = new PipeClient();
+                _pipeClient = new PipeClientManager();
                 _logger.Info("Successfully prepared communication with tray apps");
             }
             catch (Exception ex)

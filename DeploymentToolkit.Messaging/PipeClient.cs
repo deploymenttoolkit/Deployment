@@ -1,159 +1,67 @@
 ﻿using NLog;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Management;
+using System.IO;
+using System.IO.Pipes;
 
 namespace DeploymentToolkit.Messaging
 {
-    public class PipeClient : IDisposable
+    internal class PipeClient : IDisposable
     {
-        internal const string TrayAppExeName = "DeploymentToolkit.TrayApp.exe";
-        internal readonly string TrayAppExeNameLowered;
-        internal const string TrayAppExeNameWithoutExtension = "DeploymentToolkit.TrayApp";
+        internal bool IsConnected = false;
 
         private Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private ManagementEventWatcher _startWatcher;
-        private ManagementEventWatcher _stopWatcher;
+        private readonly NamedPipeClientStream _namedPipeClientStream;
 
-        private readonly object _collectionLock = new object();
-        /// <summary>
-        /// Key: ProcessID
-        /// Value: PipeClient(Manager)
-        /// </summary>
-        private Dictionary<int, PipeClientManager> _clients = new Dictionary<int, PipeClientManager>();
+        private readonly StreamReader _reader;
+        private readonly StreamWriter _writer;
 
-        public PipeClient()
+        internal PipeClient(int processId)
         {
-            TrayAppExeNameLowered = TrayAppExeName.ToLower();
+            var pipeName = $"DT_{processId}";
 
-            var processes = Process.GetProcessesByName(TrayAppExeNameWithoutExtension);
-            if(processes.Length == 0)
+            _logger.Info($"Trying to connect to {pipeName}");
+
+            try
             {
-                _logger.Info("There is currently no tray app running on this system");
+                _namedPipeClientStream = new NamedPipeClientStream(pipeName);
+                _namedPipeClientStream.Connect(10000);
+                IsConnected = true;
+
+                _logger.Info($"Successfuly connected to {pipeName}");
             }
-            else
+            catch (TimeoutException)
             {
-                _logger.Info($"Found {processes.Length} running instances of {TrayAppExeName}");
-                foreach (var process in processes)
-                {
-                    var clientPipe = new PipeClientManager(process.Id);
-                    if (clientPipe.IsConnected)
-                    {
-                        _clients.Add(
-                            process.Id,
-                            clientPipe
-                        );
-                    }
-                }
-                _logger.Info($"Successfully connected to {_clients.Count} tray apps");
+                _logger.Warn($"Connect to {pipeName} failed. Timeout after 10 seconds");
+                Dispose();
+                return;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, $"Failed to connec to {pipeName}");
+                Dispose();
+                return;
             }
 
-            _logger.Info($"Watching for new starts or stopps of {TrayAppExeName}");
-            MonitorWMI();
+            _reader = new StreamReader(_namedPipeClientStream);
+            _writer = new StreamWriter(_namedPipeClientStream)
+            {
+                AutoFlush = true
+            };
         }
 
-        private void MonitorWMI()
+        internal void SendMessage(string data)
         {
-            if(_startWatcher != null)
-            {
-                _startWatcher.Dispose();
-                _startWatcher = null;
-            }
+            if (!IsConnected)
+                return;
 
-            _startWatcher = new ManagementEventWatcher(
-                new WqlEventQuery("SELECT * FROM Win32_ProcessStartTrace")
-            );
-            _startWatcher.EventArrived += OnProcessStarted;
-            _startWatcher.Start();
-
-            _stopWatcher = new ManagementEventWatcher(
-                new WqlEventQuery("SELECT * FROM Win32_ProcessStopTrace")
-            );
-            _stopWatcher.EventArrived += OnProcessStopped;
-            _stopWatcher.Start();
-        }
-
-        private void OnProcessStarted(object sender, EventArrivedEventArgs e)
-        {
-            var processName = e.NewEvent.Properties["ProcessName"].Value.ToString();
-            _logger.Trace($"New process started: {processName}");
-            if(processName.ToLower() == TrayAppExeNameLowered)
-            {
-                _logger.Info("New Tray app started. Initiating connection...");
-                var processId = Convert.ToInt32(e.NewEvent.Properties["ProcessID"].Value);
-
-                lock (_collectionLock)
-                {
-                    try
-                    {
-                        var client = new PipeClientManager(processId);
-                        if(client.IsConnected)
-                        {
-                            _clients.Add(
-                                processId,
-                                client
-                            );
-                        }
-                    }
-                    catch(Exception ex)
-                    {
-                        _logger.Error(ex, $"Failed to process {processId}");
-                    }
-                }
-            }
-        }
-
-        private void OnProcessStopped(object sender, EventArrivedEventArgs e)
-        {
-            var processId = Convert.ToInt32(e.NewEvent.Properties["ProcessID"].Value);
-            _logger.Trace($"Process ended: {processId}");
-            if (_clients.ContainsKey(processId))
-            {
-                _logger.Info($"Tray app closed. Disposing pipe");
-                lock (_collectionLock)
-                {
-                    try
-                    {
-                        _clients[processId].Dispose();
-                        _clients.Remove(processId);
-                    }
-                    catch(Exception ex)
-                    {
-                        _logger.Error(ex, $"Failed to process {processId}");
-                    }
-                }
-            }
-        }
-
-        public void SendMessage(IMessage message)
-        {
-            var data = Serializer.SerializeMessage(message);
-            lock (_collectionLock)
-            {
-                foreach (var client in _clients.Values)
-                {
-                    client.SendMessage(data);
-                }
-            }
+            _writer.WriteLine(data);
         }
 
         public void Dispose()
         {
-            _logger.Trace("Disposing...");
-
-            _logger.Trace("Stopping WMI watchers...");
-            _startWatcher?.Dispose();
-            _stopWatcher?.Dispose();
-
-            _logger.Trace("Stopping clients...");
-            foreach(var client in _clients.Values)
-            {
-                client.Dispose();
-            }
-
-            _logger.Trace("Disposed");
+            IsConnected = false;
+            _namedPipeClientStream?.Dispose();
         }
     }
 }
