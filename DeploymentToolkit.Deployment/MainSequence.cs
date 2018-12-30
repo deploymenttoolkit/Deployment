@@ -64,12 +64,12 @@ namespace DeploymentToolkit.Deployment
             {
                 _logger.Fatal(ex, "Fatal error during execution of install/uninstall sequence");
             }
-
-            _pipeClient.Dispose();
         }
 
         public void SequenceEnd()
         {
+            _pipeClient?.Dispose();
+
             SubSequence.SequenceEnd();
         }
 
@@ -109,6 +109,9 @@ namespace DeploymentToolkit.Deployment
                 }
                 _logger.Warn("=================================================");
             }
+
+            _logger.Trace("Disconnecting from TrayApps...");
+            _pipeClient?.Dispose();
 
             OnSequenceCompleted?.Invoke(sender, e);
         }
