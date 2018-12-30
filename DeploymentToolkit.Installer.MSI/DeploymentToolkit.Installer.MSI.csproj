@@ -58,6 +58,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\DeploymentToolkit.Logging\DeploymentToolkit.Logging.csproj">
+      <Project>{8bce8c64-7c10-498f-beb2-8804b191aea7}</Project>
+      <Name>DeploymentToolkit.Logging</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DeploymentToolkit.Environment\DeploymentToolkit.Environment.csproj">
       <Project>{94C074C7-CAE2-423E-84B7-80D5B74602BB}</Project>
       <Name>DeploymentToolkit.Environment</Name>

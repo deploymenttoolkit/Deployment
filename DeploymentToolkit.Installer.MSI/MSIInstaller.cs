@@ -37,7 +37,12 @@ namespace DeploymentToolkit.Installer.MSI
                 _logger.Info("MSISettings->SupressMSIRestartReturnCode specified. Suppressing restarts after installation");
             }
 
-            _commandLine = $"/i \"{InstallSettings.CommandLine}\" {InstallSettings.Parameters} {DTEnvironment.MSI.DefaultLoggingParameters}";
+            _commandLine = $"/i \"{InstallSettings.CommandLine}\" {InstallSettings.Parameters}";
+            // Add the file name for logging
+            var logFileName = "DeploymentToolkit-MSI.log";
+            var path = System.IO.Path.Combine(Logging.LogManager.LogDirectory, logFileName);
+            // Beware the space !!!
+            _commandLine += $" {DTEnvironment.MSI.DefaultLoggingParameters} \"{path}\"";
 
             if(InstallSettings.MSISettings.SuppressReboot)
             {
