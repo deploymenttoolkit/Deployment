@@ -136,6 +136,9 @@ namespace DeploymentToolkit.Deployment
             }
 
             _logger.Info($"Ended {Namespace} v{Version}");
+#if DEBUG
+            Thread.Sleep(10000);
+#endif
             System.Environment.Exit(GlobalExitCode);
         }
 

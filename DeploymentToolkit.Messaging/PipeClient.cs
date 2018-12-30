@@ -72,16 +72,17 @@ namespace DeploymentToolkit.Messaging
                 new WqlEventQuery("SELECT * FROM Win32_ProcessStopTrace")
             );
             _stopWatcher.EventArrived += OnProcessStopped;
-            _startWatcher.Stop();
+            _stopWatcher.Start();
         }
 
         private void OnProcessStarted(object sender, EventArrivedEventArgs e)
         {
             var processName = e.NewEvent.Properties["ProcessName"].Value.ToString();
+            _logger.Trace($"New process started: {processName}");
             if(processName.ToLower() == TrayAppExeNameLowered)
             {
                 _logger.Info("New Tray app started. Initiating connection...");
-                var processId = unchecked((int)e.NewEvent.Properties["ProcessID"].Value);
+                var processId = Convert.ToInt32(e.NewEvent.Properties["ProcessID"].Value);
 
                 lock (_collectionLock)
                 {
@@ -106,8 +107,9 @@ namespace DeploymentToolkit.Messaging
 
         private void OnProcessStopped(object sender, EventArrivedEventArgs e)
         {
-            var processId = unchecked((int)e.NewEvent.Properties["ProcessID"].Value);
-            if(_clients.ContainsKey(processId))
+            var processId = Convert.ToInt32(e.NewEvent.Properties["ProcessID"].Value);
+            _logger.Trace($"Process ended: {processId}");
+            if (_clients.ContainsKey(processId))
             {
                 _logger.Info($"Tray app closed. Disposing pipe");
                 lock (_collectionLock)
