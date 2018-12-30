@@ -1,4 +1,5 @@
-﻿using NLog;
+﻿using DeploymentToolkit.Messaging.Messages;
+using NLog;
 using System;
 using System.IO;
 using System.IO.Pipes;
@@ -9,12 +10,17 @@ namespace DeploymentToolkit.Messaging
     {
         internal bool IsConnected = false;
 
+        internal int SessionId;
+        internal string Username;
+        internal string Domain;
+
         private Logger _logger = LogManager.GetCurrentClassLogger();
 
         private readonly NamedPipeClientStream _namedPipeClientStream;
 
         private readonly StreamReader _reader;
         private readonly StreamWriter _writer;
+
 
         internal PipeClient(int processId)
         {
@@ -48,6 +54,21 @@ namespace DeploymentToolkit.Messaging
             {
                 AutoFlush = true
             };
+
+            var data = _reader.ReadLine();
+            var connectMessage = Serializer.DeserializeMessage<InitialConnectMessage>(data);
+            if(connectMessage == null)
+            {
+                _logger.Error("Inital connect message was null!");
+            }
+            else
+            {
+                this.SessionId = connectMessage.SessionId;
+                this.Username = connectMessage.Username;
+                this.Domain = connectMessage.Domain;
+
+                _logger.Info($"Connected to {Username}@{Domain} on session {SessionId}");
+            }
         }
 
         internal void SendMessage(string data)

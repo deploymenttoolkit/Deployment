@@ -78,7 +78,35 @@ namespace DeploymentToolkit.Messaging
                 AutoFlush = true
             };
 
+            _logger.Trace("Sending initial connect message");
+            var user = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+            var split = user.Split('\\');
+            var connectMessage = new InitialConnectMessage()
+            {
+                Username = split[1],
+                Domain = split[0],
+                SessionId = Process.GetCurrentProcess().SessionId
+            };
+            SendMessage(connectMessage);
+
+            // Wait till the other end has read the message before processing further messages
+            _namedPipeServerStream.WaitForPipeDrain();
+
             ReadMessages();
+        }
+
+        private void SendMessage(IMessage message)
+        {
+            _logger.Info($"Sending message of type {message.MessageId}");
+            try
+            {
+                var data = Serializer.SerializeMessage(message);
+                _writer.WriteLine(data);
+            }
+            catch(Exception ex)
+            {
+                _logger.Error(ex, $"Failed to send message {message.MessageId}");
+            }
         }
 
         private async void ReadMessages()

@@ -2,6 +2,8 @@
 {
     public enum MessageId : byte
     {
+        InitialConnectMessage,
+
         CloseApplications,
 
         InstallationStarted,
