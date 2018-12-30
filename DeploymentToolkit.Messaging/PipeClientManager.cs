@@ -144,7 +144,9 @@ namespace DeploymentToolkit.Messaging
             _logger.Trace("Disposing...");
 
             _logger.Trace("Stopping WMI watchers...");
+            _startWatcher?.Stop();
             _startWatcher?.Dispose();
+            _stopWatcher?.Stop();
             _stopWatcher?.Dispose();
 
             _logger.Trace("Stopping clients...");
