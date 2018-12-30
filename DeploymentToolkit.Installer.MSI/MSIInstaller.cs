@@ -132,6 +132,11 @@ namespace DeploymentToolkit.Installer.MSI
                             _logger.Warn("MSI initiated a reboot!");
                             installCompletedEventArgs.SequenceWarnings.Add(new Exception("MSI intiated a reboot"));
                         }
+                        else if(exitCode == MSIReturnCode.ERROR_SUCCESS_REBOOT_REQUIRED && InstallSettings.MSISettings.SupressMSIRestartReturnCode)
+                        {
+                            _logger.Info($"Replacing return code with {MSIReturnCode.ERROR_SUCCESS}({(int)MSIReturnCode.ERROR_SUCCESS}) because MSISettings->SupressMSIRestartReturnCode was specified");
+                            installCompletedEventArgs.ReturnCode = (int)MSIReturnCode.ERROR_SUCCESS;
+                        }
                     }
                     break;
 
