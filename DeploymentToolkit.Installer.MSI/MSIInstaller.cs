@@ -26,6 +26,12 @@ namespace DeploymentToolkit.Installer.MSI
             if (!installSettings.CommandLine.ToLower().EndsWith(".msi"))
                 throw new Exception("MSIInstaller can only be used with MSI installations");
 
+            if(!InstallSettings.MSISettings.UseDefaultMSIParameters && string.IsNullOrEmpty(InstallSettings.Parameters))
+            {
+                _logger.Warn($"No command line specified on an MSI installation. Using default parameters ('{DTEnvironment.MSI.DefaultInstallParameters}')");
+                InstallSettings.Parameters = DTEnvironment.MSI.DefaultInstallParameters;
+            }
+
             if (InstallSettings.MSISettings.UseDefaultMSIParameters)
             {
                 _logger.Info($"MSISettings->UseDefaultMSIParameters specified. Switching Parameters from '{InstallSettings.Parameters}' to '{DTEnvironment.MSI.DefaultInstallParameters}'");
