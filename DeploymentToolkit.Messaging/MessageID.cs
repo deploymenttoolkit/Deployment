@@ -14,6 +14,8 @@
         UninstallationEnded,
         UninstallationError,
 
-        ExecutionBlocked
+        ExecutionBlocked,
+
+        DeferDeployment
     }
 }

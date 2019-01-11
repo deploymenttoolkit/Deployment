@@ -54,6 +54,7 @@
     <Compile Include="MessageId.cs" />
     <Compile Include="Messages\BasicMessage.cs" />
     <Compile Include="Messages\CloseApplicationsMessage.cs" />
+    <Compile Include="Messages\DeferMessage.cs" />
     <Compile Include="Messages\InitialConnectMessage.cs" />
     <Compile Include="PipeClientManager.cs" />
     <Compile Include="PipeClient.cs" />
