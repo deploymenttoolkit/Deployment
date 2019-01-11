@@ -51,6 +51,17 @@
     <Compile Include="MSI.cs" />
     <Compile Include="ProcessManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RegistryManager.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DeploymentToolkit.Modals\DeploymentToolkit.Modals.csproj">
+      <Project>{EC3FEDB7-4FC0-4DCF-A08F-F1DE2DC49E00}</Project>
+      <Name>DeploymentToolkit.Modals</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DeploymentToolkit.Settings\DeploymentToolkit.Settings.csproj">
+      <Project>{B33801AE-9ED8-4B65-B69D-B8D0365C9427}</Project>
+      <Name>DeploymentToolkit.Settings</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

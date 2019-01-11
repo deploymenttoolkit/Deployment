@@ -1,4 +1,7 @@
-﻿using DeploymentToolkit.DTEnvironment.Exceptions;
+﻿using DeploymentToolkit.Deployment.Settings;
+using DeploymentToolkit.Deployment.Settings.Install;
+using DeploymentToolkit.DTEnvironment.Exceptions;
+using DeploymentToolkit.Modals;
 using NLog;
 using System;
 using System.IO;
@@ -7,6 +10,11 @@ namespace DeploymentToolkit.DTEnvironment
 {
     public static partial class EnvironmentVariables
     {
+        public static IInstallUninstallSequence ActiveSequence;
+
+        public static Configuration Configuration;
+        public static InstallSettings InstallSettings;
+
         private static Logger _logger = LogManager.GetCurrentClassLogger();
 
         private static string _deploymentToolkitInstallPath = null;

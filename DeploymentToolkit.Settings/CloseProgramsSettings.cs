@@ -1,6 +1,6 @@
 ﻿using System.Xml.Serialization;
 
-namespace DeploymentToolkit.Deployment.Settings.Install
+namespace DeploymentToolkit.Deployment.Settings
 {
     public class CloseProgramsSettings
     {

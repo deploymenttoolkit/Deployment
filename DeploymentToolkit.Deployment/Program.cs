@@ -18,9 +18,6 @@ namespace DeploymentToolkit.Deployment
     {
         public static int GlobalExitCode = (int)ExitCode.ExitOK;
 
-        public static Configuration Configuration;
-        public static InstallSettings InstallSettings;
-
         private static string _namespace;
         internal static string Namespace
         {
@@ -93,7 +90,7 @@ namespace DeploymentToolkit.Deployment
                 ExitInstallation("settings.xml is missing!", ExitCode.SettingsFileMissing);
             }
 
-            Configuration = ReadXml<Configuration>("settings.xml");
+            EnvironmentVariables.Configuration = ReadXml<Configuration>("settings.xml");
 
             _logger.Trace("Successfully read settings");
 
@@ -189,50 +186,50 @@ namespace DeploymentToolkit.Deployment
         public static void Install()
         {
             _logger.Info("Detected install command line. Selected 'Install' as deployment");
-            if (Configuration.InstallSettings == null)
+            if (EnvironmentVariables.Configuration.InstallSettings == null)
             {
                 _logger.Trace("No installation arguments specified in settings.xml. Looking for install.xml");
                 if (!File.Exists("install.xml"))
                     ExitInstallation("install.xml is missing", ExitCode.InstallFileMissing);
 
                 _logger.Trace("Found install.xml. Reading...");
-                InstallSettings = ReadXml<InstallSettings>("install.xml");
+                EnvironmentVariables.InstallSettings = ReadXml<InstallSettings>("install.xml");
                 _logger.Trace("Successfully read install.xml");
             }
             else
             {
                 _logger.Trace("Install options specified inside settings.xml");
-                InstallSettings = Configuration.InstallSettings;
+                EnvironmentVariables.InstallSettings = EnvironmentVariables.Configuration.InstallSettings;
             }
 
             _logger.Info("Read install settings. Starting installation...");
             _logger.Trace("Checking CommandLine Path...");
 
             // If you specify a full path, then the length should stay the same
-            var fullPath = Path.GetFullPath(InstallSettings.CommandLine);
-            if (InstallSettings.CommandLine.Length != fullPath.Length)
+            var fullPath = Path.GetFullPath(EnvironmentVariables.InstallSettings.CommandLine);
+            if (EnvironmentVariables.InstallSettings.CommandLine.Length != fullPath.Length)
             {
                 _logger.Trace("Not a absolute path specified. Searching for file in 'Files' folder");
-                var path = Path.Combine(FilesDirectory, InstallSettings.CommandLine);
-                _logger.Trace($"Changed path from {InstallSettings.CommandLine} to {path}");
-                InstallSettings.CommandLine = path;
+                var path = Path.Combine(FilesDirectory, EnvironmentVariables.InstallSettings.CommandLine);
+                _logger.Trace($"Changed path from {EnvironmentVariables.InstallSettings.CommandLine} to {path}");
+                EnvironmentVariables.InstallSettings.CommandLine = path;
             }
 
             _logger.Trace("Verifiying that file specified in CommandLine exists...");
             // CommandLine should either specify an exe file or an msi file. Either way the file has to exist
-            if (!File.Exists(InstallSettings.CommandLine))
+            if (!File.Exists(EnvironmentVariables.InstallSettings.CommandLine))
             {
-                ExitInstallation($"File specified in CommandLine does not exists ({InstallSettings.CommandLine}). Aborting installation", ExitCode.InvalidCommandLineSpecified);
+                ExitInstallation($"File specified in CommandLine does not exists ({EnvironmentVariables.InstallSettings.CommandLine}). Aborting installation", ExitCode.InvalidCommandLineSpecified);
             }
 
             // Detecting installation type
             try
             {
                 var sequence = default(IInstallUninstallSequence);
-                if (InstallSettings.CommandLine.ToLower().EndsWith(".msi"))
+                if (EnvironmentVariables.InstallSettings.CommandLine.ToLower().EndsWith(".msi"))
                 {
                     // Microsoft Installer
-                    sequence = new MSIInstaller(InstallSettings);
+                    sequence = new MSIInstaller(EnvironmentVariables.InstallSettings);
                 }
                 else
                 {

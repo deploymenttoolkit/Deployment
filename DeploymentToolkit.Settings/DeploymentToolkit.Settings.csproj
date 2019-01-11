@@ -45,9 +45,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Install\ActiveSetupSettings.cs" />
-    <Compile Include="Install\CloseProgramsSettings.cs" />
+    <Compile Include="CloseProgramsSettings.cs" />
     <Compile Include="Configuration.cs" />
-    <Compile Include="Install\DeferSettings.cs" />
+    <Compile Include="DeferSettings.cs" />
     <Compile Include="DisplaySettings.cs" />
     <Compile Include="Install\InstallSettings.cs" />
     <Compile Include="Install\LogoffSettings.cs" />

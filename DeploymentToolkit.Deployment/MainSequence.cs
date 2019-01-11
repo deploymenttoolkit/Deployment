@@ -7,9 +7,9 @@ using System;
 
 namespace DeploymentToolkit.Deployment
 {
-    internal class MainSequence : ISequence
+    public class MainSequence : ISequence
     {
-        public IInstallUninstallSequence SubSequence { get; }
+        public IInstallUninstallSequence SubSequence { get => EnvironmentVariables.ActiveSequence; }
 
         public event EventHandler<SequenceCompletedEventArgs> OnSequenceCompleted;
 
@@ -19,7 +19,7 @@ namespace DeploymentToolkit.Deployment
         public MainSequence(IInstallUninstallSequence subSequence)
         {
             _logger.Trace("Sequence initializing...");
-            SubSequence = subSequence;
+            EnvironmentVariables.ActiveSequence = subSequence;
             _logger.Trace($"Sequence is {(subSequence is Installer.Installer ? "Install" : "Uninstall")}");
 
             _logger.Trace("Setting event...");
