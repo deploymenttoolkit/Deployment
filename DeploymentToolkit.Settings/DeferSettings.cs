@@ -14,7 +14,7 @@ namespace DeploymentToolkit.Deployment.Settings
             set 
             {
                 if(!DateTime.TryParse(value, out var date))
-                    DeadlineAsDate = DateTime.MinValue.ToShortDateString();
+                    DeadlineAsDate = DateTime.MinValue;
                 DeadlineAsDate = date;
             }
         }
