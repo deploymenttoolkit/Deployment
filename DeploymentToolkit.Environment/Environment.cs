@@ -38,5 +38,25 @@ namespace DeploymentToolkit.Environment
                 return _deploymentToolkitInstallPath;
             }
         }
+
+        public static void Initialize()
+        {
+            CheckRunningInTaskSequence();
+        }
+
+        private static void CheckRunningInTaskSequence()
+        {
+            _logger.Trace("Checking if running in TaskSequence...");
+
+            var tsEnvironment = Type.GetTypeFromProgID("Microsoft.SMS.TSEnvironment");
+            if (tsEnvironment == null)
+            {
+                _logger.Info("Couldn't load 'Microsoft.SMS.TSEnvironment' therefore we are not in a task sequence");
+                return;
+            }
+
+            _logger.Info("Successfully loaded 'Microsoft.SMS.TSEnvironment'. Task sequence mode enabled");
+            IsRunningInTaskSequence = true;
+        }
     }
 }

@@ -25,35 +25,19 @@ namespace DeploymentToolkit.Deployment
             _logger.Trace("Setting event...");
             SubSequence.OnSequenceCompleted += OnSubSequenceInstallCompleted;
 
-            _logger.Trace("Preparing environment...");
-            CheckRunningInTaskSequence();
-
-            if (DTEnvironment.GUIEnabled)
-            {
-                _logger.Info("GUI mode is enabled");
-                PrepareCommunicationWithTrayApps();
-            }
-
-            _logger.Trace("Sequence initiated");
+            _logger.Trace("Sequence initialized");
         }
 
         public void SequenceBegin()
         {
-            if(DTEnvironment.GUIEnabled)
+            _logger.Trace("Sequence started");
+
+            _logger.Trace("Preparing environment...");
+            DTEnvironment.Initialize();
+
+            if (DTEnvironment.GUIEnabled)
             {
-                var programsToClose = SubSequence.CloseProgramsSettings.Close;
-                if(programsToClose != null && programsToClose.Length > 0)
-                {
-                    var message = new CloseApplicationsMessage()
-                    {
-                        ApplicationNames = programsToClose
-                    };
-                    _pipeClient.SendMessage(message);
-                }
-#if DEBUG //&& DEBUG_GUI
-                _logger.Trace("GUI DEBUG PAUSE 5000");
-                System.Threading.Thread.Sleep(5000);
-#endif
+                PrepareGUI();
             }
 
             try
@@ -116,34 +100,48 @@ namespace DeploymentToolkit.Deployment
             OnSequenceCompleted?.Invoke(sender, e);
         }
 
-        private void PrepareCommunicationWithTrayApps()
+        public void PrepareGUI()
+        {
+            _logger.Info("GUI mode is enabled");
+
+            if (!PrepareCommunicationWithTrayApps())
+            {
+                _logger.Warn("There was an error while trying to communicate with the tray apps");
+                _logger.Warn("Switchting to non GUI mode");
+                DTEnvironment.ForceDisableGUI = true;
+                return;
+            }
+
+            var programsToClose = SubSequence.CloseProgramsSettings.Close;
+            if (programsToClose != null && programsToClose.Length > 0)
+            {
+                var message = new CloseApplicationsMessage()
+                {
+                    ApplicationNames = programsToClose
+                };
+                _pipeClient.SendMessage(message);
+            }
+
+#if DEBUG //&& DEBUG_GUI
+            _logger.Trace("GUI DEBUG PAUSE 5000");
+            System.Threading.Thread.Sleep(5000);
+#endif
+        }
+
+        private bool PrepareCommunicationWithTrayApps()
         {
             _logger.Trace("Preparing communication with tray apps...");
             try
             {
                 _pipeClient = new PipeClientManager();
                 _logger.Info("Successfully prepared communication with tray apps");
+                return true;
             }
             catch (Exception ex)
             {
                 _logger.Fatal(ex, "Failed to prepare communication with tray apps");
+                return false;
             }
-        }
-
-        private void CheckRunningInTaskSequence()
-        {
-            _logger.Trace("Checking if running in TaskSequence...");
-
-            var tsEnvironment = Type.GetTypeFromProgID("Microsoft.SMS.TSEnvironment");
-            if (tsEnvironment == null)
-            {
-                _logger.Info("Couldn't load 'Microsoft.SMS.TSEnvironment' therefore we are not in a task sequence");
-                return;
-            }
-
-            _logger.Info("Successfully loaded 'Microsoft.SMS.TSEnvironment'. Task sequence mode enabled");
-
-            DTEnvironment.IsRunningInTaskSequence = true;
         }
     }
 }
