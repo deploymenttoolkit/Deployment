@@ -45,7 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Administrator.cs" />
-    <Compile Include="Environment.cs" />
+    <Compile Include="EnvironmentVariables.cs" />
     <Compile Include="Exceptions\DeploymentToolkitInstallPathNotFoundException.cs" />
     <Compile Include="GUI.cs" />
     <Compile Include="MSI.cs" />

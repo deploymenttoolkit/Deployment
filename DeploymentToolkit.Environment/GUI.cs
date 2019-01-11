@@ -1,10 +1,10 @@
-﻿namespace DeploymentToolkit.Environment
+﻿namespace DeploymentToolkit.DTEnvironment
 {
-    public static partial class DTEnvironment
+    public static partial class EnvironmentVariables
     {
         public static bool ForceDisableGUI = false;
         public static bool IsRunningInTaskSequence = false;
-        public static bool GUIEnabled
+        public static bool IsGUIEnabled
         {
             get
             {

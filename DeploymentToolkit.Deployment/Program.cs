@@ -1,7 +1,7 @@
 ﻿using DeploymentToolkit.Deployment.Settings;
 using DeploymentToolkit.Deployment.Settings.Install;
-using DeploymentToolkit.Environment;
-using DeploymentToolkit.Environment.Exceptions;
+using DeploymentToolkit.DTEnvironment;
+using DeploymentToolkit.DTEnvironment.Exceptions;
 using DeploymentToolkit.Installer.MSI;
 using DeploymentToolkit.Modals;
 using DeploymentToolkit.Settings;
@@ -98,16 +98,16 @@ namespace DeploymentToolkit.Deployment
             _logger.Trace("Successfully read settings");
 
             _logger.Info("Verifying install dependencies ...");
-            _logger.Info($"IsAdministrator: {DTEnvironment.IsAdministrator}");
-            _logger.Info($"IsElevated: {DTEnvironment.IsElevated}");
-            if (!DTEnvironment.IsElevated)
+            _logger.Info($"IsAdministrator: {EnvironmentVariables.IsAdministrator}");
+            _logger.Info($"IsElevated: {EnvironmentVariables.IsElevated}");
+            if (!EnvironmentVariables.IsElevated)
             {
                 ExitInstallation("Program has to be run as Administrator to function properly!", ExitCode.NotElevated);
             }
 
             try
             {
-                _logger.Info($"DT-Installation Path: {DTEnvironment.DeploymentToolkitInstallPath}");
+                _logger.Info($"DT-Installation Path: {EnvironmentVariables.DeploymentToolkitInstallPath}");
             }
             catch(DeploymentToolkitInstallPathNotFoundException)
             {

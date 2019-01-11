@@ -87,9 +87,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DeploymentToolkit.Environment\DeploymentToolkit.Environment.csproj">
+    <ProjectReference Include="..\DeploymentToolkit.Environment\DeploymentToolkit.DTEnvironment.csproj">
       <Project>{94c074c7-cae2-423e-84b7-80d5b74602bb}</Project>
-      <Name>DeploymentToolkit.Environment</Name>
+      <Name>DeploymentToolkit.DTEnvironment</Name>
     </ProjectReference>
     <ProjectReference Include="..\DeploymentToolkit.Installer.MSI\DeploymentToolkit.Installer.MSI.csproj">
       <Project>{6f6770f5-a209-4a26-a6fb-9cb5122f4108}</Project>

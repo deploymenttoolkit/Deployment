@@ -50,9 +50,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DeploymentToolkit.Environment\DeploymentToolkit.Environment.csproj">
+    <ProjectReference Include="..\DeploymentToolkit.Environment\DeploymentToolkit.DTEnvironment.csproj">
       <Project>{94c074c7-cae2-423e-84b7-80d5b74602bb}</Project>
-      <Name>DeploymentToolkit.Environment</Name>
+      <Name>DeploymentToolkit.DTEnvironment</Name>
     </ProjectReference>
     <ProjectReference Include="..\DeploymentToolkit.Modals\DeploymentToolkit.Modals.csproj">
       <Project>{EC3FEDB7-4FC0-4DCF-A08F-F1DE2DC49E00}</Project>

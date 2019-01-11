@@ -1,4 +1,4 @@
-﻿using DeploymentToolkit.Environment;
+﻿using DeploymentToolkit.DTEnvironment;
 using DeploymentToolkit.Messaging;
 using DeploymentToolkit.Messaging.Messages;
 using DeploymentToolkit.Modals;
@@ -33,9 +33,9 @@ namespace DeploymentToolkit.Deployment
             _logger.Trace("Sequence started");
 
             _logger.Trace("Preparing environment...");
-            DTEnvironment.Initialize();
+            EnvironmentVariables.Initialize();
 
-            if (DTEnvironment.GUIEnabled)
+            if (EnvironmentVariables.IsGUIEnabled)
             {
                 PrepareGUI();
             }
@@ -108,7 +108,7 @@ namespace DeploymentToolkit.Deployment
             {
                 _logger.Warn("There was an error while trying to communicate with the tray apps");
                 _logger.Warn("Switchting to non GUI mode");
-                DTEnvironment.ForceDisableGUI = true;
+                EnvironmentVariables.ForceDisableGUI = true;
                 return;
             }
 

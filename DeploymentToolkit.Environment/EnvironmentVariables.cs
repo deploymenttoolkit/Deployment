@@ -1,11 +1,11 @@
-﻿using DeploymentToolkit.Environment.Exceptions;
+﻿using DeploymentToolkit.DTEnvironment.Exceptions;
 using NLog;
 using System;
 using System.IO;
 
-namespace DeploymentToolkit.Environment
+namespace DeploymentToolkit.DTEnvironment
 {
-    public static partial class DTEnvironment
+    public static partial class EnvironmentVariables
     {
         private static Logger _logger = LogManager.GetCurrentClassLogger();
 

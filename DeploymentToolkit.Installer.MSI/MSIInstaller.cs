@@ -1,5 +1,5 @@
 ﻿using DeploymentToolkit.Deployment.Settings.Install;
-using DeploymentToolkit.Environment;
+using DeploymentToolkit.DTEnvironment;
 using DeploymentToolkit.Modals;
 using NLog;
 using System;

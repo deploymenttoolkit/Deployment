@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace DeploymentToolkit.Environment
+namespace DeploymentToolkit.DTEnvironment
 {
-    public static partial class DTEnvironment
+    public static partial class EnvironmentVariables
     {
         #region DLLImports
         [DllImport("advapi32.dll", SetLastError = true)]
@@ -99,6 +95,7 @@ namespace DeploymentToolkit.Environment
                     if (!OpenProcessToken(Process.GetCurrentProcess().Handle, TOKEN_READ, out tokenHandle))
                     {
                         _logger.Error($"Failed to get process token. Win32 error: {Marshal.GetLastWin32Error()}");
+                        _isElevated = false;
                         return false;
                     }
 
@@ -144,6 +141,7 @@ namespace DeploymentToolkit.Environment
                             CloseHandle(tokenHandle);
                     }
 
+                    _isElevated = false;
                     return false;
                 }
                 catch (Exception ex)

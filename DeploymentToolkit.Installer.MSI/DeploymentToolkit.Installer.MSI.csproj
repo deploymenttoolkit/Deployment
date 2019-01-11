@@ -62,9 +62,9 @@
       <Project>{8bce8c64-7c10-498f-beb2-8804b191aea7}</Project>
       <Name>DeploymentToolkit.Logging</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DeploymentToolkit.Environment\DeploymentToolkit.Environment.csproj">
+    <ProjectReference Include="..\DeploymentToolkit.Environment\DeploymentToolkit.DTEnvironment.csproj">
       <Project>{94C074C7-CAE2-423E-84B7-80D5B74602BB}</Project>
-      <Name>DeploymentToolkit.Environment</Name>
+      <Name>DeploymentToolkit.DTEnvironment</Name>
     </ProjectReference>
     <ProjectReference Include="..\DeploymentToolkit.Installer\DeploymentToolkit.Installer.csproj">
       <Project>{d823dfad-3522-434b-b1a8-91232a1169e6}</Project>

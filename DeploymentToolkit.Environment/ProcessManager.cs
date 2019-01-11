@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -6,17 +7,21 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 
-namespace DeploymentToolkit.Environment
+namespace DeploymentToolkit.DTEnvironment
 {
-    public partial class DTEnvironment
+    public static class ProcessManager
     {
+        #region Imports
         [DllImport("user32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         static extern bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+        #endregion
+
+        private static Logger _logger = LogManager.GetCurrentClassLogger();
 
         // We probably need to extend this to 64 bit and 32 bit registry. Depending if the process is started as 64 bit or 32 bit the key is created on a differen position (WOW64Node shit)
-        private static string _blockExecutionSubKey = @"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options";
-        private static string _debuggerPath = Path.Combine(DeploymentToolkitInstallPath, "DeploymentToolkit.Debugger.exe");
+        private static readonly string _blockExecutionSubKey = @"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options";
+        private static readonly string _debuggerPath = Path.Combine(EnvironmentVariables.DeploymentToolkitInstallPath, "DeploymentToolkit.Debugger.exe");
 
         public static bool CheckPrograms(string[] applications, out List<string> openProcesses)
         {

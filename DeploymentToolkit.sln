@@ -29,7 +29,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.Logging",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.Messaging", "DeploymentToolkit.Messaging\DeploymentToolkit.Messaging.csproj", "{65AC59C5-F17A-4F96-97B2-B0ECB4304C3B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.Environment", "DeploymentToolkit.Environment\DeploymentToolkit.Environment.csproj", "{94C074C7-CAE2-423E-84B7-80D5B74602BB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.DTEnvironment", "DeploymentToolkit.Environment\DeploymentToolkit.DTEnvironment.csproj", "{94C074C7-CAE2-423E-84B7-80D5B74602BB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Installer", "Installer", "{8D8ED2C1-89A7-4A94-92F7-15E780D946B9}"
 EndProject
