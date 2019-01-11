@@ -95,7 +95,7 @@ namespace DeploymentToolkit.Messaging
             ReadMessages();
         }
 
-        private void SendMessage(IMessage message)
+        public void SendMessage(IMessage message)
         {
             _logger.Info($"Sending message of type {message.MessageId}");
             try
@@ -144,6 +144,22 @@ namespace DeploymentToolkit.Messaging
                     case MessageId.CloseApplications:
                         {
                             var message = Serializer.DeserializeMessage<CloseApplicationsMessage>(data);
+                            OnNewMessage?.BeginInvoke(
+                                this,
+                                new NewMessageEventArgs()
+                                {
+                                    MessageId = simpleMessage.MessageId,
+                                    Message = message
+                                },
+                                OnNewMessage.EndInvoke,
+                                null
+                            );
+                        }
+                        break;
+
+                    case MessageId.DeferDeployment:
+                        {
+                            var message = Serializer.DeserializeMessage<DeferMessage>(data);
                             OnNewMessage?.BeginInvoke(
                                 this,
                                 new NewMessageEventArgs()

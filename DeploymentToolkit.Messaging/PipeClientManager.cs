@@ -129,6 +129,7 @@ namespace DeploymentToolkit.Messaging
 
         public void SendMessage(IMessage message)
         {
+            _logger.Trace($"Sending {message.MessageId} to {_clients.Count} clients");
             var data = Serializer.SerializeMessage(message);
             lock (_collectionLock)
             {

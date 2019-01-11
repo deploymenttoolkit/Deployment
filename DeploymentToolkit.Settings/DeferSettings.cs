@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Xml.Serialization;
 
 namespace DeploymentToolkit.Deployment.Settings
 {
@@ -18,6 +19,7 @@ namespace DeploymentToolkit.Deployment.Settings
                 DeadlineAsDate = date;
             }
         }
+        [XmlIgnore]
         public DateTime DeadlineAsDate { get; private set; }
     }
 }

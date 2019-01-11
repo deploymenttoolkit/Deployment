@@ -1,4 +1,5 @@
 ﻿using DeploymentToolkit.DTEnvironment;
+using DeploymentToolkit.Environment;
 using DeploymentToolkit.Messaging;
 using DeploymentToolkit.Messaging.Messages;
 using DeploymentToolkit.Modals;
@@ -112,14 +113,46 @@ namespace DeploymentToolkit.Deployment
                 return;
             }
 
-            var programsToClose = SubSequence.CloseProgramsSettings.Close;
-            if (programsToClose != null && programsToClose.Length > 0)
+            if(EnvironmentVariables.ActiveSequence.DeferSettings != null)
             {
-                var message = new CloseApplicationsMessage()
+                var showDeferWindow = true;
+                var deferSettings = EnvironmentVariables.ActiveSequence.DeferSettings;
+
+                if (deferSettings.Days <= 0 && deferSettings.DeadlineAsDate == DateTime.MinValue)
                 {
-                    ApplicationNames = programsToClose
-                };
-                _pipeClient.SendMessage(message);
+                    _logger.Trace("No defer settings specified");
+                    // No defer settings specified so don't show defer window
+                    showDeferWindow = false;
+                }
+                else
+                {
+                    // There is a deadline and/or days to install specified
+                    _logger.Trace("Evaluating defer settings...");
+                    if (deferSettings.DeadlineAsDate != DateTime.MinValue && deferSettings.DeadlineAsDate < DateTime.Now)
+                    {
+                        _logger.Trace("Deadline reached. Not showing defer window");
+                        // Deadline is reached so don't show defer window
+                        showDeferWindow = false;
+                    }
+                    else if (deferSettings.Days > 0)
+                    {
+                        var remainingDays = RegistryManager.GetDeploymentRemainingDays(EnvironmentVariables.ActiveSequence.UniqueName);
+                        _logger.Trace($"{remainingDays} remaining days for user to install {EnvironmentVariables.ActiveSequence.UniqueName}");
+                        if (remainingDays <= 0)
+                        {
+                            _logger.Trace("No days left for the user to install. Not showing defer window");
+                            // There are no remaining days so don't show defer window
+                            showDeferWindow = false;
+                        }
+                    }
+                }
+
+                if(showDeferWindow)
+                {
+                    _logger.Trace("Showing defer window to user(s)");
+                    var message = new DeferMessage();
+                    _pipeClient.SendMessage(message);
+                }
             }
 
 #if DEBUG //&& DEBUG_GUI

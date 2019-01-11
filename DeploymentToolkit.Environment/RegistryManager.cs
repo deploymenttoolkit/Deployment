@@ -47,7 +47,7 @@ namespace DeploymentToolkit.Environment
             }
 
             // The current deployment is being run the first time
-            if(deploymentName == EnvironmentVariables.Configuration.Name)
+            if(deploymentName == EnvironmentVariables.ActiveSequence.UniqueName)
             {
                 _logger.Trace($"Getting remaining days of current deployment {EnvironmentVariables.ActiveSequence.DeferSettings.Days}");
 
