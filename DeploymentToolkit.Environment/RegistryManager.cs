@@ -65,10 +65,10 @@ namespace DeploymentToolkit.DTEnvironment
             if (GetDeploymentRegistryKey(deploymentName, out var registryKey))
             {
                 // This isn't the first time we are working with this deployment
-                var deploymentDeadlineString = (string)registryKey.GetValue("Deadline", string.Empty);
+                var deploymentDeadlineString = (string)registryKey.GetValue("DeploymentDeadline", string.Empty);
                 if(string.IsNullOrEmpty(deploymentDeadlineString) || !DateTime.TryParse(deploymentDeadlineString, out var deploymentDeadline))
                 {
-                    _logger.Warn($"Invalid 'Deadline' in registry or 'Deadline' not found under {_lastDeploymentRegistryKeyPath}");
+                    _logger.Warn($"Invalid 'DeploymentDeadline' in registry or 'DeploymentDeadline' not found under {_lastDeploymentRegistryKeyPath}");
                 }
                 else
                 {
