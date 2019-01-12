@@ -5,7 +5,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Pipes;
-using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -18,7 +17,8 @@ namespace DeploymentToolkit.Messaging
         private Logger _logger = LogManager.GetCurrentClassLogger();
 
         private CancellationTokenSource _cancellationToken = new CancellationTokenSource();
-        private NamedPipeServerStream _namedPipeServerStream;
+        private NamedPipeServerStream _receiverPipe;
+        private NamedPipeServerStream _senderPipe;
 
         private StreamReader _reader;
         private StreamWriter _writer;
@@ -36,7 +36,9 @@ namespace DeploymentToolkit.Messaging
 
             try
             { 
-                _namedPipeServerStream = new NamedPipeServerStream(pipeName, PipeDirection.InOut, 1, PipeTransmissionMode.Message);
+                _senderPipe = new NamedPipeServerStream($"{pipeName}_In", PipeDirection.InOut, 1, PipeTransmissionMode.Message);
+                _receiverPipe = new NamedPipeServerStream($"{pipeName}_Out", PipeDirection.InOut, 1, PipeTransmissionMode.Message);
+
                 WaitForClient();
             }
             catch(Exception ex)
@@ -52,7 +54,8 @@ namespace DeploymentToolkit.Messaging
         {
             if (!_cancellationToken.IsCancellationRequested)
                 _cancellationToken.Cancel();
-            _namedPipeServerStream?.Dispose();
+            _senderPipe?.Dispose();
+            _receiverPipe?.Dispose();
         }
 
         public async void WaitForClient()
@@ -61,19 +64,21 @@ namespace DeploymentToolkit.Messaging
             {
                 try
                 {
-                    await _namedPipeServerStream.WaitForConnectionAsync(_cancellationToken.Token);
+                    await _senderPipe.WaitForConnectionAsync(_cancellationToken.Token);
+                    await _receiverPipe.WaitForConnectionAsync(_cancellationToken.Token);
                 }
                 catch (IOException ex)
                 {
-                    _namedPipeServerStream.Disconnect();
+                    _senderPipe.Disconnect();
+                    _receiverPipe.Disconnect();
                     _logger.Info(ex, "Disconnecting pipe");
                 }
             }
-            while (!_cancellationToken.IsCancellationRequested && !_namedPipeServerStream.IsConnected);
+            while (!_cancellationToken.IsCancellationRequested && (!_senderPipe.IsConnected || !_receiverPipe.IsConnected));
             _logger.Info($"Client connected");
 
-            _reader = new StreamReader(_namedPipeServerStream);
-            _writer = new StreamWriter(_namedPipeServerStream)
+            _reader = new StreamReader(_receiverPipe);
+            _writer = new StreamWriter(_senderPipe)
             {
                 AutoFlush = true
             };
@@ -90,13 +95,18 @@ namespace DeploymentToolkit.Messaging
             SendMessage(connectMessage);
 
             // Wait till the other end has read the message before processing further messages
-            _namedPipeServerStream.WaitForPipeDrain();
+            _senderPipe.WaitForPipeDrain();
 
             ReadMessages();
         }
 
         public void SendMessage(IMessage message)
         {
+            if(!_senderPipe.IsConnected)
+            {
+                _logger.Warn("Tried to send a message while not being connected");
+                return;
+            }
             _logger.Info($"Sending message of type {message.MessageId}");
             try
             {
@@ -120,9 +130,10 @@ namespace DeploymentToolkit.Messaging
 
                 ProcessMessage(message);
             }
-            while (_namedPipeServerStream.IsConnected);
+            while (_receiverPipe.IsConnected);
             _logger.Info("Client disconnected");
-            _namedPipeServerStream.Disconnect();
+            _senderPipe.Disconnect();
+            _receiverPipe.Disconnect();
             WaitForClient();
         }
 

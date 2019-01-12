@@ -98,7 +98,7 @@ namespace DeploymentToolkit.Installer.MSI
                     new SequenceCompletedEventArgs()
                     {
                         // We don't know the exit code so it's probably a non default exit code. Meaning it probably failed
-                        InstallSuccessful = false,
+                        SequenceSuccessful = false,
                         ReturnCode = _installerProcess.ExitCode
                     },
                     OnSequenceCompleted.EndInvoke,
@@ -125,7 +125,7 @@ namespace DeploymentToolkit.Installer.MSI
                 case MSIReturnCode.ERROR_SUCCESS_REBOOT_REQUIRED:
                     {
                         _logger.Info($"Installation successful. Return code {exitCode}({_installerProcess.ExitCode})");
-                        installCompletedEventArgs.InstallSuccessful = true;
+                        installCompletedEventArgs.SequenceSuccessful = true;
 
                         if(exitCode == MSIReturnCode.ERROR_SUCCESS_REBOOT_INITIATED)
                         {
@@ -143,7 +143,7 @@ namespace DeploymentToolkit.Installer.MSI
                 default:
                     {
                         _logger.Error($"Installation failed. Return code {exitCode}({_installerProcess.ExitCode})");
-                        installCompletedEventArgs.InstallSuccessful = false;
+                        installCompletedEventArgs.SequenceSuccessful = false;
                         installCompletedEventArgs.SequenceErrors.Add(new Exception($"Install failed with code {exitCode}({(int)exitCode})"));
 
                         // Output some more information to the log file for faster troubleshooting

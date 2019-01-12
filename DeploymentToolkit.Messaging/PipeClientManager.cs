@@ -1,4 +1,5 @@
-﻿using NLog;
+﻿using DeploymentToolkit.Messaging.Events;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -8,6 +9,8 @@ namespace DeploymentToolkit.Messaging
 {
     public class PipeClientManager : IDisposable
     {
+        public event EventHandler<NewMessageEventArgs> OnNewMessage;
+
         internal const string TrayAppExeName = "DeploymentToolkit.TrayApp.exe";
         internal readonly string TrayAppExeNameLowered;
         internal const string TrayAppExeNameWithoutExtension = "DeploymentToolkit.TrayApp";
@@ -23,6 +26,9 @@ namespace DeploymentToolkit.Messaging
         /// Value: PipeClient(Manager)
         /// </summary>
         private Dictionary<int, PipeClient> _clients = new Dictionary<int, PipeClient>();
+
+        private readonly object _messageLock = new object();
+        private bool _hasReceivedDeferMessage = false;
 
         public PipeClientManager()
         {
@@ -45,6 +51,8 @@ namespace DeploymentToolkit.Messaging
                             process.Id,
                             clientPipe
                         );
+
+                        clientPipe.OnNewMessage += OnNewMessageReceived;
                     }
                 }
                 _logger.Info($"Successfully connected to {_clients.Count} tray apps");
@@ -52,6 +60,41 @@ namespace DeploymentToolkit.Messaging
 
             _logger.Info($"Watching for new starts or stopps of {TrayAppExeName}");
             MonitorWMI();
+        }
+
+        private void OnNewMessageReceived(object sender, NewMessageEventArgs e)
+        {
+            if (!(sender is PipeClient client))
+            {
+                _logger.Warn("Received message from unknown source");
+                return;
+            }
+            
+            switch(e.MessageId)
+            {
+                case MessageId.DeferDeployment:
+                    {
+                        lock (_messageLock)
+                        {
+                            if (_hasReceivedDeferMessage)
+                            {
+                                _logger.Trace($"Ignoring answer from session {client.SessionId} as there was already a prior response");
+                                return;
+                            }
+
+                            _hasReceivedDeferMessage = true;
+                        }
+
+                        // Notify our installation about the deferal
+                        OnNewMessage.BeginInvoke(
+                            client,
+                            e,
+                            OnNewMessage.EndInvoke,
+                            null
+                        );
+                    }
+                    break;
+            }
         }
 
         private void MonitorWMI()
@@ -136,6 +179,7 @@ namespace DeploymentToolkit.Messaging
                 foreach (var client in _clients.Values)
                 {
                     client.SendMessage(data);
+                    _logger.Trace($"Sent message to {client.SessionId}");
                 }
             }
         }

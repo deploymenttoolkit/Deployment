@@ -5,7 +5,7 @@ namespace DeploymentToolkit.Modals
 {
     public class SequenceCompletedEventArgs : EventArgs
     {
-        public bool InstallSuccessful { get; set; }
+        public bool SequenceSuccessful { get; set; }
         public int ReturnCode { get; set; }
 
         public int CountErrors { get => SequenceErrors?.Count ?? 0; }

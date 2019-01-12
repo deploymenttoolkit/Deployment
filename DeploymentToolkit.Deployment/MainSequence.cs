@@ -1,6 +1,6 @@
 ﻿using DeploymentToolkit.DTEnvironment;
-using DeploymentToolkit.Environment;
 using DeploymentToolkit.Messaging;
+using DeploymentToolkit.Messaging.Events;
 using DeploymentToolkit.Messaging.Messages;
 using DeploymentToolkit.Modals;
 using NLog;
@@ -38,16 +38,19 @@ namespace DeploymentToolkit.Deployment
 
             if (EnvironmentVariables.IsGUIEnabled)
             {
-                PrepareGUI();
+                EnableGUI();
             }
-
-            try
+            else
             {
-                SubSequence.SequenceBegin();
-            }
-            catch(Exception ex)
-            {
-                _logger.Fatal(ex, "Fatal error during execution of install/uninstall sequence");
+                // In non-GUI mode we just straight start the installation
+                try
+                {
+                    SubSequence.SequenceBegin();
+                }
+                catch (Exception ex)
+                {
+                    _logger.Fatal(ex, "Fatal error during execution of install/uninstall sequence");
+                }
             }
         }
 
@@ -60,7 +63,7 @@ namespace DeploymentToolkit.Deployment
 
         private void OnSubSequenceInstallCompleted(object sender, SequenceCompletedEventArgs e)
         {
-            if(e.InstallSuccessful)
+            if(e.SequenceSuccessful)
             {
                 _logger.Info("Sequence reported a successful install");
             }
@@ -101,7 +104,7 @@ namespace DeploymentToolkit.Deployment
             OnSequenceCompleted?.Invoke(sender, e);
         }
 
-        public void PrepareGUI()
+        public void EnableGUI()
         {
             _logger.Info("GUI mode is enabled");
 
@@ -113,7 +116,7 @@ namespace DeploymentToolkit.Deployment
                 return;
             }
 
-            if(EnvironmentVariables.ActiveSequence.DeferSettings != null)
+            if (EnvironmentVariables.ActiveSequence.DeferSettings != null)
             {
                 var showDeferWindow = true;
                 var deferSettings = EnvironmentVariables.ActiveSequence.DeferSettings;
@@ -154,11 +157,6 @@ namespace DeploymentToolkit.Deployment
                     _pipeClient.SendMessage(message);
                 }
             }
-
-#if DEBUG //&& DEBUG_GUI
-            _logger.Trace("GUI DEBUG PAUSE 5000");
-            System.Threading.Thread.Sleep(5000);
-#endif
         }
 
         private bool PrepareCommunicationWithTrayApps()
@@ -167,6 +165,7 @@ namespace DeploymentToolkit.Deployment
             try
             {
                 _pipeClient = new PipeClientManager();
+                _pipeClient.OnNewMessage += OnNewMessage;
                 _logger.Info("Successfully prepared communication with tray apps");
                 return true;
             }
@@ -174,6 +173,29 @@ namespace DeploymentToolkit.Deployment
             {
                 _logger.Fatal(ex, "Failed to prepare communication with tray apps");
                 return false;
+            }
+        }
+
+        private void OnNewMessage(object sender, NewMessageEventArgs e)
+        {
+            _logger.Trace($"Receive message of type {e.MessageId}");
+
+            switch(e.MessageId)
+            {
+                case MessageId.DeferDeployment:
+                    {
+                        // User has choosen to defer deployment
+                        _logger.Info("User choose to defer deployment. Saving defer state...");
+                        RegistryManager.SaveDeploymentDeferalSettings();
+                        _logger.Info("Notifying deployment process about deferal");
+
+                        OnSequenceCompleted.Invoke(this, new SequenceCompletedEventArgs()
+                        {
+                            SequenceSuccessful = true,
+                            ReturnCode = 1618 //Fast-Retry -> installation is not shown as failed in sccm for example
+                        });
+                    }
+                    break;
             }
         }
     }

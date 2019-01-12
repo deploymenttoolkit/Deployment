@@ -7,8 +7,8 @@
     <ProjectGuid>{94C074C7-CAE2-423E-84B7-80D5B74602BB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DeploymentToolkit.Environment</RootNamespace>
-    <AssemblyName>DeploymentToolkit.Environment</AssemblyName>
+    <RootNamespace>DeploymentToolkit.DTEnvironment</RootNamespace>
+    <AssemblyName>DeploymentToolkit.DTEnvironment</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>

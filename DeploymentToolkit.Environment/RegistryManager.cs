@@ -1,10 +1,9 @@
-﻿using DeploymentToolkit.DTEnvironment;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using NLog;
 using System;
 using System.IO;
 
-namespace DeploymentToolkit.Environment
+namespace DeploymentToolkit.DTEnvironment
 {
     public static class RegistryManager
     {
@@ -40,7 +39,7 @@ namespace DeploymentToolkit.Environment
                 }
                 else
                 {
-                    var remainingDays = (int)Math.Floor((deploymentEndDay - DateTime.Now).TotalDays);
+                    var remainingDays = (int)Math.Ceiling((deploymentEndDay - DateTime.Now).TotalDays);
                     _logger.Trace($"{remainingDays} remaining days for deployment {deploymentName}");
                     return remainingDays;
                 }
@@ -90,7 +89,7 @@ namespace DeploymentToolkit.Environment
             return null;
         }
 
-        private static void SaveDeploymentDeferalSettings()
+        public static void SaveDeploymentDeferalSettings()
         {
             var uniqueName = EnvironmentVariables.ActiveSequence.UniqueName;
             var deferalSettings = EnvironmentVariables.ActiveSequence.DeferSettings;
