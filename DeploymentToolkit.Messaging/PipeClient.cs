@@ -12,7 +12,7 @@ namespace DeploymentToolkit.Messaging
     {
         internal event EventHandler<NewMessageEventArgs> OnNewMessage;
 
-        internal bool IsConnected = false;
+        public bool IsConnected = false;
 
         internal int SessionId;
         internal string Username;
@@ -118,6 +118,22 @@ namespace DeploymentToolkit.Messaging
                         case MessageId.DeferDeployment:
                             {
                                 var message = Serializer.DeserializeMessage<CloseApplicationsMessage>(data);
+                                OnNewMessage?.BeginInvoke(
+                                    this,
+                                    new NewMessageEventArgs()
+                                    {
+                                        MessageId = basicMessage.MessageId,
+                                        Message = message
+                                    },
+                                    OnNewMessage.EndInvoke,
+                                    null
+                                );
+                            }
+                            break;
+
+                        case MessageId.ContinueDeployment:
+                            {
+                                var message = Serializer.DeserializeMessage<ContinueMessage>(data);
                                 OnNewMessage?.BeginInvoke(
                                     this,
                                     new NewMessageEventArgs()

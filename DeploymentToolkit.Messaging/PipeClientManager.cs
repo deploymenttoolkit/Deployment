@@ -1,4 +1,6 @@
 ﻿using DeploymentToolkit.Messaging.Events;
+using DeploymentToolkit.Messaging.Messages;
+using DeploymentToolkit.Modals;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -9,6 +11,8 @@ namespace DeploymentToolkit.Messaging
 {
     public class PipeClientManager : IDisposable
     {
+
+        public int ConnectedClients => _clients.Count;
         public event EventHandler<NewMessageEventArgs> OnNewMessage;
 
         internal const string TrayAppExeName = "DeploymentToolkit.TrayApp.exe";
@@ -72,6 +76,40 @@ namespace DeploymentToolkit.Messaging
             
             switch(e.MessageId)
             {
+                case MessageId.ContinueDeployment:
+                    {
+                        var message = e.Message as ContinueMessage;
+                        lock(_messageLock)
+                        {
+                            if(message.DeploymentStep == DeploymentStep.DeferDeployment)
+                            {
+                                if(_hasReceivedDeferMessage)
+                                {
+                                    _logger.Trace($"Ignoring answer from session {client.SessionId} as there was already a prior response");
+                                    return;
+                                }
+
+                                _hasReceivedDeferMessage = true;
+                            }
+                            else if(message.DeploymentStep == DeploymentStep.CloseApplications)
+                            {
+                                // TODO
+                            }
+                            else if(message.DeploymentStep == DeploymentStep.Restart)
+                            {
+                                // TODO
+                            }
+                        }
+
+                        OnNewMessage.BeginInvoke(
+                            client,
+                            e,
+                            OnNewMessage.EndInvoke,
+                            null
+                        );
+                    }
+                    break;
+
                 case MessageId.DeferDeployment:
                     {
                         lock (_messageLock)

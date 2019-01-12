@@ -36,11 +36,11 @@ namespace DeploymentToolkit.DTEnvironment
             foreach (var executable in applications)
             {
                 var executableName = executable.ToLower();
-                if (executable.EndsWith(".exe"))
-                    executable.Substring(0, executable.Length - 3);
+                if (executableName.EndsWith(".exe"))
+                    executableName = executableName.Substring(0, executableName.Length - 4);
 
-                _logger.Trace($"Searching for a process named {executable}");
-                var processes = Process.GetProcessesByName(executable);
+                _logger.Trace($"Searching for a process named {executableName}");
+                var processes = Process.GetProcessesByName(executableName);
                 if (processes.Length > 0)
                 {
                     openProcesses.AddRange(
@@ -67,11 +67,11 @@ namespace DeploymentToolkit.DTEnvironment
                 try
                 {
                     var executableName = executable.ToLower();
-                    if (executable.EndsWith(".exe"))
-                        executable.Substring(0, executable.Length - 3);
+                    if (executableName.EndsWith(".exe"))
+                        executableName = executableName.Substring(0, executableName.Length - 4);
 
-                    _logger.Trace($"Searching for a process named {executable}");
-                    var processes = Process.GetProcessesByName(executable);
+                    _logger.Trace($"Searching for a process named {executableName}");
+                    var processes = Process.GetProcessesByName(executableName);
                     if (processes.Length > 0)
                     {
                         foreach (var process in processes)
@@ -108,7 +108,7 @@ namespace DeploymentToolkit.DTEnvironment
             try
             {
                 _logger.Trace("Opening registry");
-                var registry = Registry.LocalMachine.OpenSubKey(_blockExecutionSubKey);
+                var registry = Registry.LocalMachine.OpenSubKey(_blockExecutionSubKey, true);
                 if (registry == null)
                 {
                     _logger.Error("Failed to open registry");
@@ -160,7 +160,7 @@ namespace DeploymentToolkit.DTEnvironment
             try
             {
                 _logger.Trace("Opening registry");
-                var registry = Registry.LocalMachine.OpenSubKey(_blockExecutionSubKey);
+                var registry = Registry.LocalMachine.OpenSubKey(_blockExecutionSubKey, true);
                 if (registry == null)
                 {
                     _logger.Error("Failed to open registry");
