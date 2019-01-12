@@ -4,8 +4,6 @@
     {
         InitialConnectMessage,
 
-        CloseApplications,
-
         InstallationStarted,
         InstallationEnded,
         InstallationError,
@@ -16,6 +14,9 @@
 
         ExecutionBlocked,
 
-        DeferDeployment
+        ContinueDeployment,
+
+        DeferDeployment,
+        CloseApplications
     }
 }

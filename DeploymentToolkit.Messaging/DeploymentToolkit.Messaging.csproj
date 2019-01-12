@@ -54,6 +54,7 @@
     <Compile Include="MessageId.cs" />
     <Compile Include="Messages\BasicMessage.cs" />
     <Compile Include="Messages\CloseApplicationsMessage.cs" />
+    <Compile Include="Messages\ContinueMessage.cs" />
     <Compile Include="Messages\DeferMessage.cs" />
     <Compile Include="Messages\InitialConnectMessage.cs" />
     <Compile Include="PipeClientManager.cs" />
@@ -64,6 +65,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DeploymentToolkit.Modals\DeploymentToolkit.Modals.csproj">
+      <Project>{EC3FEDB7-4FC0-4DCF-A08F-F1DE2DC49E00}</Project>
+      <Name>DeploymentToolkit.Modals</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

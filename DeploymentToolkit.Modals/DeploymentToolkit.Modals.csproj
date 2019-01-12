@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.cs" />
+    <Compile Include="DeploymentStep.cs" />
     <Compile Include="IInstallUninstallSequence.cs" />
     <Compile Include="Language.cs" />
     <Compile Include="SequenceCompletedEventArgs.cs" />
