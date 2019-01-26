@@ -249,7 +249,15 @@ namespace DeploymentToolkit.Deployment
             if (showDeferWindow)
             {
                 _logger.Trace("Showing defer window to user(s)");
-                var message = new DeferMessage();
+                var remainingDays = RegistryManager.GetDeploymentRemainingDays(EnvironmentVariables.ActiveSequence.UniqueName);
+                if (!remainingDays.HasValue)
+                    remainingDays = -1;
+
+                var message = new DeferMessage()
+                {
+                    DeadLine = deferSettings.DeadlineAsDate,
+                    RemainingDays = remainingDays.Value
+                };
                 _pipeClient.SendMessage(message);
             }
 

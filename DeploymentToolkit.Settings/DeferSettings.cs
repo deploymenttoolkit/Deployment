@@ -5,7 +5,7 @@ namespace DeploymentToolkit.Deployment.Settings
 {
     public class DeferSettings
     {
-        public int Days { get; set; }
+        public int Days { get; set; } = -1;
         public string Deadline
         {
             get
