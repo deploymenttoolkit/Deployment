@@ -105,59 +105,65 @@ namespace DeploymentToolkit.Messaging
         {
             try
             {
-                _logger.Trace("Waiting for new messages ...");
-                var data = await _reader.ReadLineAsync();
-                _logger.Trace($"Received message from tray app ({data})");
-
-                try
+                do
                 {
-                    var basicMessage = Serializer.DeserializeMessage<BasicMessage>(data);
-                    _logger.Trace($"Received {basicMessage.MessageId}");
-                    switch (basicMessage.MessageId)
+                    _logger.Trace("Waiting for new messages ...");
+                    var data = await _reader.ReadLineAsync();
+                    if (string.IsNullOrEmpty(data))
+                        continue;
+                    _logger.Trace($"Received message from tray app ({data})");
+
+                    try
                     {
-                        case MessageId.DeferDeployment:
-                            {
-                                var message = Serializer.DeserializeMessage<CloseApplicationsMessage>(data);
-                                OnNewMessage?.BeginInvoke(
-                                    this,
-                                    new NewMessageEventArgs()
-                                    {
-                                        MessageId = basicMessage.MessageId,
-                                        Message = message
-                                    },
-                                    OnNewMessage.EndInvoke,
-                                    null
-                                );
-                            }
-                            break;
+                        var basicMessage = Serializer.DeserializeMessage<BasicMessage>(data);
+                        _logger.Trace($"Received {basicMessage.MessageId}");
+                        switch (basicMessage.MessageId)
+                        {
+                            case MessageId.DeferDeployment:
+                                {
+                                    var message = Serializer.DeserializeMessage<CloseApplicationsMessage>(data);
+                                    OnNewMessage?.BeginInvoke(
+                                        this,
+                                        new NewMessageEventArgs()
+                                        {
+                                            MessageId = basicMessage.MessageId,
+                                            Message = message
+                                        },
+                                        OnNewMessage.EndInvoke,
+                                        null
+                                    );
+                                }
+                                break;
 
-                        case MessageId.ContinueDeployment:
-                            {
-                                var message = Serializer.DeserializeMessage<ContinueMessage>(data);
-                                OnNewMessage?.BeginInvoke(
-                                    this,
-                                    new NewMessageEventArgs()
-                                    {
-                                        MessageId = basicMessage.MessageId,
-                                        Message = message
-                                    },
-                                    OnNewMessage.EndInvoke,
-                                    null
-                                );
-                            }
-                            break;
+                            case MessageId.ContinueDeployment:
+                                {
+                                    var message = Serializer.DeserializeMessage<ContinueMessage>(data);
+                                    OnNewMessage?.BeginInvoke(
+                                        this,
+                                        new NewMessageEventArgs()
+                                        {
+                                            MessageId = basicMessage.MessageId,
+                                            Message = message
+                                        },
+                                        OnNewMessage.EndInvoke,
+                                        null
+                                    );
+                                }
+                                break;
 
-                        default:
-                            {
-                                _logger.Warn($"Unhandeld message of type {basicMessage.MessageId}");
-                            }
-                            break;
+                            default:
+                                {
+                                    _logger.Warn($"Unhandeld message of type {basicMessage.MessageId}");
+                                }
+                                break;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.Error(ex, "Failed to parse message");
                     }
                 }
-                catch (Exception ex)
-                {
-                    _logger.Error(ex, "Failed to parse message");
-                }
+                while (_receiverPipe.IsConnected);
             }
             catch (ThreadAbortException) { }
             catch(Exception ex)
