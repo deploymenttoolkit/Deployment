@@ -186,7 +186,7 @@ namespace DeploymentToolkit.DTEnvironment
                             registry.DeleteSubKeyTree(executableName);
                         }
                         else
-                            _logger.Trace($"No key for {executableName} found. Nothing to unblock ... ?");
+                            _logger.Trace($"No key for {executableName} found. Nothing to unblock");
 
                         registry.Flush();
                     }

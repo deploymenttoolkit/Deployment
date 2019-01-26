@@ -53,59 +53,82 @@ namespace DeploymentToolkit.Deployment
 
         private void OnSubSequenceInstallCompleted(object sender, SequenceCompletedEventArgs e)
         {
+            if(e.SequenceSuccessful)
+            {
+                _logger.Info("Sequence reported a successful install");
+
+                if (EnvironmentVariables.ActiveSequence.DeferSettings != null)
+                {
+                    // delete deferal settings from registry as we have a successfull installation
+                    _logger.Trace("Removing deferal settings from registry ...");
+                    RegistryManager.RemoveDeploymentDeferalSettings();
+                }
+            }
+            else
+            {
+                _logger.Error("Sequence reported errors during installation");
+
+                if (e.CountErrors > 0)
+                {
+                    _logger.Error("=================================================");
+                    _logger.Error($"{e.CountErrors} error reported");
+                    foreach (var error in e.SequenceErrors)
+                    {
+                        _logger.Error("=================================================");
+                        _logger.Error(error.Message);
+                        _logger.Error(error.StackTrace);
+                    }
+                    _logger.Error("=================================================");
+                }
+
+                if (e.CountWarnings > 0)
+                {
+                    _logger.Warn("=================================================");
+                    _logger.Warn($"{e.CountWarnings} error reported");
+                    foreach (var warnings in e.SequenceWarnings)
+                    {
+                        _logger.Warn("=================================================");
+                        _logger.Warn(warnings.Message);
+                        _logger.Warn(warnings.StackTrace);
+                    }
+                    _logger.Warn("=================================================");
+                }
+            }
+
+            Cleanup();
+
+            OnSequenceCompleted?.Invoke(sender, e);
+        }
+
+        private void Cleanup()
+        {
+            _logger.Trace("Performing cleanup tasks ...");
+
             var closeProgramSettings = EnvironmentVariables.ActiveSequence.CloseProgramsSettings;
-            if(closeProgramSettings != null && closeProgramSettings.DisableStartDuringInstallation && closeProgramSettings.Close.Length > 0)
+            if (closeProgramSettings != null && closeProgramSettings.DisableStartDuringInstallation && closeProgramSettings.Close.Length > 0)
             {
                 try
                 {
                     _logger.Info("Unblocking execution of apps ...");
                     ProcessManager.UnblockExecution(closeProgramSettings.Close);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     _logger.Error(ex, "Failed to unblock blocked applications");
                 }
             }
 
-            if(e.SequenceSuccessful)
+            try
             {
-                _logger.Info("Sequence reported a successful install");
+                _logger.Trace("Disconnecting from TrayApps...");
+                _pipeClient?.Dispose();
             }
-            else
+            catch(Exception ex)
             {
-                _logger.Error("Sequence reported errors during installation");
-            }
-
-            if(e.CountErrors > 0)
-            {
-                _logger.Error("=================================================");
-                _logger.Error($"{e.CountErrors} error reported");
-                foreach (var error in e.SequenceErrors)
-                {
-                    _logger.Error("=================================================");
-                    _logger.Error(error.Message);
-                    _logger.Error(error.StackTrace);
-                }
-                _logger.Error("=================================================");
+                _logger.Error(ex, "Failed to disconnect from TrayApps");
             }
 
-            if (e.CountWarnings > 0)
-            {
-                _logger.Warn("=================================================");
-                _logger.Warn($"{e.CountWarnings} error reported");
-                foreach (var warnings in e.SequenceWarnings)
-                {
-                    _logger.Warn("=================================================");
-                    _logger.Warn(warnings.Message);
-                    _logger.Warn(warnings.StackTrace);
-                }
-                _logger.Warn("=================================================");
-            }
-
-            _logger.Trace("Disconnecting from TrayApps...");
-            _pipeClient?.Dispose();
-
-            OnSequenceCompleted?.Invoke(sender, e);
+            _logger.Trace("Successfully performed cleanup task");
         }
 
         public bool EnableGUI()
@@ -272,6 +295,8 @@ namespace DeploymentToolkit.Deployment
                         _logger.Info("User choose to defer deployment. Saving defer state...");
                         RegistryManager.SaveDeploymentDeferalSettings();
                         _logger.Info("Notifying deployment process about deferal");
+
+                        Cleanup();
 
                         OnSequenceCompleted.Invoke(this, new SequenceCompletedEventArgs()
                         {

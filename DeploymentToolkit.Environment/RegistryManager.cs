@@ -127,5 +127,29 @@ namespace DeploymentToolkit.DTEnvironment
 
             _logger.Trace("Successfully saved deferal settings to registry");
         }
+
+        public static void RemoveDeploymentDeferalSettings()
+        {
+            var uniqueName = EnvironmentVariables.ActiveSequence.UniqueName;
+            var deploymentExists = GetDeploymentRegistryKey(uniqueName, out _);
+            var deploymentRegistryPath = _lastDeploymentRegistryKeyPath;
+
+            if (deploymentExists)
+            {
+                _logger.Trace($"{deploymentRegistryPath} exists. Deleting...");
+                try
+                {
+                    Registry.LocalMachine.DeleteSubKey(deploymentRegistryPath);
+                }
+                catch(Exception ex)
+                {
+                    _logger.Error(ex, $"Error while trying to delete deferal settings for {uniqueName} -> {deploymentRegistryPath}");
+                }
+            }
+            else
+            {
+                _logger.Trace($"No deferal settings found in registry for deployment {uniqueName}. Nothing to delete ...");
+            }
+        }
     }
 }
