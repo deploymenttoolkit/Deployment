@@ -278,7 +278,8 @@ namespace DeploymentToolkit.Deployment
                 _logger.Trace("Showing close applications window to user(s)");
                 var message = new CloseApplicationsMessage()
                 {
-                    ApplicationNames = closeApplicationsSettings.Close
+                    ApplicationNames = closeApplicationsSettings.Close,
+                    TimeUntilForceClose  = closeApplicationsSettings.TimeUntilForcedClose
                 };
                 _pipeClient.SendMessage(message);
             }
