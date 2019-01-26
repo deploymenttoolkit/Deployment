@@ -319,7 +319,10 @@ namespace DeploymentToolkit.Deployment
                             if (settings.DisableStartDuringInstallation)
                             {
                                 _logger.Trace("Blocking execution of apps ...");
-                                ProcessManager.BlockExecution(settings.Close);
+                                if (!ProcessManager.BlockExecution(settings.Close))
+                                    _logger.Warn("Error while trying to block execution of apps");
+                                else
+                                    _logger.Trace("Successfully blocked execution of apps");
                             }
 
                             // If no applications are running, then proceed with installation
