@@ -10,6 +10,7 @@ namespace DeploymentToolkit.DTEnvironment
 {
     public static partial class EnvironmentVariables
     {
+        public static SequenceType ActiveSequenceType;
         public static IInstallUninstallSequence ActiveSequence;
 
         public static Configuration Configuration;

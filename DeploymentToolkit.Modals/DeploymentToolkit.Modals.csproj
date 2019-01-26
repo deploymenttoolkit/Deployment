@@ -48,6 +48,7 @@
     <Compile Include="SequenceCompletedEventArgs.cs" />
     <Compile Include="ISequence.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SequenceType.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DeploymentToolkit.Settings\DeploymentToolkit.Settings.csproj">

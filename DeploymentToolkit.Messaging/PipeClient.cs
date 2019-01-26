@@ -1,4 +1,5 @@
-﻿using DeploymentToolkit.Messaging.Events;
+﻿using DeploymentToolkit.DTEnvironment;
+using DeploymentToolkit.Messaging.Events;
 using DeploymentToolkit.Messaging.Messages;
 using NLog;
 using System;
@@ -81,6 +82,16 @@ namespace DeploymentToolkit.Messaging
 
                 _logger.Info($"Connected to {Username}@{Domain} on session {SessionId}");
 
+                _logger.Trace("Sending DeploymentInformationMessage ...");
+                var message = new DeploymentInformationMessage()
+                {
+                    SequenceType = EnvironmentVariables.ActiveSequenceType,
+                    DeploymentName = EnvironmentVariables.Configuration.Name
+                };
+                var messageData = Serializer.SerializeMessage(message);
+                SendMessage(messageData);
+
+                _logger.Trace("Starting background worker ...");
                 _backgroundWorker = new Thread(delegate()
                 {
                     Receive();

@@ -69,9 +69,17 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DeploymentToolkit.Environment\DeploymentToolkit.DTEnvironment.csproj">
+      <Project>{94C074C7-CAE2-423E-84B7-80D5B74602BB}</Project>
+      <Name>DeploymentToolkit.DTEnvironment</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DeploymentToolkit.Modals\DeploymentToolkit.Modals.csproj">
       <Project>{EC3FEDB7-4FC0-4DCF-A08F-F1DE2DC49E00}</Project>
       <Name>DeploymentToolkit.Modals</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DeploymentToolkit.Settings\DeploymentToolkit.Settings.csproj">
+      <Project>{B33801AE-9ED8-4B65-B69D-B8D0365C9427}</Project>
+      <Name>DeploymentToolkit.Settings</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -12,18 +12,11 @@
         DeploymentInformationMessage,
 
         // Server  -> Client
-        InstallationStarted,
+        DeploymentStarted,
         // Server  -> Client
-        InstallationEnded,
+        DeploymentSuccess,
         // Server  -> Client
-        InstallationError,
-
-        // Server  -> Client
-        UninstallationStarted,
-        // Server  -> Client
-        UninstallationEnded,
-        // Server  -> Client
-        UninstallationError,
+        DeploymentError,
 
         // IFEObl  -> Server
         // Server  -> Client

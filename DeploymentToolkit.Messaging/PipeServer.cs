@@ -152,6 +152,40 @@ namespace DeploymentToolkit.Messaging
 
                 switch (simpleMessage.MessageId)
                 {
+                    case MessageId.DeploymentInformationMessage:
+                        {
+                            var message = Serializer.DeserializeMessage<DeploymentInformationMessage>(data);
+                            OnNewMessage?.BeginInvoke(
+                                this,
+                                new NewMessageEventArgs()
+                                {
+                                    MessageId = simpleMessage.MessageId,
+                                    Message = message
+                                },
+                                OnNewMessage.EndInvoke,
+                                null
+                            );
+                        }
+                        break;
+
+                    case MessageId.DeploymentStarted:
+                    case MessageId.DeploymentSuccess:
+                    case MessageId.DeploymentError:
+                        {
+                            // We don't need special parsing of these messages so just straight send them through
+                            OnNewMessage?.BeginInvoke(
+                                this,
+                                new NewMessageEventArgs()
+                                {
+                                    MessageId = simpleMessage.MessageId,
+                                    Message = simpleMessage
+                                },
+                                OnNewMessage.EndInvoke,
+                                null
+                            );
+                        }
+                        break;
+
                     case MessageId.CloseApplications:
                         {
                             var message = Serializer.DeserializeMessage<CloseApplicationsMessage>(data);

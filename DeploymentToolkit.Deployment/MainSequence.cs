@@ -22,7 +22,8 @@ namespace DeploymentToolkit.Deployment
         {
             _logger.Trace("Sequence initializing...");
             EnvironmentVariables.ActiveSequence = subSequence;
-            _logger.Trace($"Sequence is {(subSequence is Installer.Installer ? "Install" : "Uninstall")}");
+            EnvironmentVariables.ActiveSequenceType = subSequence is Installer.Installer ? SequenceType.Installation : SequenceType.Uninstallation;
+            _logger.Trace($"Sequence is {EnvironmentVariables.ActiveSequenceType}");
 
             _logger.Trace("Setting event...");
             SubSequence.OnSequenceCompleted += OnSubSequenceInstallCompleted;
@@ -40,7 +41,7 @@ namespace DeploymentToolkit.Deployment
             if (!EnableGUI())
             {
                 // In non-GUI mode we just straight start the installation
-                StartInstallation();
+                StartDeployment();
             }
         }
 
@@ -62,6 +63,12 @@ namespace DeploymentToolkit.Deployment
                     // delete deferal settings from registry as we have a successfull installation
                     _logger.Trace("Removing deferal settings from registry ...");
                     RegistryManager.RemoveDeploymentDeferalSettings();
+                }
+
+                if(EnvironmentVariables.IsGUIEnabled)
+                {
+                    // Informing tray apps about successful installation
+                    _pipeClient.SendMessage(new BasicMessage(MessageId.DeploymentSuccess));
                 }
             }
             else
@@ -92,6 +99,12 @@ namespace DeploymentToolkit.Deployment
                         _logger.Warn(warnings.StackTrace);
                     }
                     _logger.Warn("=================================================");
+                }
+
+                if (EnvironmentVariables.IsGUIEnabled)
+                {
+                    // Informing tray apps about failed installation
+                    _pipeClient.SendMessage(new BasicMessage(MessageId.DeploymentError));
                 }
             }
 
@@ -167,11 +180,11 @@ namespace DeploymentToolkit.Deployment
                 return true;
 
             // Otherwise continue with installation
-            StartInstallation();
+            StartDeployment();
             return true;
         }
 
-        private void StartInstallation()
+        private void StartDeployment()
         {
             Task.Factory.StartNew(delegate ()
             {
@@ -182,16 +195,18 @@ namespace DeploymentToolkit.Deployment
                     if(EnvironmentVariables.IsGUIEnabled)
                     {
                         _logger.Trace("Informing tray apps about installation start");
-                        _pipeClient.SendMessage(new ShowBalloonTipMessage()
-                        {
-
-                        });
+                        _pipeClient.SendMessage(new BasicMessage(MessageId.DeploymentStarted));
                     }
 
                     SubSequence.SequenceBegin();
                 }
                 catch(Exception ex)
                 {
+                    if(EnvironmentVariables.IsGUIEnabled)
+                    {
+                        _logger.Trace("Informing tray apps about installation error");
+                        _pipeClient.SendMessage(new BasicMessage(MessageId.DeploymentError));
+                    }
                     _logger.Error(ex, "Error during installation");
                 }
             }, TaskCreationOptions.LongRunning);
@@ -334,7 +349,7 @@ namespace DeploymentToolkit.Deployment
                                 return;
 
                             // If no applications are running, then proceed with installation
-                            StartInstallation();
+                            StartDeployment();
                         }
                         else if(message.DeploymentStep == DeploymentStep.DeferDeployment)
                         {
@@ -345,7 +360,7 @@ namespace DeploymentToolkit.Deployment
                                 return;
 
                             // If no applications are running, then proceed with installation
-                            StartInstallation();
+                            StartDeployment();
                         }
                         else if(message.DeploymentStep == DeploymentStep.CloseApplications)
                         {
@@ -362,7 +377,7 @@ namespace DeploymentToolkit.Deployment
                             }
 
                             // If no applications are running, then proceed with installation
-                            StartInstallation();
+                            StartDeployment();
                         }
                         else if(message.DeploymentStep == DeploymentStep.Restart)
                         {
