@@ -136,7 +136,7 @@ namespace DeploymentToolkit.Deployment
 #if DEBUG
             Thread.Sleep(10000);
 #endif
-            System.Environment.Exit(GlobalExitCode);
+            Environment.Exit(GlobalExitCode);
         }
 
         private static T ReadXml<T>(string fileName)
@@ -166,7 +166,7 @@ namespace DeploymentToolkit.Deployment
 #if DEBUG
             Console.ReadKey();
 #endif
-            System.Environment.Exit((int)exitCode);
+            Environment.Exit((int)exitCode);
         }
 
         private static void ExitInstallation(Exception exception, string message, ExitCode exitCode)
@@ -175,7 +175,7 @@ namespace DeploymentToolkit.Deployment
 #if DEBUG
             Console.ReadKey();
 #endif
-            System.Environment.Exit((int)exitCode);
+            Environment.Exit((int)exitCode);
         }
         
         public static void Uninstall()
