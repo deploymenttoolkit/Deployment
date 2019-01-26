@@ -14,6 +14,8 @@
 
         ExecutionBlocked,
 
+        ShowBalloonTip,
+
         ContinueDeployment,
 
         DeferDeployment,
