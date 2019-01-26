@@ -3,6 +3,7 @@
     public enum MessageId : byte
     {
         InitialConnectMessage,
+        DeploymentInformationMessage,
 
         InstallationStarted,
         InstallationEnded,

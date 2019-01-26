@@ -151,6 +151,7 @@ namespace DeploymentToolkit.Deployment
 
             if(_pipeClient.ConnectedClients == 0)
             {
+                // TODO: We are watching for starts and exits of the tray app. Maybe this is a bad idea to just assume no tray app will ever run during the installation ...
                 _logger.Warn("No tray apps running. Can't continue with GUI deployment");
                 _logger.Warn("Disabling GUI mode");
                 EnvironmentVariables.ForceDisableGUI = true;
@@ -177,6 +178,16 @@ namespace DeploymentToolkit.Deployment
                 try
                 {
                     _logger.Info("Starting deployment ...");
+
+                    if(EnvironmentVariables.IsGUIEnabled)
+                    {
+                        _logger.Trace("Informing tray apps about installation start");
+                        _pipeClient.SendMessage(new ShowBalloonTipMessage()
+                        {
+
+                        });
+                    }
+
                     SubSequence.SequenceBegin();
                 }
                 catch(Exception ex)
