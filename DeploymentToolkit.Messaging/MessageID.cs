@@ -18,8 +18,7 @@
         // Server  -> Client
         DeploymentError,
 
-        // IFEObl  -> Server
-        // Server  -> Client
+        // IFEObl  -> Client
         ExecutionBlocked,
 
         // Server  -> Client
