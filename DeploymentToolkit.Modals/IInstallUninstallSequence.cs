@@ -1,4 +1,5 @@
 ﻿using DeploymentToolkit.Deployment.Settings;
+using DeploymentToolkit.Deployment.Settings.Install;
 
 namespace DeploymentToolkit.Modals
 {
@@ -8,5 +9,7 @@ namespace DeploymentToolkit.Modals
 
         CloseProgramsSettings CloseProgramsSettings { get; }
         DeferSettings DeferSettings { get; }
+        RestartSettings RestartSettings { get; }
+        LogoffSettings LogoffSettings { get; }
     }
 }

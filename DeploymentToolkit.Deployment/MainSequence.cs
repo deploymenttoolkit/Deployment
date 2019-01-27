@@ -69,6 +69,23 @@ namespace DeploymentToolkit.Deployment
                 {
                     // Informing tray apps about successful installation
                     _pipeClient.SendMessage(new BasicMessage(MessageId.DeploymentSuccess));
+
+                    var restartSettings = EnvironmentVariables.ActiveSequence.RestartSettings;
+                    var logoffSettings = EnvironmentVariables.ActiveSequence.LogoffSettings;
+                    if (restartSettings != null && restartSettings.ForceRestart)
+                    {
+                        _logger.Trace("Force restart specified. Show restart dialog ...");
+                        _pipeClient.SendMessage(new DeploymentRestartMessage()
+                        {
+                            TimeUntilForceRestart = restartSettings.TimeUntilForcedRestart
+                        });
+
+                        return; // Do not perform cleanup or similar
+                    }
+                    else if (logoffSettings != null && logoffSettings.ForceLogoff)
+                    {
+                        // TODO: Implement
+                    }
                 }
             }
             else
@@ -390,7 +407,16 @@ namespace DeploymentToolkit.Deployment
                         }
                         else if(message.DeploymentStep == DeploymentStep.Restart)
                         {
-                            // TODO
+                            // User choose to restart (or time ran out whatever)
+                            _logger.Trace("4: User choose to restart");
+
+                            Cleanup();
+
+                            OnSequenceCompleted?.Invoke(sender, new SequenceCompletedEventArgs()
+                            {
+                                ReturnCode = 3010, // Restart return code
+                                SequenceSuccessful = true
+                            });
                         }
                     }
                     break;

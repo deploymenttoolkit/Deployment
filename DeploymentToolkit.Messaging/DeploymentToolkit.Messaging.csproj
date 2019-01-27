@@ -57,6 +57,7 @@
     <Compile Include="Messages\ContinueMessage.cs" />
     <Compile Include="Messages\DeferMessage.cs" />
     <Compile Include="Messages\DeploymentInformationMessage.cs" />
+    <Compile Include="Messages\DeploymentRestartMessage.cs" />
     <Compile Include="Messages\ExecutionBlockedMessage.cs" />
     <Compile Include="Messages\InitialConnectMessage.cs" />
     <Compile Include="Messages\ShowBalloonTipMessage.cs" />

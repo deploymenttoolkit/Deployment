@@ -26,6 +26,8 @@ namespace DeploymentToolkit.Installer
         }
         public CloseProgramsSettings CloseProgramsSettings { get => InstallSettings.CloseProgramsSettings; }
         public DeferSettings DeferSettings { get => InstallSettings.DeferSettings; }
+        public RestartSettings RestartSettings { get => InstallSettings.RestartSettings; }
+        public LogoffSettings LogoffSettings { get => InstallSettings.LogoffSettings; }
 
         private Logger _logger = LogManager.GetCurrentClassLogger();
 
