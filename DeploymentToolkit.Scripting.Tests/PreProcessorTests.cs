@@ -31,11 +31,25 @@ namespace DeploymentToolkit.Scripting.Tests
                 {
                     Condition = "$DT_IsTaskSequence$"
                 },
+
+                new ExpectedConditon()
+                {
+                    Condition = @"('1' == '$Is64Bit$')"
+                },
+
+                // Wrongs
+                new ExpectedConditon()
+                {
+                    Condition = "$DT_IdoNotExist$"
+                },
             };
 
             foreach(var condition in conditions)
             {
-                Assert.AreNotEqual(condition.Condition, PreProcessor.Process(condition.Condition));
+                if (condition.ExpectedResult)
+                    Assert.AreEqual(condition.Condition, PreProcessor.Process(condition.Condition));
+                else
+                    Assert.AreNotEqual(condition.Condition, PreProcessor.Process(condition.Condition));
             }
         }
 
@@ -46,17 +60,39 @@ namespace DeploymentToolkit.Scripting.Tests
             {
                 new ExpectedConditon()
                 {
+                    Condition = @"('1' == '1')",
+                    ExpectedResult = true
+                },
+                new ExpectedConditon()
+                {
                     Condition = @"$FileExists(C:\Windows\explorer.exe)$"
                 },
                 new ExpectedConditon()
                 {
                     Condition = @"$DirectoryExists(C:\Windows)$"
                 },
+
+                // Wrongs
+                new ExpectedConditon()
+                {
+                    Condition = @"$DirectoryExists()$",
+                },
+                new ExpectedConditon()
+                {
+                    Condition = @"$DirectoryExists($",
+                },
+                new ExpectedConditon()
+                {
+                    Condition = @"$IdoNotExist(Test)$"
+                },
             };
 
             foreach (var condition in conditions)
             {
-                Assert.AreNotEqual(condition.Condition, PreProcessor.Process(condition.Condition));
+                if(condition.ExpectedResult)
+                    Assert.AreEqual(condition.Condition, PreProcessor.Process(condition.Condition));
+                else
+                    Assert.AreNotEqual(condition.Condition, PreProcessor.Process(condition.Condition));
             }
         }
     }

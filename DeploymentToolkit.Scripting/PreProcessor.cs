@@ -137,9 +137,10 @@ namespace DeploymentToolkit.Scripting
                 if (end == -1)
                     break;
 
-                var variableName = part.Substring(start, end);
+                var variableName = part.Substring(0, end);
                 Debug.WriteLine($"Found {variableName}");
                 Debug.WriteLine($"ToProcess: {toProcess}");
+                toProcess = toProcess.Substring(end, toProcess.Length - end);
 
                 if (variableName.Contains("("))
                 {
@@ -148,14 +149,14 @@ namespace DeploymentToolkit.Scripting
 
                     if (variablesStart == -1 || variablesEnd == -1)
                     {
-                        processed = processed.Replace($"${variableName}$", "INVALID PARAMETERS");
+                        processed = processed.Replace($"${variableName}$", "INCOMPLETE PARAMETERS");
                         continue;
                     }
 
                     var parameterString = variableName.Substring(variablesStart, variablesEnd - variablesStart).TrimStart('(').TrimEnd(')');
                     if(string.IsNullOrEmpty(parameterString))
                     {
-                        processed = processed.Replace($"${variableName}$", "INVALID PARAMETERS");
+                        processed = processed.Replace($"${variableName}$", "MISSING PARAMETERS");
                         continue;
                     }
 
@@ -178,9 +179,8 @@ namespace DeploymentToolkit.Scripting
                     if (_variables.ContainsKey(variableName))
                         processed = processed.Replace($"${variableName}$", _variables[variableName].Invoke());
                     else
-                        processed = processed.Replace($"${variableName}$", "NOT FOUND");
+                        processed = processed.Replace($"${variableName}$", "VARIABLE NOT FOUND");
                 }
-                toProcess = toProcess.Substring(end, toProcess.Length - end);
             }
             while (toProcess.Contains(_separator));
 
