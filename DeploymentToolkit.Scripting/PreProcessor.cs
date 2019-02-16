@@ -1,20 +1,13 @@
-﻿using System.Diagnostics;
-using System.Collections.Generic;
-using System;
-using DeploymentToolkit.DTEnvironment;
+﻿using DeploymentToolkit.DTEnvironment;
 using DeploymentToolkit.DTEnvironment.Exceptions;
+using DeploymentToolkit.Scripting.Extensions;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 
 namespace DeploymentToolkit.Scripting
 {
-    public static class BoolExtension
-    {
-        public static string ToIntString(this bool boolean)
-        {
-            return Convert.ToInt32(boolean).ToString();
-        }
-    }
-
     public static class PreProcessor
     {
         private const string _separator = "$";
@@ -76,6 +69,13 @@ namespace DeploymentToolkit.Scripting
                     {
                         return "";
                     }
+                }
+            },
+            {
+                "DT_DeploymentUniqueName",
+                delegate()
+                {
+                    return EnvironmentVariables.ActiveSequence.UniqueName;
                 }
             },
             {

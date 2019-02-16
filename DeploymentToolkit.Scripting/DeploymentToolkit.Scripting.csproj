@@ -50,6 +50,7 @@
     <Compile Include="Exceptions\ScriptingInvalidGroupException.cs" />
     <Compile Include="Exceptions\ScriptingInvalidOperatorException.cs" />
     <Compile Include="Exceptions\ScriptingInvalidStringException.cs" />
+    <Compile Include="Extensions\BoolExtensions.cs" />
     <Compile Include="Modals\Condition.cs" />
     <Compile Include="Modals\Group.cs" />
     <Compile Include="Modals\GroupLink.cs" />
