@@ -53,8 +53,18 @@
     <Compile Include="Modals\Condition.cs" />
     <Compile Include="Modals\Group.cs" />
     <Compile Include="Modals\GroupLink.cs" />
+    <Compile Include="PreProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\DeploymentToolkit.Environment\DeploymentToolkit.DTEnvironment.csproj">
+      <Project>{94c074c7-cae2-423e-84b7-80d5b74602bb}</Project>
+      <Name>DeploymentToolkit.DTEnvironment</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DeploymentToolkit.Modals\DeploymentToolkit.Modals.csproj">
+      <Project>{EC3FEDB7-4FC0-4DCF-A08F-F1DE2DC49E00}</Project>
+      <Name>DeploymentToolkit.Modals</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
