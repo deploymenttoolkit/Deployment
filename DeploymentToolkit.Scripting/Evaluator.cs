@@ -4,9 +4,9 @@ using NLog;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace DeploymentToolkit.Scripting.Evaluation
+namespace DeploymentToolkit.Scripting
 {
-    public static class Evaluator
+    public static class Evaluation
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 

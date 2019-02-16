@@ -44,7 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Evaluation\Evaluator.cs" />
+    <Compile Include="Evaluator.cs" />
     <Compile Include="Exceptions\ScriptingException.cs" />
     <Compile Include="Exceptions\ScriptingInvalidConditionException.cs" />
     <Compile Include="Exceptions\ScriptingInvalidGroupException.cs" />
