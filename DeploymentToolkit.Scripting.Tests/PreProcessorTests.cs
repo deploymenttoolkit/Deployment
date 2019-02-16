@@ -65,6 +65,11 @@ namespace DeploymentToolkit.Scripting.Tests
                 },
                 new ExpectedConditon()
                 {
+                    Condition = @"$DirectoryExists()",
+                    ExpectedResult = true
+                },
+                new ExpectedConditon()
+                {
                     Condition = @"$FileExists(C:\Windows\explorer.exe)$"
                 },
                 new ExpectedConditon()
