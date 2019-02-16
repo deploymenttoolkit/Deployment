@@ -30,7 +30,8 @@ namespace DeploymentToolkit.Scripting.Evaluation
             if (parentGroup != null)
                 parentGroup.SubGroups.Add(group);
 
-            condition = condition.Substring(1, condition.Length - 1);
+            if(condition.StartsWith("("))
+                condition = condition.Substring(1, condition.Length - 1);
 
             var lastGroup = default(Group);
             var currentGroup = default(Group);
@@ -68,6 +69,8 @@ namespace DeploymentToolkit.Scripting.Evaluation
                         group.GroupLinks.Add(new GroupLink(lastGroup, currentCondition, currentGroup));
                         currentCondition = LinkType.None;
                     }
+
+                    continue;
                 }
                 else if(currentCharacter == 'A')
                 {
@@ -79,6 +82,8 @@ namespace DeploymentToolkit.Scripting.Evaluation
                         i += 2;
                         Debug.WriteLine("Detected AND");
                     }
+
+                    continue;
                 }
                 else if(currentCharacter == 'O')
                 {
@@ -90,6 +95,8 @@ namespace DeploymentToolkit.Scripting.Evaluation
                         i += 1;
                         Debug.WriteLine("Detected OR");
                     }
+
+                    continue;
                 }
             }
 
@@ -98,6 +105,13 @@ namespace DeploymentToolkit.Scripting.Evaluation
             Debug.WriteLine($"Condition: {condition}");
             Debug.WriteLine($"Len: {condition.Length}");
             Debug.WriteLine($"EndOfThisGroup: {endOfThisGroup}");
+
+            if (parentGroup == null)
+            {
+                // If we are the main group then there can't be text after this group closes
+                if (endOfThisGroup != condition.Length - 1)
+                    throw new ScriptingInvalidConditionException("Leftover text after group ended");
+            }
 
             var toEvaluate = condition;
             if (endOfThisGroup < condition.Length - 1)
