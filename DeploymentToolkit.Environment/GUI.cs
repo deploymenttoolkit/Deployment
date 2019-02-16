@@ -1,4 +1,4 @@
-﻿namespace DeploymentToolkit.DTEnvironment
+﻿namespace DeploymentToolkit.ToolkitEnvironment
 {
     public static partial class EnvironmentVariables
     {

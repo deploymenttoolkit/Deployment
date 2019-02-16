@@ -1,12 +1,12 @@
-﻿using DeploymentToolkit.Deployment.Settings;
-using DeploymentToolkit.Deployment.Settings.Install;
-using DeploymentToolkit.DTEnvironment.Exceptions;
-using DeploymentToolkit.Modals;
+﻿using DeploymentToolkit.Modals;
+using DeploymentToolkit.Modals.Settings;
+using DeploymentToolkit.Modals.Settings.Install;
+using DeploymentToolkit.ToolkitEnvironment.Exceptions;
 using NLog;
 using System;
 using System.IO;
 
-namespace DeploymentToolkit.DTEnvironment
+namespace DeploymentToolkit.ToolkitEnvironment
 {
     public static partial class EnvironmentVariables
     {

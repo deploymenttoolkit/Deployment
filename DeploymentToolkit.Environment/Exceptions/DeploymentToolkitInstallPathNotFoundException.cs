@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace DeploymentToolkit.DTEnvironment.Exceptions
+namespace DeploymentToolkit.ToolkitEnvironment.Exceptions
 {
     public class DeploymentToolkitInstallPathNotFoundException : FileNotFoundException
     {

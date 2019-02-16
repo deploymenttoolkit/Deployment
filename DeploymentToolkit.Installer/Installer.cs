@@ -1,7 +1,7 @@
-﻿using DeploymentToolkit.Deployment.Settings;
-using DeploymentToolkit.Deployment.Settings.Install;
-using DeploymentToolkit.DTEnvironment;
-using DeploymentToolkit.Modals;
+﻿using DeploymentToolkit.Modals;
+using DeploymentToolkit.Modals.Settings;
+using DeploymentToolkit.Modals.Settings.Install;
+using DeploymentToolkit.ToolkitEnvironment;
 using NLog;
 using System;
 
@@ -28,6 +28,7 @@ namespace DeploymentToolkit.Installer
         public DeferSettings DeferSettings { get => InstallSettings.DeferSettings; }
         public RestartSettings RestartSettings { get => InstallSettings.RestartSettings; }
         public LogoffSettings LogoffSettings { get => InstallSettings.LogoffSettings; }
+        public CustomActions CustomActions { get => InstallSettings.CustomActions; }
 
         private Logger _logger = LogManager.GetCurrentClassLogger();
 

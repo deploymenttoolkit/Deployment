@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 
-namespace DeploymentToolkit.DTEnvironment
+namespace DeploymentToolkit.ToolkitEnvironment
 {
     public static partial class EnvironmentVariables
     {

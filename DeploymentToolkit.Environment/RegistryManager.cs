@@ -3,7 +3,7 @@ using NLog;
 using System;
 using System.IO;
 
-namespace DeploymentToolkit.DTEnvironment
+namespace DeploymentToolkit.ToolkitEnvironment
 {
     public static class RegistryManager
     {

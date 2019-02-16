@@ -87,9 +87,17 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DeploymentToolkit.Environment\DeploymentToolkit.DTEnvironment.csproj">
+    <ProjectReference Include="..\DeploymentToolkit.Actions\DeploymentToolkit.Actions.csproj">
+      <Project>{0059F67C-809E-4811-995D-4647BB520C99}</Project>
+      <Name>DeploymentToolkit.Actions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DeploymentToolkit.DeploymentEnvironment\DeploymentToolkit.DeploymentEnvironment.csproj">
+      <Project>{4EA54C46-9DBE-4872-9820-E24D2A88FB39}</Project>
+      <Name>DeploymentToolkit.DeploymentEnvironment</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DeploymentToolkit.Environment\DeploymentToolkit.ToolkitEnvironment.csproj">
       <Project>{94c074c7-cae2-423e-84b7-80d5b74602bb}</Project>
-      <Name>DeploymentToolkit.DTEnvironment</Name>
+      <Name>DeploymentToolkit.ToolkitEnvironment</Name>
     </ProjectReference>
     <ProjectReference Include="..\DeploymentToolkit.Installer.MSI\DeploymentToolkit.Installer.MSI.csproj">
       <Project>{6f6770f5-a209-4a26-a6fb-9cb5122f4108}</Project>
@@ -107,9 +115,9 @@
       <Project>{EC3FEDB7-4FC0-4DCF-A08F-F1DE2DC49E00}</Project>
       <Name>DeploymentToolkit.Modals</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DeploymentToolkit.Settings\DeploymentToolkit.Settings.csproj">
-      <Project>{b33801ae-9ed8-4b65-b69d-b8d0365c9427}</Project>
-      <Name>DeploymentToolkit.Settings</Name>
+    <ProjectReference Include="..\DeploymentToolkit.Scripting\DeploymentToolkit.Scripting.csproj">
+      <Project>{AD620098-DF03-45B9-9B91-7E1DD13BC86C}</Project>
+      <Name>DeploymentToolkit.Scripting</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

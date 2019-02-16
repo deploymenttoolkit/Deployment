@@ -7,7 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 
-namespace DeploymentToolkit.DTEnvironment
+namespace DeploymentToolkit.ToolkitEnvironment
 {
     public static class ProcessManager
     {

@@ -11,8 +11,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.Installer
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.TrayApp", "..\DeploymentToolkit.TrayApp\DeploymentToolkit.TrayApp.csproj", "{9586473D-9BB5-4AF1-B9E1-77B72D5874B8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.Settings", "DeploymentToolkit.Settings\DeploymentToolkit.Settings.csproj", "{B33801AE-9ED8-4B65-B69D-B8D0365C9427}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.Modals", "DeploymentToolkit.Modals\DeploymentToolkit.Modals.csproj", "{EC3FEDB7-4FC0-4DCF-A08F-F1DE2DC49E00}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DeploymentToolkit", "DeploymentToolkit", "{672AD382-4F4E-442D-B0C8-F094751E2995}"
@@ -29,13 +27,17 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.Logging",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.Messaging", "DeploymentToolkit.Messaging\DeploymentToolkit.Messaging.csproj", "{65AC59C5-F17A-4F96-97B2-B0ECB4304C3B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.DTEnvironment", "DeploymentToolkit.Environment\DeploymentToolkit.DTEnvironment.csproj", "{94C074C7-CAE2-423E-84B7-80D5B74602BB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.ToolkitEnvironment", "DeploymentToolkit.Environment\DeploymentToolkit.ToolkitEnvironment.csproj", "{94C074C7-CAE2-423E-84B7-80D5B74602BB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Installer", "Installer", "{8D8ED2C1-89A7-4A94-92F7-15E780D946B9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.Scripting", "DeploymentToolkit.Scripting\DeploymentToolkit.Scripting.csproj", "{AD620098-DF03-45B9-9B91-7E1DD13BC86C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.Scripting.Tests", "DeploymentToolkit.Scripting.Tests\DeploymentToolkit.Scripting.Tests.csproj", "{1199E298-4D2F-4D19-8602-73B05C6B9E9D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.Actions", "DeploymentToolkit.Actions\DeploymentToolkit.Actions.csproj", "{0059F67C-809E-4811-995D-4647BB520C99}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.DeploymentEnvironment", "DeploymentToolkit.DeploymentEnvironment\DeploymentToolkit.DeploymentEnvironment.csproj", "{4EA54C46-9DBE-4872-9820-E24D2A88FB39}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,10 +61,6 @@ Global
 		{9586473D-9BB5-4AF1-B9E1-77B72D5874B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9586473D-9BB5-4AF1-B9E1-77B72D5874B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9586473D-9BB5-4AF1-B9E1-77B72D5874B8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B33801AE-9ED8-4B65-B69D-B8D0365C9427}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B33801AE-9ED8-4B65-B69D-B8D0365C9427}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B33801AE-9ED8-4B65-B69D-B8D0365C9427}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B33801AE-9ED8-4B65-B69D-B8D0365C9427}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EC3FEDB7-4FC0-4DCF-A08F-F1DE2DC49E00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EC3FEDB7-4FC0-4DCF-A08F-F1DE2DC49E00}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EC3FEDB7-4FC0-4DCF-A08F-F1DE2DC49E00}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -91,6 +89,14 @@ Global
 		{1199E298-4D2F-4D19-8602-73B05C6B9E9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1199E298-4D2F-4D19-8602-73B05C6B9E9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1199E298-4D2F-4D19-8602-73B05C6B9E9D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0059F67C-809E-4811-995D-4647BB520C99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0059F67C-809E-4811-995D-4647BB520C99}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0059F67C-809E-4811-995D-4647BB520C99}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0059F67C-809E-4811-995D-4647BB520C99}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4EA54C46-9DBE-4872-9820-E24D2A88FB39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4EA54C46-9DBE-4872-9820-E24D2A88FB39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4EA54C46-9DBE-4872-9820-E24D2A88FB39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4EA54C46-9DBE-4872-9820-E24D2A88FB39}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -100,7 +106,6 @@ Global
 		{D823DFAD-3522-434B-B1A8-91232A1169E6} = {8D8ED2C1-89A7-4A94-92F7-15E780D946B9}
 		{6F6770F5-A209-4A26-A6FB-9CB5122F4108} = {8D8ED2C1-89A7-4A94-92F7-15E780D946B9}
 		{9586473D-9BB5-4AF1-B9E1-77B72D5874B8} = {F71CC262-D270-489F-9BA5-69ECA6B0B267}
-		{B33801AE-9ED8-4B65-B69D-B8D0365C9427} = {26E734FC-81B7-40B3-99E0-17A799AEEE77}
 		{EC3FEDB7-4FC0-4DCF-A08F-F1DE2DC49E00} = {26E734FC-81B7-40B3-99E0-17A799AEEE77}
 		{EE27D0DC-F1B3-426F-86BD-C8146944F9C9} = {BDC9234B-D443-4880-96B2-E9897A2D6D52}
 		{8BCE8C64-7C10-498F-BEB2-8804B191AEA7} = {26E734FC-81B7-40B3-99E0-17A799AEEE77}
@@ -108,6 +113,8 @@ Global
 		{94C074C7-CAE2-423E-84B7-80D5B74602BB} = {26E734FC-81B7-40B3-99E0-17A799AEEE77}
 		{8D8ED2C1-89A7-4A94-92F7-15E780D946B9} = {672AD382-4F4E-442D-B0C8-F094751E2995}
 		{AD620098-DF03-45B9-9B91-7E1DD13BC86C} = {26E734FC-81B7-40B3-99E0-17A799AEEE77}
+		{0059F67C-809E-4811-995D-4647BB520C99} = {26E734FC-81B7-40B3-99E0-17A799AEEE77}
+		{4EA54C46-9DBE-4872-9820-E24D2A88FB39} = {26E734FC-81B7-40B3-99E0-17A799AEEE77}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7CF45D1D-C7D1-4A80-8540-720E7D4182AA}

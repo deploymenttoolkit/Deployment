@@ -1,6 +1,6 @@
-﻿using DeploymentToolkit.DTEnvironment;
-using DeploymentToolkit.Messaging.Events;
+﻿using DeploymentToolkit.Messaging.Events;
 using DeploymentToolkit.Messaging.Messages;
+using DeploymentToolkit.ToolkitEnvironment;
 using NLog;
 using System;
 using System.IO;

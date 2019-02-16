@@ -1,5 +1,5 @@
-﻿using DeploymentToolkit.Deployment.Settings;
-using DeploymentToolkit.Deployment.Settings.Install;
+﻿using DeploymentToolkit.Modals.Settings;
+using DeploymentToolkit.Modals.Settings.Install;
 
 namespace DeploymentToolkit.Modals
 {
@@ -11,5 +11,6 @@ namespace DeploymentToolkit.Modals
         DeferSettings DeferSettings { get; }
         RestartSettings RestartSettings { get; }
         LogoffSettings LogoffSettings { get; }
+        CustomActions CustomActions { get; }
     }
 }

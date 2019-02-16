@@ -62,9 +62,9 @@
       <Project>{8bce8c64-7c10-498f-beb2-8804b191aea7}</Project>
       <Name>DeploymentToolkit.Logging</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DeploymentToolkit.Environment\DeploymentToolkit.DTEnvironment.csproj">
+    <ProjectReference Include="..\DeploymentToolkit.Environment\DeploymentToolkit.ToolkitEnvironment.csproj">
       <Project>{94C074C7-CAE2-423E-84B7-80D5B74602BB}</Project>
-      <Name>DeploymentToolkit.DTEnvironment</Name>
+      <Name>DeploymentToolkit.ToolkitEnvironment</Name>
     </ProjectReference>
     <ProjectReference Include="..\DeploymentToolkit.Installer\DeploymentToolkit.Installer.csproj">
       <Project>{d823dfad-3522-434b-b1a8-91232a1169e6}</Project>
@@ -73,10 +73,6 @@
     <ProjectReference Include="..\DeploymentToolkit.Modals\DeploymentToolkit.Modals.csproj">
       <Project>{EC3FEDB7-4FC0-4DCF-A08F-F1DE2DC49E00}</Project>
       <Name>DeploymentToolkit.Modals</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\DeploymentToolkit.Settings\DeploymentToolkit.Settings.csproj">
-      <Project>{b33801ae-9ed8-4b65-b69d-b8d0365c9427}</Project>
-      <Name>DeploymentToolkit.Settings</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

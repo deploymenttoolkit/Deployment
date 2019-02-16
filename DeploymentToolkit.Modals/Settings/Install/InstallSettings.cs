@@ -1,6 +1,4 @@
-﻿using DeploymentToolkit.Settings;
-
-namespace DeploymentToolkit.Deployment.Settings.Install
+﻿namespace DeploymentToolkit.Modals.Settings.Install
 {
     public class InstallSettings
     {

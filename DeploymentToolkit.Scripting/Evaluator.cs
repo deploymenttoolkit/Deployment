@@ -19,7 +19,7 @@ namespace DeploymentToolkit.Scripting
             return mainGroup.IsTrue();
         }
 
-        public static int ProcessGroup(string condition, out Group group, Group parentGroup = null)
+        private static int ProcessGroup(string condition, out Group group, Group parentGroup = null)
         {
             _logger.Trace($"Starting processing of '{condition}'");
             Debug.WriteLine($"Starting processing of '{condition}'");
@@ -135,7 +135,7 @@ namespace DeploymentToolkit.Scripting
             return endOfThisGroup;
         }
 
-        public static Condition EvaluateCondition(string condition)
+        private static Condition EvaluateCondition(string condition)
         {
             _logger.Trace($"Evaluating {condition}");
             Debug.WriteLine($"Evaluating {condition}");

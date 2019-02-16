@@ -1,10 +1,10 @@
-﻿using DeploymentToolkit.Deployment.Settings;
-using DeploymentToolkit.Deployment.Settings.Install;
-using DeploymentToolkit.DTEnvironment;
-using DeploymentToolkit.DTEnvironment.Exceptions;
+﻿using DeploymentToolkit.DeploymentEnvironment;
 using DeploymentToolkit.Installer.MSI;
 using DeploymentToolkit.Modals;
-using DeploymentToolkit.Settings;
+using DeploymentToolkit.Modals.Settings;
+using DeploymentToolkit.Modals.Settings.Install;
+using DeploymentToolkit.ToolkitEnvironment;
+using DeploymentToolkit.ToolkitEnvironment.Exceptions;
 using NLog;
 using System;
 using System.IO;
@@ -40,28 +40,6 @@ namespace DeploymentToolkit.Deployment
             }
         }
 
-        private static string _rootDirectory;
-        internal static string RootDirectory
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(_rootDirectory))
-                    _rootDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                return _rootDirectory;
-            }
-        }
-
-        private static string _filesDirectory;
-        internal static string FilesDirectory
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(_filesDirectory))
-                    _filesDirectory = Path.Combine(RootDirectory, "Files");
-                return _filesDirectory;
-            }
-        }
-
         private static MainSequence _mainSequence;
 
         private static Logger _logger = LogManager.GetCurrentClassLogger();
@@ -78,7 +56,7 @@ namespace DeploymentToolkit.Deployment
             {
                 Console.WriteLine($"Failed to initialize logger: {ex}");
                 Console.ReadKey();
-                System.Environment.Exit((int)ExitCode.FailedToInitilizeLogger);
+                Environment.Exit((int)ExitCode.FailedToInitilizeLogger);
             }
 
             _logger.Info($"Initialized {Namespace} v{Version}");
@@ -210,7 +188,7 @@ namespace DeploymentToolkit.Deployment
             if (EnvironmentVariables.InstallSettings.CommandLine.Length != fullPath.Length)
             {
                 _logger.Trace("Not a absolute path specified. Searching for file in 'Files' folder");
-                var path = Path.Combine(FilesDirectory, EnvironmentVariables.InstallSettings.CommandLine);
+                var path = Path.Combine(DeploymentEnvironmentVariables.FilesDirectory, EnvironmentVariables.InstallSettings.CommandLine);
                 _logger.Trace($"Changed path from {EnvironmentVariables.InstallSettings.CommandLine} to {path}");
                 EnvironmentVariables.InstallSettings.CommandLine = path;
             }

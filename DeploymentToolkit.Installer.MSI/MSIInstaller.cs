@@ -1,6 +1,5 @@
-﻿using DeploymentToolkit.Deployment.Settings.Install;
-using DeploymentToolkit.DTEnvironment;
-using DeploymentToolkit.Modals;
+﻿using DeploymentToolkit.Modals;
+using DeploymentToolkit.Modals.Settings.Install;
 using NLog;
 using System;
 using System.Diagnostics;
@@ -28,14 +27,14 @@ namespace DeploymentToolkit.Installer.MSI
 
             if(!InstallSettings.MSISettings.UseDefaultMSIParameters && string.IsNullOrEmpty(InstallSettings.Parameters))
             {
-                _logger.Warn($"No command line specified on an MSI installation. Using default parameters ('{DTEnvironment.MSI.DefaultInstallParameters}')");
-                InstallSettings.Parameters = DTEnvironment.MSI.DefaultInstallParameters;
+                _logger.Warn($"No command line specified on an MSI installation. Using default parameters ('{ToolkitEnvironment.MSI.DefaultInstallParameters}')");
+                InstallSettings.Parameters = ToolkitEnvironment.MSI.DefaultInstallParameters;
             }
 
             if (InstallSettings.MSISettings.UseDefaultMSIParameters)
             {
-                _logger.Info($"MSISettings->UseDefaultMSIParameters specified. Switching Parameters from '{InstallSettings.Parameters}' to '{DTEnvironment.MSI.DefaultInstallParameters}'");
-                InstallSettings.Parameters = DTEnvironment.MSI.DefaultInstallParameters;
+                _logger.Info($"MSISettings->UseDefaultMSIParameters specified. Switching Parameters from '{InstallSettings.Parameters}' to '{ToolkitEnvironment.MSI.DefaultInstallParameters}'");
+                InstallSettings.Parameters = ToolkitEnvironment.MSI.DefaultInstallParameters;
             }
 
             if (InstallSettings.MSISettings.SupressMSIRestartReturnCode)
@@ -48,12 +47,12 @@ namespace DeploymentToolkit.Installer.MSI
             var logFileName = "DeploymentToolkit-MSI.log";
             var path = System.IO.Path.Combine(Logging.LogManager.LogDirectory, logFileName);
             // Beware the space !!!
-            _commandLine += $" {DTEnvironment.MSI.DefaultLoggingParameters} \"{path}\"";
+            _commandLine += $" {ToolkitEnvironment.MSI.DefaultLoggingParameters} \"{path}\"";
 
             if(InstallSettings.MSISettings.SuppressReboot)
             {
-                _logger.Info($"Adding {DTEnvironment.MSI.SuppressReboot} to command line");
-                _commandLine += $" {DTEnvironment.MSI.SuppressReboot}";
+                _logger.Info($"Adding {ToolkitEnvironment.MSI.SuppressReboot} to command line");
+                _commandLine += $" {ToolkitEnvironment.MSI.SuppressReboot}";
             }
 
             _logger.Info($"Final command line: {_commandLine}");

@@ -50,17 +50,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DeploymentToolkit.Environment\DeploymentToolkit.DTEnvironment.csproj">
+    <ProjectReference Include="..\DeploymentToolkit.Environment\DeploymentToolkit.ToolkitEnvironment.csproj">
       <Project>{94c074c7-cae2-423e-84b7-80d5b74602bb}</Project>
-      <Name>DeploymentToolkit.DTEnvironment</Name>
+      <Name>DeploymentToolkit.ToolkitEnvironment</Name>
     </ProjectReference>
     <ProjectReference Include="..\DeploymentToolkit.Modals\DeploymentToolkit.Modals.csproj">
       <Project>{EC3FEDB7-4FC0-4DCF-A08F-F1DE2DC49E00}</Project>
       <Name>DeploymentToolkit.Modals</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\DeploymentToolkit.Settings\DeploymentToolkit.Settings.csproj">
-      <Project>{b33801ae-9ed8-4b65-b69d-b8d0365c9427}</Project>
-      <Name>DeploymentToolkit.Settings</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

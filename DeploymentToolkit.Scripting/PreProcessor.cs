@@ -1,6 +1,6 @@
-﻿using DeploymentToolkit.DTEnvironment;
-using DeploymentToolkit.DTEnvironment.Exceptions;
-using DeploymentToolkit.Scripting.Extensions;
+﻿using DeploymentToolkit.Scripting.Extensions;
+using DeploymentToolkit.ToolkitEnvironment;
+using DeploymentToolkit.ToolkitEnvironment.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

@@ -1,10 +1,14 @@
-﻿using DeploymentToolkit.DTEnvironment;
+﻿using DeploymentToolkit.Actions.Modals;
+using DeploymentToolkit.ToolkitEnvironment;
 using DeploymentToolkit.Messaging;
 using DeploymentToolkit.Messaging.Events;
 using DeploymentToolkit.Messaging.Messages;
 using DeploymentToolkit.Modals;
+using DeploymentToolkit.Scripting.Exceptions;
 using NLog;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace DeploymentToolkit.Deployment
@@ -37,6 +41,42 @@ namespace DeploymentToolkit.Deployment
 
             _logger.Trace("Preparing environment...");
             EnvironmentVariables.Initialize();
+
+            if (EnvironmentVariables.ActiveSequence.CustomActions != null)
+            {
+                _logger.Trace("Processing CustomActions...");
+                var actions = EnvironmentVariables.ActiveSequence.CustomActions.Actions;
+                if (actions != null && actions.Count > 0)
+                {
+                    var compiledActions = new List<Actions.Modals.Action>();
+                    foreach (var action in actions)
+                    {
+                        if (string.IsNullOrEmpty(action.Condition))
+                            continue;
+
+                        // We do not pre-compile AfterDeployment actions
+                        if (action.ExectionOrder == ExectionOrder.AfterDeployment)
+                            return;
+
+                        try
+                        {
+                            _logger.Trace($"Processing {action.Condition}");
+                            var preprocessed = Scripting.PreProcessor.Process(action.Condition);
+                            _logger.Trace($"Preprocessed: {preprocessed}");
+                            action.ConditionResults = Scripting.Evaluation.Evaluate(preprocessed);
+                            _logger.Trace($"Result: {action.ConditionResults}");
+                            compiledActions.Add(action);
+                        }
+                        catch (ScriptingException ex)
+                        {
+                            _logger.Error(ex, "Failed to process CustomAction");
+                            _logger.Error("Action will be ignored");
+                        }
+                    }
+
+                    EnvironmentVariables.ActiveSequence.CustomActions.Actions = compiledActions;
+                }
+            }
 
             if (!EnableGUI())
             {
@@ -213,6 +253,30 @@ namespace DeploymentToolkit.Deployment
                     {
                         _logger.Trace("Informing tray apps about installation start");
                         _pipeClient.SendMessage(new BasicMessage(MessageId.DeploymentStarted));
+                    }
+
+                    if(EnvironmentVariables.ActiveSequence.CustomActions?.Actions?.Count > 0)
+                    {
+                        _logger.Trace("Running BeforeDeployment actions ...");
+                        var beforeDeploymentActions = EnvironmentVariables.ActiveSequence.CustomActions.Actions.Where((a) => a.ExectionOrder == ExectionOrder.BeforeDeployment && a.ConditionResults).ToList();
+                        if (beforeDeploymentActions.Count > 0)
+                        {
+                            _logger.Trace($"Executing {beforeDeploymentActions.Count} actions ...");
+                            foreach(var action in beforeDeploymentActions)
+                            {
+                                try
+                                {
+                                    action.ExecuteActions();
+                                }
+                                catch(Exception ex)
+                                {
+                                    _logger.Error(ex, "Error during execution of CustomAction");
+                                }
+                            }
+                            _logger.Trace("Execution ended");
+                        }
+                        else
+                            _logger.Trace("No BeforeDeployment actions found");
                     }
 
                     SubSequence.SequenceBegin();
