@@ -521,7 +521,11 @@ namespace DeploymentToolkit.Deployment
             foreach (var action in actions)
             {
                 if (string.IsNullOrEmpty(action.Condition))
+                {
+                    action.ConditionResults = true;
+                    compiledActions.Add(action);
                     continue;
+                }
 
                 try
                 {
