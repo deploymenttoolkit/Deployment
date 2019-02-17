@@ -100,7 +100,7 @@ namespace DeploymentToolkit.Deployment
             {
                 _logger.Info("Sequence reported a successful install");
 
-                if(EnvironmentVariables.ActiveSequence.CustomActions != null)
+                if(EnvironmentVariables.ActiveSequence.CustomActions?.Actions?.Count > 0)
                 {
                     var actions = EnvironmentVariables.ActiveSequence.CustomActions.Actions.Where((a) => a.ExectionOrder == ExectionOrder.AfterDeployment).ToList();
                     if(actions.Count > 0)
