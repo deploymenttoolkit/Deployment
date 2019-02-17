@@ -71,33 +71,12 @@ namespace DeploymentToolkit.Deployment
                 var actions = EnvironmentVariables.ActiveSequence.CustomActions.Actions;
                 if (actions != null && actions.Count > 0)
                 {
-                    var compiledActions = new List<Actions.Modals.Action>();
-                    foreach (var action in actions)
-                    {
-                        if (string.IsNullOrEmpty(action.Condition))
-                            continue;
-
-                        // We do not pre-compile AfterDeployment actions
-                        if (action.ExectionOrder == ExectionOrder.AfterDeployment)
-                            return;
-
-                        try
-                        {
-                            _logger.Trace($"Processing {action.Condition}");
-                            var preprocessed = Scripting.PreProcessor.Process(action.Condition);
-                            _logger.Trace($"Preprocessed: {preprocessed}");
-                            action.ConditionResults = Scripting.Evaluation.Evaluate(preprocessed);
-                            _logger.Trace($"Result: {action.ConditionResults}");
-                            compiledActions.Add(action);
-                        }
-                        catch (ScriptingException ex)
-                        {
-                            _logger.Error(ex, "Failed to process CustomAction");
-                            _logger.Error("Action will be ignored");
-                        }
-                    }
-
-                    EnvironmentVariables.ActiveSequence.CustomActions.Actions = compiledActions;
+                    EnvironmentVariables.ActiveSequence.CustomActions.Actions = EvaluateCustomActions(
+                        actions.Where(
+                            (a) => a.ExectionOrder == ExectionOrder.BeforeDeployment
+                        )
+                        .ToList()
+                    );
                 }
             }
 
@@ -120,6 +99,32 @@ namespace DeploymentToolkit.Deployment
             if(e.SequenceSuccessful)
             {
                 _logger.Info("Sequence reported a successful install");
+
+                if(EnvironmentVariables.ActiveSequence.CustomActions != null)
+                {
+                    var actions = EnvironmentVariables.ActiveSequence.CustomActions.Actions.Where((a) => a.ExectionOrder == ExectionOrder.AfterDeployment).ToList();
+                    if(actions.Count > 0)
+                    {
+                        _logger.Trace("Running AfterDeployment actions ...");
+                        var afterDeploymentActions = EvaluateCustomActions(actions);
+                        if (afterDeploymentActions.Count > 0)
+                        {
+                            _logger.Trace($"Executing {afterDeploymentActions.Count} actions ...");
+                            foreach (var action in afterDeploymentActions)
+                            {
+                                try
+                                {
+                                    action.ExecuteActions();
+                                }
+                                catch(Exception ex)
+                                {
+                                    _logger.Error(ex, $"Error during execution of CustomAction");
+                                }
+                            }
+                            _logger.Trace("Execution ended");
+                        }
+                    }
+                }
 
                 if (EnvironmentVariables.ActiveSequence.DeferSettings != null)
                 {
@@ -508,6 +513,32 @@ namespace DeploymentToolkit.Deployment
                     }
                     break;
             }
+        }
+
+        private List<Actions.Modals.Action> EvaluateCustomActions(List<Actions.Modals.Action> actions)
+        {
+            var compiledActions = new List<Actions.Modals.Action>();
+            foreach (var action in actions)
+            {
+                if (string.IsNullOrEmpty(action.Condition))
+                    continue;
+
+                try
+                {
+                    _logger.Trace($"Processing {action.Condition}");
+                    var preprocessed = PreProcessor.Process(action.Condition);
+                    _logger.Trace($"Preprocessed: {preprocessed}");
+                    action.ConditionResults = Evaluation.Evaluate(preprocessed);
+                    _logger.Trace($"Result: {action.ConditionResults}");
+                    compiledActions.Add(action);
+                }
+                catch (ScriptingException ex)
+                {
+                    _logger.Error(ex, "Failed to process CustomAction");
+                    _logger.Error("Action will be ignored");
+                }
+            }
+            return compiledActions;
         }
     }
 }
