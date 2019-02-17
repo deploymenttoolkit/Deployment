@@ -61,6 +61,7 @@
     <Compile Include="PreProcessor.cs" />
     <Compile Include="PreProcessorFunctions\DirectoryFunctions.cs" />
     <Compile Include="PreProcessorFunctions\FileFunctions.cs" />
+    <Compile Include="PreProcessorFunctions\Functions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

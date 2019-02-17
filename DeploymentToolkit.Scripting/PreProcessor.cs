@@ -6,12 +6,11 @@ using NLog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Management.Automation;
 
 namespace DeploymentToolkit.Scripting
 {
-    public static class PreProcessor
+    public static partial class PreProcessor
     {
         private const string _separator = "$";
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
@@ -89,18 +88,6 @@ namespace DeploymentToolkit.Scripting
                     return EnvironmentVariables.IsRunningInTaskSequence.ToIntString();
                 }
             },
-        };
-
-        private static readonly Dictionary<string, Func<string[], string>> _functions = new Dictionary<string, Func<string[], string>>()
-        {
-            {
-                "FileExists",
-                FileFunctions.Exists
-            },
-            {
-                "DirectoryExists",
-                DirectoryFunctions.Exists
-            }
         };
 
         public static string Process(string data)
