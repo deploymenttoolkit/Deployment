@@ -16,6 +16,6 @@ namespace DeploymentToolkit.Modals
     public class CustomVariables
     {
         [XmlElement(ElementName = "CustomVariable")]
-        public List<CustomVariable> CustomVariable { get; set; }
+        public List<CustomVariable> Variables { get; set; }
     }
 }

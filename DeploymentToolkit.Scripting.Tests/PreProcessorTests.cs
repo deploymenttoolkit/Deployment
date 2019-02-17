@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using DeploymentToolkit.Scripting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 
 namespace DeploymentToolkit.Scripting.Tests
@@ -44,7 +45,7 @@ namespace DeploymentToolkit.Scripting.Tests
                 },
             };
 
-            foreach(var condition in conditions)
+            foreach (var condition in conditions)
             {
                 if (condition.ExpectedResult)
                     Assert.AreEqual(condition.Condition, PreProcessor.Process(condition.Condition));
@@ -94,10 +95,79 @@ namespace DeploymentToolkit.Scripting.Tests
 
             foreach (var condition in conditions)
             {
-                if(condition.ExpectedResult)
+                if (condition.ExpectedResult)
                     Assert.AreEqual(condition.Condition, PreProcessor.Process(condition.Condition));
                 else
                     Assert.AreNotEqual(condition.Condition, PreProcessor.Process(condition.Condition));
+            }
+        }
+
+        [TestMethod()]
+        public void AddVariableTest()
+        {
+            var scripts = new List<ExpectedScript>()
+            {
+                new ExpectedScript()
+                {
+                    Name = "IsWindowsInstalled",
+                    Script = @"function IsWindowsInstalled { return Test-Path C:\Windows }",
+                    Result = true,
+                    TestCondition = new ExpectedConditon()
+                    {
+                        Condition = @"('$IsWindowsInstalled$' == '1')",
+                        ExpectedResult = true
+                    }
+                },
+                new ExpectedScript()
+                {
+                    Name = "StringTest",
+                    Script = @"function StringTest { return 'Test' }",
+                    Result = true,
+                    TestCondition = new ExpectedConditon()
+                    {
+                        Condition = @"('$StringTest$' == 'Test')",
+                        ExpectedResult = true
+                    }
+                },
+
+                // Errors
+                new ExpectedScript()
+                {
+                    Name = "Test",
+                    Script = @"function WrongName { return Test-Path C:\Windows }",
+                    Result = false,
+                },
+
+                // Double declaration
+                new ExpectedScript()
+                {
+                    Name = "Test",
+                    Script = @"function Test { return Test-Path C:\Windows }",
+                    Result = true,
+                    TestCondition = new ExpectedConditon()
+                    {
+                        Condition = @"('$Test$' == '1')",
+                        ExpectedResult = true
+                    }
+                },
+                new ExpectedScript()
+                {
+                    Name = "Test",
+                    Script = @"function Test { return Test-Path C:\Windows }",
+                    Result = false,
+                }
+            };
+
+            foreach(var script in scripts)
+            {
+                var result = PreProcessor.AddVariable(script.Name, script.Script);
+                Assert.AreEqual(script.Result, result);
+
+                if (!result)
+                    continue;
+
+                var preProcessed = PreProcessor.Process(script.TestCondition.Condition);
+                Assert.AreEqual(script.TestCondition.ExpectedResult, Evaluation.Evaluate(preProcessed));
             }
         }
     }

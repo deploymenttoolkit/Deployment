@@ -1,10 +1,10 @@
 ﻿using DeploymentToolkit.Actions.Modals;
-using DeploymentToolkit.ToolkitEnvironment;
 using DeploymentToolkit.Messaging;
 using DeploymentToolkit.Messaging.Events;
 using DeploymentToolkit.Messaging.Messages;
 using DeploymentToolkit.Modals;
 using DeploymentToolkit.Scripting.Exceptions;
+using DeploymentToolkit.ToolkitEnvironment;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -31,6 +31,21 @@ namespace DeploymentToolkit.Deployment
 
             _logger.Trace("Setting event...");
             SubSequence.OnSequenceCompleted += OnSubSequenceInstallCompleted;
+
+            if (EnvironmentVariables.Configuration.CustomVariables != null)
+            {
+                var customVariables = EnvironmentVariables.Configuration.CustomVariables.Variables;
+                _logger.Trace($"Processing {customVariables.Count} CustomVariables...");
+                foreach(var variable in customVariables)
+                {
+                    if(string.IsNullOrEmpty(variable.Name) || string.IsNullOrEmpty(variable.Script))
+                    {
+                        _logger.Warn($"Invalid CustomVariable ({variable.Name}/{variable.Script})");
+                        _logger.Warn("Variable has been skipped");
+                        continue;
+                    }
+                }
+            }
 
             _logger.Trace("Sequence initialized");
         }
