@@ -11,7 +11,7 @@ namespace DeploymentToolkit.Modals.Actions
 
         public static bool MoveFile(string source, string target, bool overwrite = false)
         {
-            _logger.Trace($"MoveFile({source}, {target})");
+            _logger.Trace($"MoveFile({source}, {target}, {overwrite})");
             if (string.IsNullOrEmpty(source))
                 throw new ArgumentNullException(nameof(source));
             if (string.IsNullOrEmpty(source))
@@ -51,7 +51,7 @@ namespace DeploymentToolkit.Modals.Actions
 
         public static bool CopyFile(string source, string target, bool overwrite = false)
         {
-            _logger.Trace($"CopyFile({source}, {target})");
+            _logger.Trace($"CopyFile({source}, {target}, {overwrite})");
             if (string.IsNullOrEmpty(source))
                 throw new ArgumentNullException(nameof(source));
             if (string.IsNullOrEmpty(source))
@@ -84,25 +84,25 @@ namespace DeploymentToolkit.Modals.Actions
             return true;
         }
 
-        public static bool DeleteFile(string source)
+        public static bool DeleteFile(string target)
         {
-            _logger.Trace($"DeleteFile({source})");
-            if (string.IsNullOrEmpty(source))
-                throw new ArgumentNullException(nameof(source));
+            _logger.Trace($"DeleteFile({target})");
+            if (string.IsNullOrEmpty(target))
+                throw new ArgumentNullException(nameof(target));
 
-            if (!Path.IsPathRooted(source))
+            if (!Path.IsPathRooted(target))
             {
-                source = Path.GetFullPath(source);
-                _logger.Trace($"Source path was a non absolute path. Changed path to '{source}'");
+                target = Path.GetFullPath(target);
+                _logger.Trace($"Target path was a non absolute path. Changed path to '{target}'");
             }
 
-            if(!File.Exists(source))
+            if(!File.Exists(target))
             {
                 _logger.Info($"No file to delete");
                 return true;
             }
 
-            File.Delete(source);
+            File.Delete(target);
             return true;
         }
     }

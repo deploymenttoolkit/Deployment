@@ -44,8 +44,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DirectoryActions.cs" />
+    <Compile Include="Extensions\DirectoryExtensions.cs" />
     <Compile Include="FileActions.cs" />
     <Compile Include="Modals\Action.cs" />
+    <Compile Include="Modals\DirectoryCopy.cs" />
+    <Compile Include="Modals\DirectoryCreate.cs" />
+    <Compile Include="Modals\DirectoryDelete.cs" />
+    <Compile Include="Modals\DirectoryMove.cs" />
     <Compile Include="Modals\ExecutionOrder.cs" />
     <Compile Include="Modals\FileCopy.cs" />
     <Compile Include="Modals\FileDelete.cs" />
