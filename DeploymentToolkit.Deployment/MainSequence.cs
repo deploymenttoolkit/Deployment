@@ -3,6 +3,7 @@ using DeploymentToolkit.Messaging;
 using DeploymentToolkit.Messaging.Events;
 using DeploymentToolkit.Messaging.Messages;
 using DeploymentToolkit.Modals;
+using DeploymentToolkit.Scripting;
 using DeploymentToolkit.Scripting.Exceptions;
 using DeploymentToolkit.ToolkitEnvironment;
 using NLog;
@@ -19,8 +20,9 @@ namespace DeploymentToolkit.Deployment
 
         public event EventHandler<SequenceCompletedEventArgs> OnSequenceCompleted;
 
+        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
         private PipeClientManager _pipeClient;
-        private Logger _logger = LogManager.GetCurrentClassLogger();
 
         public MainSequence(IInstallUninstallSequence subSequence)
         {
@@ -44,6 +46,12 @@ namespace DeploymentToolkit.Deployment
                         _logger.Warn("Variable has been skipped");
                         continue;
                     }
+
+                    if(!PreProcessor.AddVariable(variable.Name, variable.Script))
+                    {
+                        _logger.Warn($"Failed to add {variable.Name} as variable. Check prior logs for more information");
+                    }
+                    _logger.Trace($"Successfully added {variable.Name} as CustomVariable");
                 }
             }
 
