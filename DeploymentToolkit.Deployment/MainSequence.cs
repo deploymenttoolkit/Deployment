@@ -65,21 +65,6 @@ namespace DeploymentToolkit.Deployment
             _logger.Trace("Preparing environment...");
             EnvironmentVariables.Initialize();
 
-            if (EnvironmentVariables.ActiveSequence.CustomActions != null)
-            {
-                _logger.Trace("Processing CustomActions...");
-                var actions = EnvironmentVariables.ActiveSequence.CustomActions.Actions;
-                if (actions != null && actions.Count > 0)
-                {
-                    EnvironmentVariables.ActiveSequence.CustomActions.Actions = EvaluateCustomActions(
-                        actions.Where(
-                            (a) => a.ExectionOrder == ExectionOrder.BeforeDeployment
-                        )
-                        .ToList()
-                    );
-                }
-            }
-
             if (!EnableGUI())
             {
                 // In non-GUI mode we just straight start the installation
@@ -286,9 +271,11 @@ namespace DeploymentToolkit.Deployment
                     if(EnvironmentVariables.ActiveSequence.CustomActions?.Actions?.Count > 0)
                     {
                         _logger.Trace("Running BeforeDeployment actions ...");
-                        var beforeDeploymentActions = EnvironmentVariables.ActiveSequence.CustomActions.Actions.Where((a) => a.ExectionOrder == ExectionOrder.BeforeDeployment && a.ConditionResults).ToList();
-                        if (beforeDeploymentActions.Count > 0)
+                        var actions = EnvironmentVariables.ActiveSequence.CustomActions.Actions.Where((a) => a.ExectionOrder == ExectionOrder.BeforeDeployment && a.ConditionResults).ToList();
+                        if (actions.Count > 0)
                         {
+                            _logger.Trace("Evaluating BeforeDeploymentActions ...");
+                            var beforeDeploymentActions = EvaluateCustomActions(actions);
                             _logger.Trace($"Executing {beforeDeploymentActions.Count} actions ...");
                             foreach(var action in beforeDeploymentActions)
                             {
