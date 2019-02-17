@@ -1,4 +1,5 @@
 ﻿using DeploymentToolkit.Scripting.Extensions;
+using DeploymentToolkit.Scripting.PreProcessorFunctions;
 using DeploymentToolkit.ToolkitEnvironment;
 using DeploymentToolkit.ToolkitEnvironment.Exceptions;
 using NLog;
@@ -7,7 +8,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Management.Automation;
-using System.Text;
 
 namespace DeploymentToolkit.Scripting
 {
@@ -95,29 +95,11 @@ namespace DeploymentToolkit.Scripting
         {
             {
                 "FileExists",
-                delegate(string[] parameters)
-                {
-                    if(parameters.Length == 0)
-                        return false.ToIntString();
-
-                    var path = parameters[0];
-                    if(!Path.IsPathRooted(path))
-                        path = Path.GetFullPath(path);
-                    return File.Exists(path).ToIntString();
-                }
+                FileFunctions.Exists
             },
             {
                 "DirectoryExists",
-                delegate(string[] parameters)
-                {
-                    if(parameters.Length == 0)
-                        return false.ToIntString();
-
-                    var path = parameters[0];
-                    if(!Path.IsPathRooted(path))
-                        path = Path.GetFullPath(path);
-                    return Directory.Exists(path).ToIntString();
-                }
+                DirectoryFunctions.Exists
             }
         };
 

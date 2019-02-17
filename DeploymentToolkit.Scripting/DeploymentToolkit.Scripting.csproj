@@ -59,6 +59,8 @@
     <Compile Include="Modals\Group.cs" />
     <Compile Include="Modals\GroupLink.cs" />
     <Compile Include="PreProcessor.cs" />
+    <Compile Include="PreProcessorFunctions\DirectoryFunctions.cs" />
+    <Compile Include="PreProcessorFunctions\FileFunctions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
