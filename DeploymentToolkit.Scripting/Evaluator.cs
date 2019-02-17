@@ -22,7 +22,9 @@ namespace DeploymentToolkit.Scripting
         private static int ProcessGroup(string condition, out Group group, Group parentGroup = null)
         {
             _logger.Trace($"Starting processing of '{condition}'");
+#if DEBUG
             Debug.WriteLine($"Starting processing of '{condition}'");
+#endif
             group = new Group();
 
             var endOfThisGroup = 0;
@@ -40,17 +42,23 @@ namespace DeploymentToolkit.Scripting
             for (var i = 0; i < condition.Length; i++)
             {
                 var currentCharacter = condition[i];
+#if DEBUG
                 Debug.WriteLine($"{currentCharacter}");
+#endif
                 if (currentCharacter == ')')
                 {
                     // End of this group
                     endOfThisGroup = i;
+#if DEBUG
                     Debug.WriteLine($"Group ends at {i}");
+#endif
                     break;
                 }
                 else if(currentCharacter == '(')
                 {
+#if DEBUG
                     Debug.WriteLine($"Start of another group at {i}");
+#endif
                     lastGroup = currentGroup;
                     // Another sub-group
                     var groupStart = i;
@@ -59,7 +67,9 @@ namespace DeploymentToolkit.Scripting
                     toCut.Add(new int[] { groupStart, groupEnd });
 
                     i = groupEnd; // Skip to the end of the group
+#if DEBUG
                     Debug.WriteLine($"Skipping to {i}");
+#endif
 
                     if(currentCondition != LinkType.None)
                     {
@@ -80,7 +90,9 @@ namespace DeploymentToolkit.Scripting
                         currentCondition = LinkType.And;
                         toCut.Add(new int[] { i, i + 2 });
                         i += 2;
+#if DEBUG
                         Debug.WriteLine("Detected AND");
+#endif
                     }
 
                     continue;
@@ -93,7 +105,9 @@ namespace DeploymentToolkit.Scripting
                         currentCondition = LinkType.Or;
                         toCut.Add(new int[] { i, i + 1 });
                         i += 1;
+#if DEBUG
                         Debug.WriteLine("Detected OR");
+#endif
                     }
 
                     continue;
@@ -101,10 +115,11 @@ namespace DeploymentToolkit.Scripting
             }
 
             toCut.Reverse();
-
+#if DEBUG
             Debug.WriteLine($"Condition: {condition}");
             Debug.WriteLine($"Len: {condition.Length}");
             Debug.WriteLine($"EndOfThisGroup: {endOfThisGroup}");
+#endif
 
             if (parentGroup == null)
             {
@@ -138,7 +153,9 @@ namespace DeploymentToolkit.Scripting
         private static Condition EvaluateCondition(string condition)
         {
             _logger.Trace($"Evaluating {condition}");
+#if DEBUG
             Debug.WriteLine($"Evaluating {condition}");
+#endif
 
             var currentIndex = 0;
             var result = new Condition();
@@ -206,8 +223,9 @@ namespace DeploymentToolkit.Scripting
                 }
             }
             while (currentIndex < condition.Length);
-
+#if DEBUG
             Debug.WriteLine($"Final condition: {result.FirstString} {result.Operator} {result.SecondString} -> {result.IsTrue()}");
+#endif
 
             return result;
         }

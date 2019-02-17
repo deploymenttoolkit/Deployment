@@ -29,8 +29,10 @@ namespace DeploymentToolkit.Scripting
                     break;
 
                 var variableName = part.Substring(0, end);
+#if DEBUG
                 Debug.WriteLine($"Found {variableName}");
                 Debug.WriteLine($"ToProcess: {toProcess}");
+#endif
                 toProcess = toProcess.Substring(end, toProcess.Length - end);
 
                 if (variableName.Contains("("))
@@ -52,9 +54,10 @@ namespace DeploymentToolkit.Scripting
                     }
 
                     var functionName = variableName.Substring(0, variablesStart);
+#if DEBUG
                     Debug.WriteLine($"Function: {functionName}");
                     Debug.WriteLine($"Params: {parameterString}");
-
+#endif
                     if (_functions.ContainsKey(functionName))
                     {
                         var parameters = parameterString.Split(',');
@@ -74,9 +77,9 @@ namespace DeploymentToolkit.Scripting
                 }
             }
             while (toProcess.Contains(_separator));
-
+#if DEBUG
             Debug.WriteLine($"Processed: {processed}");
-
+#endif
             return processed;
         }
     }
