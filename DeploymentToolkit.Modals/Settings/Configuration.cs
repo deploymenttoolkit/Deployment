@@ -7,6 +7,7 @@ namespace DeploymentToolkit.Modals.Settings
         public string Name { get; set; }
         public string Version { get; set; }
         public DisplaySettings DisplaySettings { get; set; }
+        public CustomVariables CustomVariables { get; set; }
         public InstallSettings InstallSettings { get; set; }
     }
 }
