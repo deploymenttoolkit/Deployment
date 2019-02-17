@@ -5,22 +5,30 @@
         String,
         Number
     }
+    public enum Operator
+    {
+        Equal,
+        NotEqual,
+        Greater,
+        GreaterEqual,
+        Less,
+        LessEqual
+    }
 
     public class Condition
     {
         public CompareType CompareType { get; set; } = CompareType.String;
         public string FirstString { get; set; }
         public string SecondString { get; set; }
-        public string Operator { get; set; }
+        public Operator Operator { get; set; }
 
         public bool IsTrue()
         {
             switch(Operator)
             {
-                case "==":
-                case "!=":
+                case Operator.Equal:
+                case Operator.NotEqual:
                     {
-                        var isNotEqual = Operator == "!=";
                         var result = false;
 
                         if (CompareType == CompareType.String)
@@ -35,28 +43,28 @@
                             result = firstNumber == secondNumber;
                         }
 
-                        if (isNotEqual)
+                        if (Operator == Operator.NotEqual)
                             return !result;
                         return result;
                     }
 
-                case ">":
-                case ">=":
-                case "<":
-                case "<=":
+                case Operator.Greater:
+                case Operator.GreaterEqual:
+                case Operator.Less:
+                case Operator.LessEqual:
                     {
                         if (!int.TryParse(FirstString, out var firstNumber) || !int.TryParse(SecondString, out var secondNumber))
                             return false;
 
                         switch(Operator)
                         {
-                            case ">":
+                            case Operator.Greater:
                                 return firstNumber > secondNumber;
-                            case ">=":
+                            case Operator.GreaterEqual:
                                 return firstNumber >= secondNumber;
-                            case "<":
+                            case Operator.Less:
                                 return firstNumber < secondNumber;
-                            case "<=":
+                            case Operator.LessEqual:
                                 return firstNumber <= secondNumber;
                         }
                         

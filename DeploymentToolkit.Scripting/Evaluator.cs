@@ -1,6 +1,7 @@
 ﻿using DeploymentToolkit.Scripting.Exceptions;
 using DeploymentToolkit.Scripting.Modals;
 using NLog;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -42,7 +43,7 @@ namespace DeploymentToolkit.Scripting
             for (var i = 0; i < condition.Length; i++)
             {
                 var currentCharacter = condition[i];
-#if DEBUG
+#if DEBUG && EVALUTATOR_TRACE
                 Debug.WriteLine($"{currentCharacter}");
 #endif
                 if (currentCharacter == ')')
@@ -196,7 +197,7 @@ namespace DeploymentToolkit.Scripting
                     if (nextCharacter == '=')
                     {
                         // == or !=
-                        result.Operator = $"{currentCharacter}{nextCharacter}";
+                        result.Operator = GetOperator($"{currentCharacter}{nextCharacter}");
                         currentIndex += 2;
                     }
                     else
@@ -212,12 +213,12 @@ namespace DeploymentToolkit.Scripting
                     var nextCharacter = condition[currentIndex];
                     if (nextCharacter == '=')
                     {
-                        result.Operator = $"{currentCharacter}{nextCharacter}";
+                        result.Operator = GetOperator($"{currentCharacter}{nextCharacter}");
                         currentIndex += 2;
                     }
                     else
                     {
-                        result.Operator = $"{currentCharacter}";
+                        result.Operator = GetOperator($"{currentCharacter}");
                         currentIndex += 1;
                     }
                 }
@@ -228,6 +229,30 @@ namespace DeploymentToolkit.Scripting
 #endif
 
             return result;
+        }
+
+        private static Operator GetOperator(string data)
+        {
+#if DEBUG
+            Debug.WriteLine($"Processing {data}");
+#endif
+            switch(data)
+            {
+                case "==":
+                    return Operator.Equal;
+                case "!=":
+                    return Operator.NotEqual;
+                case ">":
+                    return Operator.Greater;
+                case ">=":
+                    return Operator.GreaterEqual;
+                case "<":
+                    return Operator.Less;
+                case "<=":
+                    return Operator.LessEqual;
+            }
+
+            throw new ArgumentOutOfRangeException(nameof(data), "Invalid operator found!");
         }
     }
 }
