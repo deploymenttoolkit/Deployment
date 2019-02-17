@@ -197,7 +197,7 @@ namespace DeploymentToolkit.Scripting
                     if (nextCharacter == '=')
                     {
                         // == or !=
-                        result.Operator = GetOperator($"{currentCharacter}{nextCharacter}");
+                        result.Operator = GetOperatorFromString($"{currentCharacter}{nextCharacter}");
                         currentIndex += 2;
                     }
                     else
@@ -213,12 +213,12 @@ namespace DeploymentToolkit.Scripting
                     var nextCharacter = condition[currentIndex];
                     if (nextCharacter == '=')
                     {
-                        result.Operator = GetOperator($"{currentCharacter}{nextCharacter}");
+                        result.Operator = GetOperatorFromString($"{currentCharacter}{nextCharacter}");
                         currentIndex += 2;
                     }
                     else
                     {
-                        result.Operator = GetOperator($"{currentCharacter}");
+                        result.Operator = GetOperatorFromString($"{currentCharacter}");
                         currentIndex += 1;
                     }
                 }
@@ -231,12 +231,12 @@ namespace DeploymentToolkit.Scripting
             return result;
         }
 
-        private static Operator GetOperator(string data)
+        private static Operator GetOperatorFromString(string input)
         {
 #if DEBUG
-            Debug.WriteLine($"Processing {data}");
+            Debug.WriteLine($"Processing {input}");
 #endif
-            switch(data)
+            switch(input)
             {
                 case "==":
                     return Operator.Equal;
@@ -252,7 +252,7 @@ namespace DeploymentToolkit.Scripting
                     return Operator.LessEqual;
             }
 
-            throw new ArgumentOutOfRangeException(nameof(data), "Invalid operator found!");
+            throw new ArgumentOutOfRangeException(nameof(input), "Invalid operator found!");
         }
     }
 }
