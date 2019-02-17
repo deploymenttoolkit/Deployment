@@ -1,4 +1,5 @@
 ﻿using DeploymentToolkit.DeploymentEnvironment;
+using DeploymentToolkit.Installer.Executable;
 using DeploymentToolkit.Installer.MSI;
 using DeploymentToolkit.Modals;
 using DeploymentToolkit.Modals.Settings;
@@ -212,6 +213,7 @@ namespace DeploymentToolkit.Deployment
                 else
                 {
                     // Unknwon / EXE installer
+                    sequence = new ExeInstaller(EnvironmentVariables.InstallSettings);
                 }
 
                 _mainSequence = new MainSequence(sequence);

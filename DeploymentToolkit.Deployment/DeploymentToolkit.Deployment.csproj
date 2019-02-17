@@ -99,6 +99,10 @@
       <Project>{94c074c7-cae2-423e-84b7-80d5b74602bb}</Project>
       <Name>DeploymentToolkit.ToolkitEnvironment</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DeploymentToolkit.Installer.Executable\DeploymentToolkit.Installer.Executable.csproj">
+      <Project>{3B6F788E-675B-4C3C-BAF7-D3B232811A62}</Project>
+      <Name>DeploymentToolkit.Installer.Executable</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DeploymentToolkit.Installer.MSI\DeploymentToolkit.Installer.MSI.csproj">
       <Project>{6f6770f5-a209-4a26-a6fb-9cb5122f4108}</Project>
       <Name>DeploymentToolkit.Installer.MSI</Name>

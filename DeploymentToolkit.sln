@@ -39,6 +39,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.Actions",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.DeploymentEnvironment", "DeploymentToolkit.DeploymentEnvironment\DeploymentToolkit.DeploymentEnvironment.csproj", "{4EA54C46-9DBE-4872-9820-E24D2A88FB39}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.Installer.Executable", "DeploymentToolkit.Installer.Executable\DeploymentToolkit.Installer.Executable.csproj", "{3B6F788E-675B-4C3C-BAF7-D3B232811A62}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -97,6 +99,10 @@ Global
 		{4EA54C46-9DBE-4872-9820-E24D2A88FB39}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4EA54C46-9DBE-4872-9820-E24D2A88FB39}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4EA54C46-9DBE-4872-9820-E24D2A88FB39}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B6F788E-675B-4C3C-BAF7-D3B232811A62}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B6F788E-675B-4C3C-BAF7-D3B232811A62}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B6F788E-675B-4C3C-BAF7-D3B232811A62}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B6F788E-675B-4C3C-BAF7-D3B232811A62}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -115,6 +121,7 @@ Global
 		{AD620098-DF03-45B9-9B91-7E1DD13BC86C} = {26E734FC-81B7-40B3-99E0-17A799AEEE77}
 		{0059F67C-809E-4811-995D-4647BB520C99} = {26E734FC-81B7-40B3-99E0-17A799AEEE77}
 		{4EA54C46-9DBE-4872-9820-E24D2A88FB39} = {26E734FC-81B7-40B3-99E0-17A799AEEE77}
+		{3B6F788E-675B-4C3C-BAF7-D3B232811A62} = {8D8ED2C1-89A7-4A94-92F7-15E780D946B9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7CF45D1D-C7D1-4A80-8540-720E7D4182AA}
