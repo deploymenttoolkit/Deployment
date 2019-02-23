@@ -56,7 +56,7 @@ namespace DeploymentToolkit.Installer.Executable
             _installerProcess.Exited += OnInstallationEnded;
             _installerProcess.Start();
 
-            _logger.Info($"Started MSI installation process. {_installerProcess.Id} in {_installerProcess.SessionId}");
+            _logger.Info($"Started EXE installation process. {_installerProcess.Id} in {_installerProcess.SessionId}");
         }
 
         public override void SequenceEnd()
