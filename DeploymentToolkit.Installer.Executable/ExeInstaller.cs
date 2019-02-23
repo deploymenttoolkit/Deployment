@@ -27,6 +27,9 @@ namespace DeploymentToolkit.Installer.Executable
             if (installSettings.CommandLine.ToLower().EndsWith(".msi"))
                 throw new Exception("ExeInstaller can only be used with non-MSI installations");
 
+            if (string.IsNullOrEmpty(installSettings.CommandLine))
+                throw new Exception($"{nameof(installSettings.CommandLine)} can't be empty!");
+
             if (string.IsNullOrEmpty(installSettings.Parameters))
                 _logger.Warn($"No parameters specified");
 
