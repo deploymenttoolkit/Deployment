@@ -1,18 +1,20 @@
 ﻿using DeploymentToolkit.Modals;
 using DeploymentToolkit.Modals.Settings;
 using DeploymentToolkit.Modals.Settings.Install;
+using DeploymentToolkit.Modals.Settings.Uninstall;
 using DeploymentToolkit.ToolkitEnvironment;
 using NLog;
 using System;
 
-namespace DeploymentToolkit.Installer
+namespace DeploymentToolkit.Uninstaller
 {
-    public abstract class Installer : IInstallUninstallSequence
+    public abstract class Uninstaller : IInstallUninstallSequence
     {
-        public abstract InstallerType InstallerType { get; }
+        public abstract UninstallerType UninstallerType { get; }
+
         public abstract event EventHandler<SequenceCompletedEventArgs> OnSequenceCompleted;
 
-        public InstallSettings InstallSettings { get; set; }
+        public UninstallSettings InstallSettings { get; set; }
 
         private string _unqiueName;
         public string UniqueName
@@ -20,7 +22,7 @@ namespace DeploymentToolkit.Installer
             get
             {
                 if (string.IsNullOrEmpty(_unqiueName))
-                    _unqiueName = $"{EnvironmentVariables.Configuration.Name}_{EnvironmentVariables.Configuration.Version}_Install";
+                    _unqiueName = $"{EnvironmentVariables.Configuration.Name}_{EnvironmentVariables.Configuration.Version}_Uninstall";
                 return _unqiueName;
             }
         }
@@ -37,7 +39,7 @@ namespace DeploymentToolkit.Installer
             get => throw new NotSupportedException();
         }
 
-        public Installer(InstallSettings installSettings)
+        public Uninstaller(UninstallSettings installSettings)
         {
             InstallSettings = installSettings;
         }

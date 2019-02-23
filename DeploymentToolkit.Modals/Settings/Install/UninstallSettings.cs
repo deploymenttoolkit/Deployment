@@ -2,7 +2,8 @@
 
 namespace DeploymentToolkit.Modals.Settings.Install
 {
-    public class UninstallSettings
+    [XmlRoot(ElementName = "UninstallSettings")]
+    public class InstallerUninstallSettings
     {
         public bool IgnoreUninstallErrors { get; set; }
         [XmlArrayItemAttribute("Item", IsNullable = false)]
