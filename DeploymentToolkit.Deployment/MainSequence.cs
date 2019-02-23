@@ -262,7 +262,17 @@ namespace DeploymentToolkit.Deployment
                 {
                     _logger.Info("Starting deployment ...");
 
-                    if(EnvironmentVariables.IsGUIEnabled)
+                    var closeProgramSettings = EnvironmentVariables.ActiveSequence.CloseProgramsSettings;
+                    if (closeProgramSettings.DisableStartDuringInstallation)
+                    {
+                        _logger.Trace("Blocking execution of apps ...");
+                        if (!ProcessManager.BlockExecution(closeProgramSettings.Close))
+                            _logger.Warn("Error while trying to block execution of apps");
+                        else
+                            _logger.Trace("Successfully blocked execution of apps");
+                    }
+
+                    if (EnvironmentVariables.IsGUIEnabled)
                     {
                         _logger.Trace("Informing tray apps about installation start");
                         _pipeClient.SendMessage(new BasicMessage(MessageId.DeploymentStarted));
@@ -387,12 +397,6 @@ namespace DeploymentToolkit.Deployment
                 };
                 _pipeClient.SendMessage(message);
             }
-            else if(closeApplicationsSettings.DisableStartDuringInstallation)
-            {
-                // None of the apps are currently running so prevent the user from starting them
-                _logger.Info("Blocking execution of apps ...");
-                ProcessManager.BlockExecution(closeApplicationsSettings.Close);
-            }
 
             return showCloseApplicationsWindow;
         }
@@ -471,15 +475,6 @@ namespace DeploymentToolkit.Deployment
                         {
                             // User choose to do the install now
                             _logger.Trace("3: User choose to continue with installation");
-                            var settings = EnvironmentVariables.ActiveSequence.CloseProgramsSettings;
-                            if (settings.DisableStartDuringInstallation)
-                            {
-                                _logger.Trace("Blocking execution of apps ...");
-                                if (!ProcessManager.BlockExecution(settings.Close))
-                                    _logger.Warn("Error while trying to block execution of apps");
-                                else
-                                    _logger.Trace("Successfully blocked execution of apps");
-                            }
 
                             // If no applications are running, then proceed with installation
                             StartDeployment();
