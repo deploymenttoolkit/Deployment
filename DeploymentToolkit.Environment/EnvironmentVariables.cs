@@ -1,6 +1,7 @@
 ﻿using DeploymentToolkit.Modals;
 using DeploymentToolkit.Modals.Settings;
 using DeploymentToolkit.Modals.Settings.Install;
+using DeploymentToolkit.Modals.Settings.Uninstall;
 using DeploymentToolkit.ToolkitEnvironment.Exceptions;
 using NLog;
 using System;
@@ -15,6 +16,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
 
         public static Configuration Configuration;
         public static InstallSettings InstallSettings;
+        public static UninstallSettings UninstallSettings;
 
         private static Logger _logger = LogManager.GetCurrentClassLogger();
 

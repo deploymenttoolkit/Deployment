@@ -123,6 +123,18 @@
       <Project>{AD620098-DF03-45B9-9B91-7E1DD13BC86C}</Project>
       <Name>DeploymentToolkit.Scripting</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DeploymentToolkit.Uninstaller.Executable\DeploymentToolkit.Uninstaller.Executable.csproj">
+      <Project>{A0E7F558-00A9-41B6-9B8B-125A102BDB57}</Project>
+      <Name>DeploymentToolkit.Uninstaller.Executable</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DeploymentToolkit.Uninstaller.MSI\DeploymentToolkit.Uninstaller.MSI.csproj">
+      <Project>{364666E5-EE07-4266-AB69-70A701C57E9E}</Project>
+      <Name>DeploymentToolkit.Uninstaller.MSI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DeploymentToolkit.Uninstaller\DeploymentToolkit.Uninstaller.csproj">
+      <Project>{1F774A30-E6F9-4BFD-B535-D7509D4C0A0F}</Project>
+      <Name>DeploymentToolkit.Uninstaller</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

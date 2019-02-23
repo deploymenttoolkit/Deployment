@@ -4,8 +4,11 @@ using DeploymentToolkit.Installer.MSI;
 using DeploymentToolkit.Modals;
 using DeploymentToolkit.Modals.Settings;
 using DeploymentToolkit.Modals.Settings.Install;
+using DeploymentToolkit.Modals.Settings.Uninstall;
 using DeploymentToolkit.ToolkitEnvironment;
 using DeploymentToolkit.ToolkitEnvironment.Exceptions;
+using DeploymentToolkit.Uninstaller.Executable;
+using DeploymentToolkit.Uninstaller.MSI;
 using NLog;
 using System;
 using System.IO;
@@ -160,6 +163,72 @@ namespace DeploymentToolkit.Deployment
         public static void Uninstall()
         {
             _logger.Info("Detected uninstall command line. Selected 'Uninstall' as deployment");
+            if(EnvironmentVariables.Configuration.UninstallSettings == null)
+            {
+                _logger.Trace("No uninstall arguments specified in settings.xml. Looking for uninstall.xml");
+                if (!File.Exists("uninstall.xml"))
+                    ExitInstallation("uninstall.xml is missing", ExitCode.UninstallFileMissing);
+
+                _logger.Trace("Found uninstall.xml. Reading...");
+                EnvironmentVariables.UninstallSettings = ReadXml<UninstallSettings>("uninstall.xml");
+                _logger.Trace("Successfully read uninstall.xml");
+            }
+            else
+            {
+                _logger.Trace("Uninstall options specified inside settings.xml");
+                EnvironmentVariables.UninstallSettings = EnvironmentVariables.Configuration.UninstallSettings;
+            }
+
+            _logger.Trace("Read uninstall settings. Starting uninstallation...");
+            _logger.Trace("Checking CommandLine Path...");
+
+            var fullPath = Path.GetFullPath(EnvironmentVariables.UninstallSettings.CommandLine);
+            if(EnvironmentVariables.UninstallSettings.CommandLine.Length != fullPath.Length)
+            {
+                _logger.Trace("Not a absolute path specified. Searching for file in 'Files' folder");
+                var path = Path.Combine(DeploymentEnvironmentVariables.FilesDirectory, EnvironmentVariables.UninstallSettings.CommandLine);
+                _logger.Trace($"Changed path from {EnvironmentVariables.UninstallSettings.CommandLine} to {path}");
+                EnvironmentVariables.UninstallSettings.CommandLine = path;
+            }
+
+            _logger.Trace("Verifiying that file specified in CommandLine exists...");
+            // CommandLine should either specify an exe file or an msi file. Either way the file has to exist
+            if (!File.Exists(EnvironmentVariables.UninstallSettings.CommandLine))
+            {
+                ExitInstallation($"File specified in CommandLine does not exists ({EnvironmentVariables.UninstallSettings.CommandLine}). Aborting uninstallation", ExitCode.InvalidCommandLineSpecified);
+            }
+
+            // Detecting installation type
+            try
+            {
+                var sequence = default(IInstallUninstallSequence);
+                if (EnvironmentVariables.UninstallSettings.CommandLine.ToLower().EndsWith(".msi"))
+                {
+                    // Microsoft Installer
+                    sequence = new MSIUninstaller(EnvironmentVariables.UninstallSettings);
+                }
+                else
+                {
+                    // Unknwon / EXE installer
+                    sequence = new ExeUninstaller(EnvironmentVariables.UninstallSettings);
+                }
+
+                _mainSequence = new MainSequence(sequence);
+                _mainSequence.OnSequenceCompleted += OnSequenceCompleted;
+                _mainSequence.SequenceBegin();
+
+                do
+                {
+                    Thread.Sleep(1000);
+                }
+                while (!_sequenceCompleted);
+            }
+            catch (Exception ex)
+            {
+                ExitInstallation(ex, "Error during uninstallation", ExitCode.ErrorDuringUninstallation);
+            }
+
+            _logger.Info("Uninstall sequence completed");
         }
 
         public static void Install()

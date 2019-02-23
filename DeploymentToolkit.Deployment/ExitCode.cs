@@ -13,6 +13,7 @@
         NotElevated = -8,
 
         InvalidCommandLineSpecified = -10,
-        ErrorDuringInstallation = -11
+        ErrorDuringInstallation = -11,
+        ErrorDuringUninstallation = -12
     }
 }
