@@ -1,16 +1,16 @@
 ﻿using DeploymentToolkit.Modals;
-using DeploymentToolkit.Modals.Settings.Install;
+using DeploymentToolkit.Modals.Settings.Uninstall;
 using NLog;
 using System;
 using System.Diagnostics;
 
-namespace DeploymentToolkit.Installer.MSI
+namespace DeploymentToolkit.Uninstaller.MSI
 {
-    public class MSIInstaller : Installer
+    public class MSIUninstaller : Uninstaller
     {
-        public override InstallerType InstallerType
+        public override UninstallerType UninstallerType
         {
-            get => InstallerType.MicrosoftInstaller;
+            get => UninstallerType.MicrosoftInstaller;
         }
 
         public override event EventHandler<SequenceCompletedEventArgs> OnSequenceCompleted;
@@ -18,38 +18,38 @@ namespace DeploymentToolkit.Installer.MSI
         private Logger _logger = LogManager.GetCurrentClassLogger();
 
         private string _commandLine = "";
-        private Process _installerProcess;
+        private Process _uninstallerProcess;
 
-        public MSIInstaller(InstallSettings installSettings) : base(installSettings)
+        public MSIUninstaller(UninstallSettings uninstallSettings) : base(uninstallSettings)
         {
-            if (!installSettings.CommandLine.ToLower().EndsWith(".msi"))
-                throw new Exception("MSIInstaller can only be used with MSI installations");
+            if (!uninstallSettings.CommandLine.ToLower().EndsWith(".msi"))
+                throw new Exception("MSIInstaller can only be used with MSI uninstallations");
 
-            if(!InstallSettings.MSISettings.UseDefaultMSIParameters && string.IsNullOrEmpty(InstallSettings.Parameters))
+            if (!UninstallSettings.MSISettings.UseDefaultMSIParameters && string.IsNullOrEmpty(UninstallSettings.Parameters))
             {
-                _logger.Warn($"No command line specified on an MSI installation. Using default parameters ('{ToolkitEnvironment.MSI.DefaultInstallParameters}')");
-                InstallSettings.Parameters = ToolkitEnvironment.MSI.DefaultInstallParameters;
+                _logger.Warn($"No command line specified on an MSI uninstallation. Using default parameters ('{ToolkitEnvironment.MSI.DefaultUninstallParameters}')");
+                UninstallSettings.Parameters = ToolkitEnvironment.MSI.DefaultUninstallParameters;
             }
 
-            if (InstallSettings.MSISettings.UseDefaultMSIParameters)
+            if (UninstallSettings.MSISettings.UseDefaultMSIParameters)
             {
-                _logger.Info($"MSISettings->UseDefaultMSIParameters specified. Switching Parameters from '{InstallSettings.Parameters}' to '{ToolkitEnvironment.MSI.DefaultInstallParameters}'");
-                InstallSettings.Parameters = ToolkitEnvironment.MSI.DefaultInstallParameters;
+                _logger.Info($"MSISettings->UseDefaultMSIParameters specified. Switching Parameters from '{UninstallSettings.Parameters}' to '{ToolkitEnvironment.MSI.DefaultUninstallParameters}'");
+                UninstallSettings.Parameters = ToolkitEnvironment.MSI.DefaultUninstallParameters;
             }
 
-            if (InstallSettings.MSISettings.SupressMSIRestartReturnCode)
+            if (UninstallSettings.MSISettings.SupressMSIRestartReturnCode)
             {
                 _logger.Info("MSISettings->SupressMSIRestartReturnCode specified. Suppressing restarts after installation");
             }
 
-            _commandLine = $"/i \"{InstallSettings.CommandLine}\" {InstallSettings.Parameters}";
+            _commandLine = $"/x \"{UninstallSettings.CommandLine}\" {UninstallSettings.Parameters}";
             // Add the file name for logging
-            var logFileName = "DeploymentToolkit-MSI_installation.log";
+            var logFileName = "DeploymentToolkit-MSI_uninstallation.log";
             var path = System.IO.Path.Combine(Logging.LogManager.LogDirectory, logFileName);
             // Beware the space !!!
             _commandLine += $" {ToolkitEnvironment.MSI.DefaultLoggingParameters} \"{path}\"";
 
-            if(InstallSettings.MSISettings.SuppressReboot)
+            if (UninstallSettings.MSISettings.SuppressReboot)
             {
                 _logger.Info($"Adding {ToolkitEnvironment.MSI.SuppressReboot} to command line");
                 _commandLine += $" {ToolkitEnvironment.MSI.SuppressReboot}";
@@ -62,7 +62,7 @@ namespace DeploymentToolkit.Installer.MSI
         {
             _logger.Trace("Preparing process execution...");
 
-            _installerProcess = new Process()
+            _uninstallerProcess = new Process()
             {
                 StartInfo = new ProcessStartInfo()
                 {
@@ -74,47 +74,47 @@ namespace DeploymentToolkit.Installer.MSI
                 EnableRaisingEvents = true
             };
 
-            _installerProcess.Exited += OnInstallationEnded;
-            _installerProcess.Start();
+            _uninstallerProcess.Exited += OnInstallationEnded;
+            _uninstallerProcess.Start();
 
-            _logger.Info($"Started MSI installation process. {_installerProcess.Id} in {_installerProcess.SessionId}");
+            _logger.Info($"Started MSI uninstallation process. {_uninstallerProcess.Id} in {_uninstallerProcess.SessionId}");
         }
 
         public override void SequenceEnd()
         {
-            
+
         }
 
         private void OnInstallationEnded(object sender, EventArgs e)
         {
-            _logger.Info("MSI installation process ended. Validating...");
+            _logger.Info("MSI uninstallation process ended. Validating...");
 
-            if(!Enum.TryParse<MSIReturnCode>(_installerProcess.ExitCode.ToString(), true, out var exitCode))
+            if (!Enum.TryParse<MSIReturnCode>(_uninstallerProcess.ExitCode.ToString(), true, out var exitCode))
             {
-                _logger.Error($"Failed to decode return code ({_installerProcess.ExitCode}). Passing return code straight to parent...");
+                _logger.Error($"Failed to decode return code ({_uninstallerProcess.ExitCode}). Passing return code straight to parent...");
                 OnSequenceCompleted?.BeginInvoke(
                     this,
                     new SequenceCompletedEventArgs()
                     {
                         // We don't know the exit code so it's probably a non default exit code. Meaning it probably failed
                         SequenceSuccessful = false,
-                        ReturnCode = _installerProcess.ExitCode
+                        ReturnCode = _uninstallerProcess.ExitCode
                     },
                     OnSequenceCompleted.EndInvoke,
                     null
                 );
                 return;
             }
-            
-            if(exitCode == MSIReturnCode.ERROR_SUCCESS_REBOOT_REQUIRED && InstallSettings.MSISettings.SuppressReboot)
+
+            if (exitCode == MSIReturnCode.ERROR_SUCCESS_REBOOT_REQUIRED && UninstallSettings.MSISettings.SuppressReboot)
             {
                 _logger.Info($"MSI returned {MSIReturnCode.ERROR_SUCCESS_REBOOT_REQUIRED} and SuppressReboot specified. Overwriting return code...");
                 exitCode = MSIReturnCode.ERROR_SUCCESS;
             }
 
-            var installCompletedEventArgs = new SequenceCompletedEventArgs()
+            var uninstallCompletedEventArgs = new SequenceCompletedEventArgs()
             {
-                ReturnCode = _installerProcess.ExitCode
+                ReturnCode = _uninstallerProcess.ExitCode
             };
 
             switch (exitCode)
@@ -123,49 +123,49 @@ namespace DeploymentToolkit.Installer.MSI
                 case MSIReturnCode.ERROR_SUCCESS_REBOOT_INITIATED:
                 case MSIReturnCode.ERROR_SUCCESS_REBOOT_REQUIRED:
                     {
-                        _logger.Info($"Installation successful. Return code {exitCode}({_installerProcess.ExitCode})");
-                        installCompletedEventArgs.SequenceSuccessful = true;
+                        _logger.Info($"Uninstallation successful. Return code {exitCode}({_uninstallerProcess.ExitCode})");
+                        uninstallCompletedEventArgs.SequenceSuccessful = true;
 
-                        if(exitCode == MSIReturnCode.ERROR_SUCCESS_REBOOT_INITIATED)
+                        if (exitCode == MSIReturnCode.ERROR_SUCCESS_REBOOT_INITIATED)
                         {
                             _logger.Warn("MSI initiated a reboot!");
-                            installCompletedEventArgs.SequenceWarnings.Add(new Exception("MSI intiated a reboot"));
+                            uninstallCompletedEventArgs.SequenceWarnings.Add(new Exception("MSI intiated a reboot"));
                         }
-                        else if(exitCode == MSIReturnCode.ERROR_SUCCESS_REBOOT_REQUIRED && InstallSettings.MSISettings.SupressMSIRestartReturnCode)
+                        else if (exitCode == MSIReturnCode.ERROR_SUCCESS_REBOOT_REQUIRED && UninstallSettings.MSISettings.SupressMSIRestartReturnCode)
                         {
                             _logger.Info($"Replacing return code with {MSIReturnCode.ERROR_SUCCESS}({(int)MSIReturnCode.ERROR_SUCCESS}) because MSISettings->SupressMSIRestartReturnCode was specified");
-                            installCompletedEventArgs.ReturnCode = (int)MSIReturnCode.ERROR_SUCCESS;
+                            uninstallCompletedEventArgs.ReturnCode = (int)MSIReturnCode.ERROR_SUCCESS;
                         }
                     }
                     break;
 
                 default:
                     {
-                        _logger.Error($"Installation failed. Return code {exitCode}({_installerProcess.ExitCode})");
-                        installCompletedEventArgs.SequenceSuccessful = false;
-                        installCompletedEventArgs.SequenceErrors.Add(new Exception($"Install failed with code {exitCode}({(int)exitCode})"));
+                        _logger.Error($"Uninstallation failed. Return code {exitCode}({_uninstallerProcess.ExitCode})");
+                        uninstallCompletedEventArgs.SequenceSuccessful = false;
+                        uninstallCompletedEventArgs.SequenceErrors.Add(new Exception($"Uninstall failed with code {exitCode}({(int)exitCode})"));
 
                         // Output some more information to the log file for faster troubleshooting
-                        if(
+                        if (
                             exitCode == MSIReturnCode.ERROR_INSTALL_TRANSFORM_FAILURE ||
                             exitCode == MSIReturnCode.ERROR_INSTALL_TRANSFORM_REJECTED)
                         {
                             _logger.Error("There seems to be a problem with the transform. Please check the transform");
                         }
 
-                        if(
+                        if (
                             exitCode == MSIReturnCode.ERROR_INSTALL_PACKAGE_INVALID ||
                             exitCode == MSIReturnCode.ERROR_INSTALL_PACKAGE_OPEN_FAILED)
                         {
                             _logger.Error("There seems to be a problem with the msi package. Please check the msi file");
                         }
 
-                        if(exitCode == MSIReturnCode.ERROR_INSTALL_PACKAGE_REJECTED)
+                        if (exitCode == MSIReturnCode.ERROR_INSTALL_PACKAGE_REJECTED)
                         {
                             _logger.Error("The msi file was rejected by the system. Please check the msi file (requirements)");
                         }
 
-                        if(exitCode == MSIReturnCode.ERROR_INSTALL_PACKAGE_VERSION)
+                        if (exitCode == MSIReturnCode.ERROR_INSTALL_PACKAGE_VERSION)
                         {
                             _logger.Error("The msi file is created for a newer version of Windows Installer. Please update the Windows Installer service");
                         }
@@ -175,7 +175,7 @@ namespace DeploymentToolkit.Installer.MSI
 
             OnSequenceCompleted?.BeginInvoke(
                 this,
-                installCompletedEventArgs,
+                uninstallCompletedEventArgs,
                 OnSequenceCompleted.EndInvoke,
                 null
             );

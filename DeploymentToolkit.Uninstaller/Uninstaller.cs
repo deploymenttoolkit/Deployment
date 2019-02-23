@@ -14,7 +14,7 @@ namespace DeploymentToolkit.Uninstaller
 
         public abstract event EventHandler<SequenceCompletedEventArgs> OnSequenceCompleted;
 
-        public UninstallSettings InstallSettings { get; set; }
+        public UninstallSettings UninstallSettings { get; set; }
 
         private string _unqiueName;
         public string UniqueName
@@ -26,11 +26,11 @@ namespace DeploymentToolkit.Uninstaller
                 return _unqiueName;
             }
         }
-        public CloseProgramsSettings CloseProgramsSettings { get => InstallSettings.CloseProgramsSettings; }
-        public DeferSettings DeferSettings { get => InstallSettings.DeferSettings; }
-        public RestartSettings RestartSettings { get => InstallSettings.RestartSettings; }
-        public LogoffSettings LogoffSettings { get => InstallSettings.LogoffSettings; }
-        public CustomActions CustomActions { get => InstallSettings.CustomActions; }
+        public CloseProgramsSettings CloseProgramsSettings { get => UninstallSettings.CloseProgramsSettings; }
+        public DeferSettings DeferSettings { get => UninstallSettings.DeferSettings; }
+        public RestartSettings RestartSettings { get => UninstallSettings.RestartSettings; }
+        public LogoffSettings LogoffSettings { get => UninstallSettings.LogoffSettings; }
+        public CustomActions CustomActions { get => UninstallSettings.CustomActions; }
 
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
@@ -41,7 +41,7 @@ namespace DeploymentToolkit.Uninstaller
 
         public Uninstaller(UninstallSettings installSettings)
         {
-            InstallSettings = installSettings;
+            UninstallSettings = installSettings;
         }
 
         public abstract void SequenceBegin();

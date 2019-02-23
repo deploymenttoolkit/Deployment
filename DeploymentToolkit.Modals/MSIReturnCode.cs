@@ -1,4 +1,4 @@
-﻿namespace DeploymentToolkit.Installer.MSI
+﻿namespace DeploymentToolkit.Modals
 {
     // https://docs.microsoft.com/en-us/windows/desktop/msi/error-codes
     public enum MSIReturnCode

@@ -47,6 +47,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.Uninstall
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.Uninstaller.Executable", "DeploymentToolkit.Uninstaller.Executable\DeploymentToolkit.Uninstaller.Executable.csproj", "{A0E7F558-00A9-41B6-9B8B-125A102BDB57}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.Uninstaller.MSI", "DeploymentToolkit.Uninstaller.MSI\DeploymentToolkit.Uninstaller.MSI.csproj", "{364666E5-EE07-4266-AB69-70A701C57E9E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -117,6 +119,10 @@ Global
 		{A0E7F558-00A9-41B6-9B8B-125A102BDB57}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A0E7F558-00A9-41B6-9B8B-125A102BDB57}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A0E7F558-00A9-41B6-9B8B-125A102BDB57}.Release|Any CPU.Build.0 = Release|Any CPU
+		{364666E5-EE07-4266-AB69-70A701C57E9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{364666E5-EE07-4266-AB69-70A701C57E9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{364666E5-EE07-4266-AB69-70A701C57E9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{364666E5-EE07-4266-AB69-70A701C57E9E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -139,6 +145,7 @@ Global
 		{4BD3FEBC-9E55-4A00-B646-F6C9DEC79E3F} = {672AD382-4F4E-442D-B0C8-F094751E2995}
 		{1F774A30-E6F9-4BFD-B535-D7509D4C0A0F} = {4BD3FEBC-9E55-4A00-B646-F6C9DEC79E3F}
 		{A0E7F558-00A9-41B6-9B8B-125A102BDB57} = {4BD3FEBC-9E55-4A00-B646-F6C9DEC79E3F}
+		{364666E5-EE07-4266-AB69-70A701C57E9E} = {4BD3FEBC-9E55-4A00-B646-F6C9DEC79E3F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7CF45D1D-C7D1-4A80-8540-720E7D4182AA}

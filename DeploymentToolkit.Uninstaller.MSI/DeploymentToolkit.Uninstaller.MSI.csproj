@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{6F6770F5-A209-4A26-A6FB-9CB5122F4108}</ProjectGuid>
+    <ProjectGuid>{364666E5-EE07-4266-AB69-70A701C57E9E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DeploymentToolkit.Installer.MSI</RootNamespace>
-    <AssemblyName>DeploymentToolkit.Installer.MSI</AssemblyName>
+    <RootNamespace>DeploymentToolkit.Uninstaller.MSI</RootNamespace>
+    <AssemblyName>DeploymentToolkit.Uninstaller.MSI</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -31,16 +31,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Deployment.WindowsInstaller, Version=3.0.0.0, Culture=neutral, PublicKeyToken=ce35f76fcda82bad, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>Libs\Microsoft.Deployment.WindowsInstaller.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Deployment.WindowsInstaller.Linq, Version=3.0.0.0, Culture=neutral, PublicKeyToken=ce35f76fcda82bad, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>Libs\Microsoft.Deployment.WindowsInstaller.Linq.dll</HintPath>
-    </Reference>
-    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="NLog">
       <HintPath>..\..\DeploymentToolkit.Logging\bin\Debug\NLog.dll</HintPath>
     </Reference>
     <Reference Include="System" />
@@ -53,7 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MSIInstaller.cs" />
+    <Compile Include="MSIUninstaller.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -62,16 +53,16 @@
       <Name>DeploymentToolkit.Logging</Name>
     </ProjectReference>
     <ProjectReference Include="..\DeploymentToolkit.Environment\DeploymentToolkit.ToolkitEnvironment.csproj">
-      <Project>{94C074C7-CAE2-423E-84B7-80D5B74602BB}</Project>
+      <Project>{94c074c7-cae2-423e-84b7-80d5b74602bb}</Project>
       <Name>DeploymentToolkit.ToolkitEnvironment</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\DeploymentToolkit.Installer\DeploymentToolkit.Installer.csproj">
-      <Project>{d823dfad-3522-434b-b1a8-91232a1169e6}</Project>
-      <Name>DeploymentToolkit.Installer</Name>
     </ProjectReference>
     <ProjectReference Include="..\DeploymentToolkit.Modals\DeploymentToolkit.Modals.csproj">
       <Project>{EC3FEDB7-4FC0-4DCF-A08F-F1DE2DC49E00}</Project>
       <Name>DeploymentToolkit.Modals</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DeploymentToolkit.Uninstaller\DeploymentToolkit.Uninstaller.csproj">
+      <Project>{1f774a30-e6f9-4bfd-b535-d7509d4c0a0f}</Project>
+      <Name>DeploymentToolkit.Uninstaller</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

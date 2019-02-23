@@ -51,6 +51,7 @@
     <Compile Include="DeploymentStep.cs" />
     <Compile Include="IInstallUninstallSequence.cs" />
     <Compile Include="Language.cs" />
+    <Compile Include="MSIReturnCode.cs" />
     <Compile Include="SequenceCompletedEventArgs.cs" />
     <Compile Include="ISequence.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
