@@ -159,11 +159,11 @@ namespace DeploymentToolkit.Messaging
         private void OnProcessStarted(object sender, EventArrivedEventArgs e)
         {
             var processName = e.NewEvent.Properties["ProcessName"].Value.ToString();
-            _logger.Trace($"New process started: {processName}");
-            if(processName.ToLower() == TrayAppExeNameLowered)
+            var processId = Convert.ToInt32(e.NewEvent.Properties["ProcessID"].Value);
+            _logger.Trace($"New process started: [{processId}] {processName}");
+            if (processName.ToLower() == TrayAppExeNameLowered)
             {
                 _logger.Info("New Tray app started. Initiating connection...");
-                var processId = Convert.ToInt32(e.NewEvent.Properties["ProcessID"].Value);
 
                 lock (_collectionLock)
                 {
@@ -188,8 +188,9 @@ namespace DeploymentToolkit.Messaging
 
         private void OnProcessStopped(object sender, EventArrivedEventArgs e)
         {
+            var processName = e.NewEvent.Properties["ProcessName"].Value.ToString();
             var processId = Convert.ToInt32(e.NewEvent.Properties["ProcessID"].Value);
-            _logger.Trace($"Process ended: {processId}");
+            _logger.Trace($"Process ended: [{processId}] {processName}");
             if (_clients.ContainsKey(processId))
             {
                 _logger.Info($"Tray app closed. Disposing pipe");

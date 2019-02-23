@@ -3,7 +3,7 @@ using NLog;
 using System;
 using System.IO;
 
-namespace DeploymentToolkit.Modals.Actions
+namespace DeploymentToolkit.Actions
 {
     public static class FileActions
     {

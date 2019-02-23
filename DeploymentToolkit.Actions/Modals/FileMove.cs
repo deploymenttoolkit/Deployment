@@ -1,5 +1,4 @@
-﻿using DeploymentToolkit.Modals.Actions;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 
 namespace DeploymentToolkit.Actions.Modals
 {
