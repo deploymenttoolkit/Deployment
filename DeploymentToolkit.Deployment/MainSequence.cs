@@ -47,7 +47,7 @@ namespace DeploymentToolkit.Deployment
                         continue;
                     }
 
-                    if(!PreProcessor.AddVariable(variable.Name, variable.Script))
+                    if(!PreProcessor.AddVariable(variable.Name, variable.Script, variable.Environment))
                     {
                         _logger.Warn($"Failed to add {variable.Name} as variable. Check prior logs for more information");
                     }

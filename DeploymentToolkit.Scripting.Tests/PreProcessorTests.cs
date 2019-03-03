@@ -130,6 +130,32 @@ namespace DeploymentToolkit.Scripting.Tests
                     }
                 },
 
+                // Same environments tests
+                new ExpectedScript()
+                {
+                    Name = "IsEnvironment",
+                    Script = "$environment = 'TEST'; function IsEnvironment { return 'Test' }",
+                    Environment = "TEST",
+                    Result = true,
+                    TestCondition = new ExpectedConditon()
+                    {
+                        Condition = @"('$IsEnvironment$' == 'Test')",
+                        ExpectedResult = true
+                    }
+                },
+                new ExpectedScript()
+                {
+                    Name = "IsEnvironmentTest",
+                    Script = @"function IsEnvironmentTest { return $environment }",
+                    Environment = "TEST",
+                    Result = true,
+                    TestCondition = new ExpectedConditon()
+                    {
+                        Condition = @"('$IsEnvironmentTest$' == 'TEST')",
+                        ExpectedResult = true
+                    }
+                },
+
                 // Errors
                 new ExpectedScript()
                 {
@@ -160,7 +186,7 @@ namespace DeploymentToolkit.Scripting.Tests
 
             foreach(var script in scripts)
             {
-                var result = PreProcessor.AddVariable(script.Name, script.Script);
+                var result = PreProcessor.AddVariable(script.Name, script.Script, script.Environment);
                 Assert.AreEqual(script.Result, result);
 
                 if (!result)

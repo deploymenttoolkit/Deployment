@@ -10,6 +10,8 @@ namespace DeploymentToolkit.Modals
         public string Name { get; set; }
         [XmlAttribute(AttributeName = "Script")]
         public string Script { get; set; }
+        [XmlAttribute(AttributeName = "Environment")]
+        public string Environment { get; set; }
     }
 
     [XmlRoot(ElementName = "CustomVariables")]

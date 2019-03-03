@@ -3,6 +3,7 @@ using DeploymentToolkit.ToolkitEnvironment;
 using DeploymentToolkit.ToolkitEnvironment.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Management.Automation;
 
 namespace DeploymentToolkit.Scripting
@@ -84,12 +85,36 @@ namespace DeploymentToolkit.Scripting
             },
         };
 
-        public static bool AddVariable(string name, string script)
+        private static int _uniqueEnvironmentCounter = 0;
+        private static readonly Dictionary<string, PowerShell> _powershellEnvironments = new Dictionary<string, PowerShell>();
+
+        public static void DisposePowerShellEnvironments()
+        {
+            if (_powershellEnvironments.Count == 0)
+                return;
+
+            foreach (var powerShell in _powershellEnvironments)
+            {
+                try
+                {
+                    powerShell.Value?.Dispose();
+                }
+                catch (ObjectDisposedException) { }
+                catch(Exception ex)
+                {
+                    _logger.Warn(ex, $"Failed to dispose powershell environment ({powerShell.Key})");
+                }
+            }
+        }
+
+        public static bool AddVariable(string name, string script, string environment)
         {
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
             if (string.IsNullOrEmpty(script))
                 throw new ArgumentNullException(nameof(script));
+            if (string.IsNullOrEmpty(environment))
+                environment = "UNIQUE";
 
             if (_variables.ContainsKey(name))
             {
@@ -97,26 +122,40 @@ namespace DeploymentToolkit.Scripting
                 return false;
             }
 
+            if(environment == "UNIQUE")
+            {
+                environment = GetUniqueEnvironmentName();
+            }
+
             try
             {
-                using (var powershell = PowerShell.Create())
+#if DEBUG
+                Debug.WriteLine($"Running in PowerShell environment '{environment}'");
+#endif
+                PowerShell powershell;
+                if (!_powershellEnvironments.ContainsKey(environment))
                 {
-                    powershell.AddScript(script, false);
-                    powershell.Invoke();
-                    powershell.Commands.Clear();
-                    powershell.AddCommand(name);
-                    var results = powershell.Invoke();
-                    var result = GetResultFromPSObject(
-                        results.Count >= 1 ?
-                        results[0] :
-                        string.Empty
-                    );
-
-                    _variables.Add(name, delegate ()
-                    {
-                        return result;
-                    });
+                    powershell = PowerShell.Create();
+                    _powershellEnvironments.Add(environment, powershell);
                 }
+                else
+                    powershell = _powershellEnvironments[environment];
+
+                powershell.AddScript(script, false);
+                powershell.Invoke();
+                powershell.Commands.Clear();
+                powershell.AddCommand(name);
+                var results = powershell.Invoke();
+                var result = GetResultFromPSObject(
+                    results.Count >= 1 ?
+                    results[0] :
+                    string.Empty
+                );
+
+                _variables.Add(name, delegate ()
+                {
+                    return result;
+                });
 
                 return true;
             }
@@ -125,6 +164,18 @@ namespace DeploymentToolkit.Scripting
                 _logger.Error(ex, $"Error while trying to add CustomVariable {name}");
                 return false;
             }
+        }
+
+        private static string GetUniqueEnvironmentName()
+        {
+            var environmentName = string.Empty;
+            do
+            {
+                environmentName = $"UNIQUE_{_uniqueEnvironmentCounter++}";
+            }
+            while (_powershellEnvironments.ContainsKey(environmentName));
+
+            return environmentName;
         }
 
         private static string GetResultFromPSObject(PSObject input)
