@@ -29,7 +29,7 @@ namespace DeploymentToolkit.Scripting
                     break;
 
                 var variableName = part.Substring(0, end);
-#if DEBUG
+#if DEBUG && PREPROCESSOR_TRACE
                 Debug.WriteLine($"Found {variableName}");
                 Debug.WriteLine($"ToProcess: {toProcess}");
 #endif
@@ -54,7 +54,7 @@ namespace DeploymentToolkit.Scripting
                     }
 
                     var functionName = variableName.Substring(0, variablesStart);
-#if DEBUG
+#if DEBUG && PREPROCESSOR_TRACE
                     Debug.WriteLine($"Function: {functionName}");
                     Debug.WriteLine($"Params: {parameterString}");
 #endif
@@ -77,7 +77,7 @@ namespace DeploymentToolkit.Scripting
                 }
             }
             while (toProcess.Contains(_separator));
-#if DEBUG
+#if DEBUG && PREPROCESSOR_TRACE
             Debug.WriteLine($"Processed: {processed}");
 #endif
             return processed;
