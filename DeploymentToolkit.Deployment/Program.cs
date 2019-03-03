@@ -44,10 +44,9 @@ namespace DeploymentToolkit.Deployment
             }
         }
 
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
         private static MainSequence _mainSequence;
-
-        private static Logger _logger = LogManager.GetCurrentClassLogger();
-
         private static bool _sequenceCompleted = false;
 
         static void Main(string[] args)
