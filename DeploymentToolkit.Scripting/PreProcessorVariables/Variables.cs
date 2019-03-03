@@ -134,7 +134,7 @@ namespace DeploymentToolkit.Scripting
 
             try
             {
-#if DEBUG
+#if DEBUG && PREPROCESSOR_TRACE
                 Debug.WriteLine($"Running in PowerShell environment '{environment}'");
 #endif
                 PowerShell powershell;
