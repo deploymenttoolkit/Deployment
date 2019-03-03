@@ -95,6 +95,7 @@ namespace DeploymentToolkit.Scripting
 
             foreach (var powerShell in _powershellEnvironments)
             {
+                _logger.Trace($"Disposing {powerShell.Key}");
                 try
                 {
                     powerShell.Value?.Dispose();

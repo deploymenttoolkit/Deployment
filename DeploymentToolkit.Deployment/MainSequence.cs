@@ -201,6 +201,9 @@ namespace DeploymentToolkit.Deployment
                 }
             }
 
+            _logger.Trace("Disposing PowerShell environments ...");
+            PreProcessor.DisposePowerShellEnvironments();
+
             try
             {
                 _logger.Trace("Disconnecting from TrayApps...");
