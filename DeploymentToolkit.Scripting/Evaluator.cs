@@ -21,7 +21,7 @@ namespace DeploymentToolkit.Scripting
         private static int ProcessGroup(string condition, out Group group, Group parentGroup = null)
         {
             _logger.Trace($"Starting processing of '{condition}'");
-#if DEBUG
+#if DEBUG && EVALUTATOR_TRACE
             Debug.WriteLine($"Starting processing of '{condition}'");
 #endif
             group = new Group();
@@ -48,14 +48,14 @@ namespace DeploymentToolkit.Scripting
                 {
                     // End of this group
                     endOfThisGroup = i;
-#if DEBUG
+#if DEBUG && EVALUTATOR_TRACE
                     Debug.WriteLine($"Group ends at {i}");
 #endif
                     break;
                 }
                 else if(currentCharacter == '(')
                 {
-#if DEBUG
+#if DEBUG && EVALUTATOR_TRACE
                     Debug.WriteLine($"Start of another group at {i}");
 #endif
                     lastGroup = currentGroup;
@@ -66,11 +66,11 @@ namespace DeploymentToolkit.Scripting
                     toCut.Add(new int[] { groupStart, groupEnd });
 
                     i = groupEnd; // Skip to the end of the group
-#if DEBUG
+#if DEBUG && EVALUTATOR_TRACE
                     Debug.WriteLine($"Skipping to {i}");
 #endif
 
-                    if(currentCondition != LinkType.None)
+                    if (currentCondition != LinkType.None)
                     {
                         if (lastGroup == null || currentGroup == null)
                             throw new ScriptingInvalidConditionException("Invalid placed AND or OR");
@@ -89,7 +89,7 @@ namespace DeploymentToolkit.Scripting
                         currentCondition = LinkType.And;
                         toCut.Add(new int[] { i, i + 2 });
                         i += 2;
-#if DEBUG
+#if DEBUG && EVALUTATOR_TRACE
                         Debug.WriteLine("Detected AND");
 #endif
                     }
@@ -104,7 +104,7 @@ namespace DeploymentToolkit.Scripting
                         currentCondition = LinkType.Or;
                         toCut.Add(new int[] { i, i + 1 });
                         i += 1;
-#if DEBUG
+#if DEBUG && EVALUTATOR_TRACE
                         Debug.WriteLine("Detected OR");
 #endif
                     }
@@ -114,7 +114,7 @@ namespace DeploymentToolkit.Scripting
             }
 
             toCut.Reverse();
-#if DEBUG
+#if DEBUG && EVALUTATOR_TRACE
             Debug.WriteLine($"Condition: {condition}");
             Debug.WriteLine($"Len: {condition.Length}");
             Debug.WriteLine($"EndOfThisGroup: {endOfThisGroup}");
@@ -152,7 +152,7 @@ namespace DeploymentToolkit.Scripting
         private static Condition EvaluateCondition(string condition)
         {
             _logger.Trace($"Evaluating {condition}");
-#if DEBUG
+#if DEBUG && EVALUTATOR_TRACE
             Debug.WriteLine($"Evaluating {condition}");
 #endif
 
@@ -222,7 +222,7 @@ namespace DeploymentToolkit.Scripting
                 }
             }
             while (currentIndex < condition.Length);
-#if DEBUG
+#if DEBUG && EVALUTATOR_TRACE
             Debug.WriteLine($"Final condition: {result.FirstString} {result.Operator} {result.SecondString} -> {result.IsTrue()}");
 #endif
 
@@ -231,10 +231,10 @@ namespace DeploymentToolkit.Scripting
 
         private static Operator GetOperatorFromString(string input)
         {
-#if DEBUG
+#if DEBUG && EVALUTATOR_TRACE
             Debug.WriteLine($"Processing {input}");
 #endif
-            switch(input)
+            switch (input)
             {
                 case "==":
                     return Operator.Equal;
