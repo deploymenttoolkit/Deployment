@@ -13,8 +13,6 @@ namespace DeploymentToolkit.Scripting
 
         public static bool Evaluate(string condition)
         {
-            var original = string.Copy(condition);
-
             ProcessGroup(condition, out var mainGroup);
 
             return mainGroup.IsTrue();
