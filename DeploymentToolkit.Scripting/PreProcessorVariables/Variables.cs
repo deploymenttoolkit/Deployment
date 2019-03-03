@@ -88,11 +88,12 @@ namespace DeploymentToolkit.Scripting
         private static int _uniqueEnvironmentCounter = 0;
         private static readonly Dictionary<string, PowerShell> _powershellEnvironments = new Dictionary<string, PowerShell>();
 
-        public static void DisposePowerShellEnvironments()
+        public static bool DisposePowerShellEnvironments()
         {
             if (_powershellEnvironments.Count == 0)
-                return;
+                return true;
 
+            var hadException = false;
             foreach (var powerShell in _powershellEnvironments)
             {
                 _logger.Trace($"Disposing {powerShell.Key}");
@@ -104,8 +105,11 @@ namespace DeploymentToolkit.Scripting
                 catch(Exception ex)
                 {
                     _logger.Warn(ex, $"Failed to dispose powershell environment ({powerShell.Key})");
+                    hadException = true;
                 }
             }
+
+            return !hadException;
         }
 
         public static bool AddVariable(string name, string script, string environment)

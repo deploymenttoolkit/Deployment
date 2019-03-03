@@ -196,5 +196,11 @@ namespace DeploymentToolkit.Scripting.Tests
                 Assert.AreEqual(script.TestCondition.ExpectedResult, Evaluation.Evaluate(preProcessed));
             }
         }
+
+        [TestMethod]
+        public void TestPowerShellEnvironmentDipose()
+        {
+            Assert.IsTrue(PreProcessor.DisposePowerShellEnvironments());
+        }
     }
 }
