@@ -2,6 +2,7 @@
 using NLog;
 using System;
 using System.ComponentModel;
+using System.IO;
 using System.Runtime.InteropServices;
 
 namespace DeploymentToolkit.Registry.Modals
@@ -40,12 +41,14 @@ namespace DeploymentToolkit.Registry.Modals
 
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
         private WinRegistryBase _winRegistryBase { get; }
+        private RegistryHive _hive { get; }
 
-        public WinRegistryKey(WinRegistryBase winRegistryBase, UIntPtr regPointer, string Key)
+        public WinRegistryKey(WinRegistryBase winRegistryBase, UIntPtr regPointer, string Key, RegistryHive hive)
         {
             this._winRegistryBase = winRegistryBase;
             this.Key = Key;
             this.RegPointer = regPointer;
+            this._hive = hive;
         }
 
         public bool DeleteValue(string key)
@@ -157,6 +160,22 @@ namespace DeploymentToolkit.Registry.Modals
                 if (result != IntPtr.Zero)
                     Marshal.FreeHGlobal(result);
             }
+        }
+
+        public WinRegistryKey CreateSubKey(string name)
+        {
+            return _winRegistryBase.InternalCreateOrOpenKey(
+                Path.Combine(
+                    Key,
+                    name
+                ),
+                _hive
+            );
+        }
+
+        public bool DeleteSubKey(string name)
+        {
+            return _winRegistryBase.DeleteKey(this, name);
         }
 
         public void Dispose()

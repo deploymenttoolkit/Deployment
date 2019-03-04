@@ -6,7 +6,7 @@ using System.Diagnostics;
 namespace DeploymentToolkit.Registry.Tests
 {
     [TestClass()]
-    public class WinRegistryTests
+    public class WinRegistryValueTests
     {
         public Win32Registry Win32Registry = new Win32Registry();
         public Win64Registry Win64Registry = new Win64Registry();

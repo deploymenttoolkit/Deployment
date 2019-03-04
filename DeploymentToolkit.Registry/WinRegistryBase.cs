@@ -26,15 +26,23 @@ namespace DeploymentToolkit.Registry
 
         [DllImport("advapi32.dll")]
         static extern int RegCreateKeyEx(
+                RegistryHive hKey,
+                string lpSubKey,
+                int Reserved,
+                string lpClass,
+                RegOption dwOptions,
+                RegSAM samDesired,
+                SECURITY_ATTRIBUTES lpSecurityAttributes,
+                out UIntPtr phkResult,
+                out RegDisposition lpdwDisposition
+        );
+
+        [DllImport("advapi32.dll")]
+        public static extern int RegDeleteKeyEx(
             UIntPtr hKey,
-            [MarshalAs(UnmanagedType.VBByRefStr)] ref string lpSubKey,
-            uint Reserved,
-            string lpClass,
-            RegOption dwOptions,
+            string lpSubKey,
             RegSAM samDesired,
-            ref SECURITY_ATTRIBUTES lpSecurityAttributes,
-            out UIntPtr phkResult,
-            out RegDisposition lpdwDisposition
+            uint Reserved
         );
 
         protected abstract RegAccess RegAccess { get; }
@@ -53,7 +61,58 @@ namespace DeploymentToolkit.Registry
             _logger.Trace($"Errorlevel: {error}");
 
             if (error == 0)
-                return new WinRegistryKey(this, key, newPath);
+                return new WinRegistryKey(this, key, newPath, hive);
+            throw new Win32Exception(error);
+        }
+
+        public WinRegistryKey CreateOrOpenKey(string path)
+        {
+            _logger.Trace($"CreateKey({path})");
+            if (string.IsNullOrEmpty(path))
+                throw new ArgumentNullException(nameof(path));
+
+            var hive = GetHiveFromString(path, out var newPath);
+            return InternalCreateOrOpenKey(newPath, hive);
+        }
+
+        internal WinRegistryKey InternalCreateOrOpenKey(string path, RegistryHive hive)
+        {
+            _logger.Trace($"InternalCreateOrOpenKey({path}, {hive})");
+            var error = RegCreateKeyEx(
+                hive,
+                path,
+                0,
+                String.Empty,
+                RegOption.NonVolatile,
+                RegSAM.Write | (RegAccess == RegAccess.KEY_WOW64_64KEY ? RegSAM.WOW64_64Key : RegSAM.WOW64_32Key),
+                new SECURITY_ATTRIBUTES(),
+                out UIntPtr key,
+                out RegDisposition result
+            );
+            _logger.Trace($"Errorlevel: {error}");
+
+            if (error == 0)
+                return new WinRegistryKey(this, key, path, hive);
+
+            throw new Win32Exception(error);
+        }
+
+        public bool DeleteKey(WinRegistryKey key, string subKey)
+        {
+            _logger.Trace($"DeleteKey({key.Key}, {subKey})");
+            if (string.IsNullOrEmpty(subKey))
+                throw new ArgumentNullException(nameof(subKey));
+
+            var error = RegDeleteKeyEx(
+                key.RegPointer,
+                subKey,
+                RegAccess == RegAccess.KEY_WOW64_64KEY ? RegSAM.WOW64_64Key : RegSAM.WOW64_32Key,
+                0
+            );
+            _logger.Trace($"Errorlevel: {error}");
+
+            if (error == 0)
+                return true;
             throw new Win32Exception(error);
         }
 

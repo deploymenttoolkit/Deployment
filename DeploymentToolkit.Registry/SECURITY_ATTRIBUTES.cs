@@ -1,13 +1,12 @@
-﻿using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
 namespace DeploymentToolkit.Registry
 {
     [StructLayout(LayoutKind.Sequential)]
-    public struct SECURITY_ATTRIBUTES
+    public class SECURITY_ATTRIBUTES
     {
         public int nLength;
-        public IntPtr lpSecurityDescriptor;
+        public unsafe byte* lpSecurityDescriptor;
         public int bInheritHandle;
     }
 }
