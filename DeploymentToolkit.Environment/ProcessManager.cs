@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using DeploymentToolkit.RegistryWrapper;
+using Microsoft.Win32;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -107,17 +108,6 @@ namespace DeploymentToolkit.ToolkitEnvironment
 
             try
             {
-                _logger.Trace("Opening registry");
-                var registry = Registry.LocalMachine.OpenSubKey(_blockExecutionSubKey, true);
-                if (registry == null)
-                {
-                    _logger.Error("Failed to open registry");
-                    return false;
-                }
-
-                var subKeys = registry.GetSubKeyNames();
-                var subKeysLowered = subKeys.ToList().ConvertAll(key => key.ToLower());
-
                 var executableNames = applications.Distinct();
                 foreach (var executable in executableNames)
                 {
@@ -128,11 +118,8 @@ namespace DeploymentToolkit.ToolkitEnvironment
                             executableName += ".exe";
 
                         _logger.Trace($"Blocking execution of {executableName}");
-
-                        var subKey = registry.CreateSubKey(executableName);
-                        subKey.SetValue("Debugger", _debuggerPath);
-
-                        registry.Flush();
+                        Win96Registry.CreateSubKey(RegistryHive.LocalMachine, _blockExecutionSubKey, executableName);
+                        Win96Registry.SetValue(RegistryHive.LocalMachine, _blockExecutionSubKey, executableName, "Debugger", _debuggerPath);
                     }
                     catch (Exception ex)
                     {
@@ -159,17 +146,6 @@ namespace DeploymentToolkit.ToolkitEnvironment
 
             try
             {
-                _logger.Trace("Opening registry");
-                var registry = Registry.LocalMachine.OpenSubKey(_blockExecutionSubKey, true);
-                if (registry == null)
-                {
-                    _logger.Error("Failed to open registry");
-                    return false;
-                }
-
-                var subKeys = registry.GetSubKeyNames();
-                var subKeysLowered = subKeys.ToList().ConvertAll(key => key.ToLower());
-
                 var executableNames = applications.Distinct();
                 foreach (var executable in executableNames)
                 {
@@ -180,15 +156,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
                             executableName += ".exe";
 
                         _logger.Trace($"Unblocking execution of {executableName}");
-
-                        if (subKeysLowered.Contains(executableName))
-                        {
-                            registry.DeleteSubKeyTree(executableName);
-                        }
-                        else
-                            _logger.Trace($"No key for {executableName} found. Nothing to unblock");
-
-                        registry.Flush();
+                        Win96Registry.DeleteSubKey(RegistryHive.LocalMachine, _blockExecutionSubKey, executableName);
                     }
                     catch (Exception ex)
                     {

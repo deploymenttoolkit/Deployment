@@ -58,6 +58,10 @@
       <Project>{EC3FEDB7-4FC0-4DCF-A08F-F1DE2DC49E00}</Project>
       <Name>DeploymentToolkit.Modals</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DeploymentToolkit.RegistryWrapper\DeploymentToolkit.RegistryWrapper.csproj">
+      <Project>{D98D219D-9FE8-44C0-AB9A-D5FFF3578FEE}</Project>
+      <Name>DeploymentToolkit.RegistryWrapper</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
