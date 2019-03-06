@@ -1,9 +1,11 @@
 ﻿using Microsoft.Win32;
 using NLog;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace DeploymentToolkit.Registry.Modals
 {
@@ -33,6 +35,34 @@ namespace DeploymentToolkit.Registry.Modals
         static extern int RegDeleteValue(
             UIntPtr hKey,
             [MarshalAs(UnmanagedType.VBByRefStr)] ref string lpValueName
+        );
+
+        [DllImport("advapi32.dll")]
+        extern private static int RegQueryInfoKey(
+            UIntPtr hkey,
+            StringBuilder lpClass,
+            ref uint lpcbClass,
+            IntPtr lpReserved,
+            ref uint lpcSubKeys,
+            IntPtr lpcbMaxSubKeyLen,
+            IntPtr lpcbMaxClassLen,
+            IntPtr lpcValues,
+            IntPtr lpcbMaxValueNameLen,
+            IntPtr lpcbMaxValueLen,
+            IntPtr lpcbSecurityDescriptor,
+            IntPtr lpftLastWriteTime
+        );
+
+        [DllImport("advapi32.dll")]
+        static extern int RegEnumKeyEx(
+            UIntPtr hKey,
+            uint dwIndex,
+            StringBuilder lpName,
+            ref uint lpcchName,
+            IntPtr lpReserved,
+            IntPtr lpClass,
+            IntPtr lpcchClass,
+            System.Runtime.InteropServices.ComTypes.FILETIME lpftLastWriteTime
         );
 
         public string Key { get; }
@@ -164,6 +194,7 @@ namespace DeploymentToolkit.Registry.Modals
 
         public WinRegistryKey CreateSubKey(string name)
         {
+            _logger.Trace($"CreateSubKey({name})");
             return _winRegistryBase.InternalCreateOrOpenKey(
                 Path.Combine(
                     Key,
@@ -173,8 +204,95 @@ namespace DeploymentToolkit.Registry.Modals
             );
         }
 
+        public List<WinRegistryKey> GetSubKeys()
+        {
+            _logger.Trace("GetSubKeys()");
+            var subKeys = new List<WinRegistryKey>();
+            try
+            {
+                var classSize = 255u;
+                var className = new StringBuilder((int)classSize);
+                var subKeyCount = 0u;
+                var error = RegQueryInfoKey(
+                    RegPointer,
+                    className,
+                    ref classSize,
+                    IntPtr.Zero,
+                    ref subKeyCount,
+                    IntPtr.Zero,
+                    IntPtr.Zero,
+                    IntPtr.Zero,
+                    IntPtr.Zero,
+                    IntPtr.Zero,
+                    IntPtr.Zero,
+                    IntPtr.Zero
+                );
+                if(error == 0)
+                {
+                    //var subKeyCount = Marshal.ReadInt32(subKeyCountAddress);
+                    _logger.Trace($"Found {subKeyCount} subkeys");
+                    
+                    if(subKeyCount > 0)
+                    {
+                        for(uint i = 0; i < subKeyCount; i++)
+                        {
+                            _logger.Trace($"Getting info for {i}");
+                            var name = new StringBuilder((int)classSize);
+                            error = RegEnumKeyEx(
+                                RegPointer,
+                                i,
+                                name,
+                                ref classSize,
+                                IntPtr.Zero,
+                                IntPtr.Zero,
+                                IntPtr.Zero,
+                                new System.Runtime.InteropServices.ComTypes.FILETIME()
+                            );
+
+                            if(error == 0)
+                            {
+                                var path = Path.Combine(Key, name.ToString());
+                                try
+                                {
+                                    var key = _winRegistryBase.OpenKey(path);
+                                    subKeys.Add(key);
+                                }
+                                catch(Win32Exception ex)
+                                {
+                                    _logger.Warn(ex, "Failed to open key");
+                                }
+                                catch(Exception ex)
+                                {
+                                    _logger.Error(ex, "Failed to open key");
+                                }
+                            }
+                            else
+                            {
+                                var exception = new Win32Exception(error);
+                                _logger.Warn(exception, $"Failed to get SubKey ({i})");
+#if DEBUG
+                                throw exception;
+#endif
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    var exception = new Win32Exception(error);
+                    _logger.Error(exception, "Failed to get RegInfo");
+                }
+            }
+            finally
+            {
+
+            }
+            return subKeys;
+        }
+
         public bool DeleteSubKey(string name)
         {
+            _logger.Trace($"DeleteSubKey({name})");
             return _winRegistryBase.DeleteKey(this, name);
         }
 

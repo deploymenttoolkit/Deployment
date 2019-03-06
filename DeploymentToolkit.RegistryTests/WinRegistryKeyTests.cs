@@ -1,5 +1,6 @@
 ﻿using DeploymentToolkit.Registry;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Diagnostics;
 using System.IO;
 
 namespace DeploymentToolkit.RegistryTests
@@ -75,6 +76,22 @@ namespace DeploymentToolkit.RegistryTests
             using (var key = Win64Registry.CreateOrOpenKey(Path.Combine(Win64WriteLocation, "Test")))
             {
                 Assert.IsNotNull(key);
+            }
+        }
+
+        [TestMethod()]
+        public void Win64GetSubKeyTests()
+        {
+            using (var key = Win64Registry.OpenKey(Win64WriteLocation))
+            {
+                Assert.IsNotNull(key);
+
+                var subKeys = key.GetSubKeys();
+                
+                foreach(var subKey in subKeys)
+                {
+                    Debug.WriteLine($"Path: {subKey.Key}");
+                }
             }
         }
 
