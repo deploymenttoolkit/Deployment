@@ -55,6 +55,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{C10C8EF8
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.RegistryTests", "DeploymentToolkit.RegistryTests\DeploymentToolkit.RegistryTests.csproj", "{3879250E-0D6E-41C3-8B17-4BD84C95FFE3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.RegistryWrapper", "DeploymentToolkit.RegistryWrapper\DeploymentToolkit.RegistryWrapper.csproj", "{D98D219D-9FE8-44C0-AB9A-D5FFF3578FEE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -137,6 +139,10 @@ Global
 		{3879250E-0D6E-41C3-8B17-4BD84C95FFE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3879250E-0D6E-41C3-8B17-4BD84C95FFE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3879250E-0D6E-41C3-8B17-4BD84C95FFE3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D98D219D-9FE8-44C0-AB9A-D5FFF3578FEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D98D219D-9FE8-44C0-AB9A-D5FFF3578FEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D98D219D-9FE8-44C0-AB9A-D5FFF3578FEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D98D219D-9FE8-44C0-AB9A-D5FFF3578FEE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -163,6 +169,7 @@ Global
 		{364666E5-EE07-4266-AB69-70A701C57E9E} = {4BD3FEBC-9E55-4A00-B646-F6C9DEC79E3F}
 		{0EE12FB6-92F6-497A-8429-32E0C31B648A} = {26E734FC-81B7-40B3-99E0-17A799AEEE77}
 		{3879250E-0D6E-41C3-8B17-4BD84C95FFE3} = {C10C8EF8-ECD3-4572-9F68-C087EC075331}
+		{D98D219D-9FE8-44C0-AB9A-D5FFF3578FEE} = {26E734FC-81B7-40B3-99E0-17A799AEEE77}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7CF45D1D-C7D1-4A80-8540-720E7D4182AA}
