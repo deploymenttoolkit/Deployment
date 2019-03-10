@@ -14,6 +14,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Threading;
 
 namespace DeploymentToolkit.Deployment
@@ -181,21 +182,9 @@ namespace DeploymentToolkit.Deployment
             _logger.Trace("Read uninstall settings. Starting uninstallation...");
             _logger.Trace("Checking CommandLine Path...");
 
-            var fullPath = Path.GetFullPath(EnvironmentVariables.UninstallSettings.CommandLine);
-            if(EnvironmentVariables.UninstallSettings.CommandLine.Length != fullPath.Length)
-            {
-                _logger.Trace("Not a absolute path specified. Searching for file in 'Files' folder");
-                var path = Path.Combine(DeploymentEnvironmentVariables.FilesDirectory, EnvironmentVariables.UninstallSettings.CommandLine);
-                _logger.Trace($"Changed path from {EnvironmentVariables.UninstallSettings.CommandLine} to {path}");
-                EnvironmentVariables.UninstallSettings.CommandLine = path;
-            }
+            EnvironmentVariables.UninstallSettings.CommandLine = VerifyCommandLine(EnvironmentVariables.UninstallSettings.CommandLine);
 
-            _logger.Trace("Verifiying that file specified in CommandLine exists...");
-            // CommandLine should either specify an exe file or an msi file. Either way the file has to exist
-            if (!File.Exists(EnvironmentVariables.UninstallSettings.CommandLine))
-            {
-                ExitInstallation($"File specified in CommandLine does not exists ({EnvironmentVariables.UninstallSettings.CommandLine}). Aborting uninstallation", ExitCode.InvalidCommandLineSpecified);
-            }
+            VerifyUninstall();
 
             // Detecting installation type
             try
@@ -252,15 +241,7 @@ namespace DeploymentToolkit.Deployment
             _logger.Info("Read install settings. Starting installation...");
             _logger.Trace("Checking CommandLine Path...");
 
-            // If you specify a full path, then the length should stay the same
-            var fullPath = Path.GetFullPath(EnvironmentVariables.InstallSettings.CommandLine);
-            if (EnvironmentVariables.InstallSettings.CommandLine.Length != fullPath.Length)
-            {
-                _logger.Trace("Not a absolute path specified. Searching for file in 'Files' folder");
-                var path = Path.Combine(DeploymentEnvironmentVariables.FilesDirectory, EnvironmentVariables.InstallSettings.CommandLine);
-                _logger.Trace($"Changed path from {EnvironmentVariables.InstallSettings.CommandLine} to {path}");
-                EnvironmentVariables.InstallSettings.CommandLine = path;
-            }
+            EnvironmentVariables.InstallSettings.CommandLine = VerifyCommandLine(EnvironmentVariables.InstallSettings.CommandLine);
 
             _logger.Trace("Verifiying that file specified in CommandLine exists...");
             // CommandLine should either specify an exe file or an msi file. Either way the file has to exist
@@ -320,6 +301,42 @@ namespace DeploymentToolkit.Deployment
             {
                 _sequenceCompleted = true;
             }
+        }
+
+        private static string VerifyCommandLine(string commandLine)
+        {
+            // If you specify a full path, then the length should stay the same
+            var fullPath = Path.GetFullPath(commandLine);
+            if (commandLine.Length != fullPath.Length)
+            {
+                _logger.Trace("Not a absolute path specified. Searching for file in 'Files' folder");
+                var path = Path.Combine(DeploymentEnvironmentVariables.FilesDirectory, commandLine);
+                _logger.Trace($"Changed path from {commandLine} to {path}");
+                return path;
+            }
+            return commandLine;
+        }
+
+        private static bool VerifyUninstall()
+        {
+            var commandLine = EnvironmentVariables.UninstallSettings.CommandLine;
+
+            _logger.Trace("Verifiying that file specified in CommandLine exists...");
+            // CommandLine should either specify an exe file or an msi file. Either way the file has to exist
+            if (!File.Exists(commandLine))
+            {
+                // With MSI uninstallation its also possible to uninstall via GUID
+                var regex = new Regex(@"(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}");
+                var match = regex.Match(commandLine);
+                if(match.Success)
+                {
+                    _logger.Trace("Detected MSI GUID. Not verifying existence of MSI file");
+                    return true;
+                }
+                ExitInstallation($"File specified in CommandLine does not exists ({commandLine}). Aborting uninstallation", ExitCode.InvalidCommandLineSpecified);
+                return false;
+            }
+            return true;
         }
     }
 }
