@@ -22,9 +22,6 @@ namespace DeploymentToolkit.Uninstaller.MSI
 
         public MSIUninstaller(UninstallSettings uninstallSettings) : base(uninstallSettings)
         {
-            if (!uninstallSettings.CommandLine.ToLower().EndsWith(".msi"))
-                throw new Exception("MSIInstaller can only be used with MSI uninstallations");
-
             if (!UninstallSettings.MSISettings.UseDefaultMSIParameters && string.IsNullOrEmpty(UninstallSettings.Parameters))
             {
                 _logger.Warn($"No command line specified on an MSI uninstallation. Using default parameters ('{ToolkitEnvironment.MSI.DefaultUninstallParameters}')");
