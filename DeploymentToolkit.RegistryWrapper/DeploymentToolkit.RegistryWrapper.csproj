@@ -46,7 +46,7 @@
   <ItemGroup>
     <Compile Include="Win32Registry.cs" />
     <Compile Include="Win64Registry.cs" />
-    <Compile Include="WinRegistry.cs" />
+    <Compile Include="Win96Registry.cs" />
     <Compile Include="WinRegistryBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

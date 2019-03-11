@@ -8,14 +8,48 @@ namespace DeploymentToolkit.Scripting
     {
         private static readonly Dictionary<string, Func<string[], string>> _functions = new Dictionary<string, Func<string[], string>>()
         {
+            #region FileFunctions
             {
                 "FileExists",
                 FileFunctions.Exists
             },
+            #endregion
+            #region DirectoryFunctions
             {
                 "DirectoryExists",
                 DirectoryFunctions.Exists
+            },
+            #endregion
+            #region RegistryFunctions
+            {
+                "RegHasKey",
+                RegistryFunctions.HasKey
+            },
+            {
+                "RegCreateKey",
+                RegistryFunctions.CreateKey
+            },
+            {
+                "RegDeleteKey",
+                RegistryFunctions.DeleteKey
+            },
+            {
+                "RegHasValue",
+                RegistryFunctions.HasValue
+            },
+            {
+                "RegGetValue",
+                RegistryFunctions.GetValue
+            },
+            {
+                "RegSetValue",
+                RegistryFunctions.SetValue
+            },
+            {
+                "RegDeleteValue",
+                RegistryFunctions.DeleteValue
             }
+            #endregion
         };
     }
 }
