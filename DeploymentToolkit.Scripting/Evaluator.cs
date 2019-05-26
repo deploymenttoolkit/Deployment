@@ -1,5 +1,4 @@
-﻿#define EVALUTATOR_TRACE
-using DeploymentToolkit.Scripting.Exceptions;
+﻿using DeploymentToolkit.Scripting.Exceptions;
 using DeploymentToolkit.Scripting.Modals;
 using NLog;
 using System;
