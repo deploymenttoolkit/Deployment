@@ -1,4 +1,5 @@
-﻿using DeploymentToolkit.Scripting.Exceptions;
+﻿#define EVALUTATOR_TRACE
+using DeploymentToolkit.Scripting.Exceptions;
 using DeploymentToolkit.Scripting.Modals;
 using NLog;
 using System;
@@ -223,7 +224,7 @@ namespace DeploymentToolkit.Scripting
             }
             while (currentIndex < condition.Length);
 #if DEBUG && EVALUTATOR_TRACE
-            Debug.WriteLine($"Final condition: {result.FirstString} {result.Operator} {result.SecondString} -> {result.IsTrue()}");
+            Debug.WriteLine($"Final condition: '{result.FirstString}' {result.Operator} '{result.SecondString}' as {result.CompareType} -> {result.IsTrue()}");
 #endif
 
             return result;

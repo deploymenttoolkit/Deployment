@@ -10,6 +10,21 @@ namespace DeploymentToolkit.Actions
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
+        public static bool Exists(string path)
+        {
+            _logger.Trace($"Exists({path})");
+            if (string.IsNullOrEmpty(path))
+                throw new ArgumentNullException(nameof(path));
+
+            if (!Path.IsPathRooted(path))
+            {
+                path = Path.Combine(DeploymentEnvironmentVariables.FilesDirectory, path);
+                _logger.Trace($"Path was a non absolute path. Changed path to '{path}'");
+            }
+
+            return Directory.Exists(path);
+        }
+
         public static bool MoveDirectory(string source, string target, bool overwrite = false, bool recursive = true)
         {
             _logger.Trace($"MoveDirectory({source}, {target}, {overwrite}, {recursive})");

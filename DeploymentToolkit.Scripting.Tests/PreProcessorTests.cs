@@ -66,7 +66,7 @@ namespace DeploymentToolkit.Scripting.Tests
                 },
                 new ExpectedConditon()
                 {
-                    Condition = @"$DirectoryExists()",
+                    Condition = @"$DirectoryExists(C:\Windows)",
                     ExpectedResult = true
                 },
                 new ExpectedConditon()

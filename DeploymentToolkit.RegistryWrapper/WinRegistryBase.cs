@@ -51,35 +51,6 @@ namespace DeploymentToolkit.RegistryWrapper
 
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        //private RegistryHive GetHiveFromKey(string path)
-        //{
-        //    switch(path.ToUpper())
-        //    {
-        //        case "HKCR":
-        //        case "HKEY_CLASSES_ROOT":
-        //            return RegistryHive.ClassesRoot;
-
-        //        case "HKCC":
-        //        case "HKEY_CURRENT_CONFIG":
-        //            return RegistryHive.CurrentConfig;
-
-        //        case "HKCU":
-        //        case "HKEY_CURRENT_USER":
-        //            return RegistryHive.CurrentUser;
-
-        //        case "HKLM":
-        //        case "HKEY_LOCAL_MACHINE":
-        //            return RegistryHive.LocalMachine;
-
-        //        case "HKUS":
-        //        case "HKEY_USERS":
-        //            return RegistryHive.Users;
-
-        //        default:
-        //            throw new ArgumentOutOfRangeException(nameof(path), "Unknown or unsupported hive");
-        //    }
-        //}
-
         private RegistryKey GetBaseKey(string path, out string newPath)
         {
             if (string.IsNullOrEmpty(path))
@@ -89,10 +60,13 @@ namespace DeploymentToolkit.RegistryWrapper
             if (split.Length == 0)
                 throw new ArgumentOutOfRangeException(nameof(path), "Invalid path supplied");
 
-            var hive = split[0];
-            newPath = split.Length == 1 ? split[1] : split.Skip(1).Aggregate((i, j) => i + @"\" + j);
-
-            switch(hive)
+            var hive = split[0].Trim().ToUpperInvariant();
+            newPath = string.Empty;
+            if (split.Length == 2)
+                newPath = split[1];
+            else if (split.Length > 2)
+                newPath = split.Skip(1).Aggregate((i, j) => i + @"\" + j);
+            switch (hive)
             {
                 case "HKCR":
                 case "HKEY_CLASSES_ROOT":
@@ -145,7 +119,7 @@ namespace DeploymentToolkit.RegistryWrapper
                 throw new ArgumentNullException(nameof(subKeyName));
 
             var key = GetBaseKey(path, out var newPath);
-            var subKey = key.OpenSubKey(newPath);
+            var subKey = key.OpenSubKey(newPath, true);
             if(subKey != null)
             {
                 subKey.CreateSubKey(subKeyName);
@@ -163,7 +137,7 @@ namespace DeploymentToolkit.RegistryWrapper
                 throw new ArgumentNullException(nameof(subKeyName));
 
             var key = GetBaseKey(path, out var newPath);
-            var subKey = key.OpenSubKey(newPath);
+            var subKey = key.OpenSubKey(newPath, true);
             if (subKey != null)
             {
                 subKey.DeleteSubKeyTree(subKeyName);
@@ -194,11 +168,11 @@ namespace DeploymentToolkit.RegistryWrapper
         {
             if (string.IsNullOrEmpty(path))
                 throw new ArgumentNullException(nameof(path));
-            if (string.IsNullOrEmpty(value))
-                throw new ArgumentNullException(nameof(value));
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentNullException(nameof(name));
 
             var key = GetBaseKey(path, out var newPath);
-            var subKey = key.OpenSubKey(newPath);
+            var subKey = key.OpenSubKey(newPath, true);
             if (subKey != null)
             {
                 subKey.SetValue(name, value, valueKind);
@@ -233,7 +207,7 @@ namespace DeploymentToolkit.RegistryWrapper
                 throw new ArgumentNullException(nameof(value));
 
             var key = GetBaseKey(path, out var newPath);
-            var subKey = key.OpenSubKey(newPath);
+            var subKey = key.OpenSubKey(newPath, true);
             if (subKey != null)
             {
                 subKey.DeleteValue(value);

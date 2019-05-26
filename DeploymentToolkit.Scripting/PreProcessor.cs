@@ -1,5 +1,6 @@
 ﻿using NLog;
 using System.Diagnostics;
+using System.Linq;
 
 namespace DeploymentToolkit.Scripting
 {
@@ -60,7 +61,8 @@ namespace DeploymentToolkit.Scripting
 #endif
                     if (_functions.ContainsKey(functionName))
                     {
-                        var parameters = parameterString.Split(',');
+                        // Trim each variable so you can create better visibility in scripts with spaces
+                        var parameters = parameterString.Split(',').Select((p) => p.Trim()).ToArray();
                         processed = processed.Replace($"${variableName}$", _functions[functionName].Invoke(parameters));
                     }
                     else

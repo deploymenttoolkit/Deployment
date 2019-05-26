@@ -67,6 +67,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DeploymentToolkit.Actions\DeploymentToolkit.Actions.csproj">
+      <Project>{0059F67C-809E-4811-995D-4647BB520C99}</Project>
+      <Name>DeploymentToolkit.Actions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DeploymentToolkit.Environment\DeploymentToolkit.ToolkitEnvironment.csproj">
       <Project>{94c074c7-cae2-423e-84b7-80d5b74602bb}</Project>
       <Name>DeploymentToolkit.ToolkitEnvironment</Name>

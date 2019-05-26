@@ -59,11 +59,16 @@
     <Compile Include="Modals\IExecutableAction.cs" />
     <Compile Include="Modals\IOrderedAction.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RegistryActions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DeploymentToolkit.DeploymentEnvironment\DeploymentToolkit.DeploymentEnvironment.csproj">
       <Project>{4EA54C46-9DBE-4872-9820-E24D2A88FB39}</Project>
       <Name>DeploymentToolkit.DeploymentEnvironment</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DeploymentToolkit.RegistryWrapper\DeploymentToolkit.RegistryWrapper.csproj">
+      <Project>{D98D219D-9FE8-44C0-AB9A-D5FFF3578FEE}</Project>
+      <Name>DeploymentToolkit.RegistryWrapper</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

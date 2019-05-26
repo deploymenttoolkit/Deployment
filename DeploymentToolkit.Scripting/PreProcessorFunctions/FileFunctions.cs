@@ -1,5 +1,5 @@
-﻿using DeploymentToolkit.Scripting.Extensions;
-using System.IO;
+﻿using DeploymentToolkit.Actions;
+using DeploymentToolkit.Scripting.Extensions;
 
 namespace DeploymentToolkit.Scripting.PreProcessorFunctions
 {
@@ -10,10 +10,7 @@ namespace DeploymentToolkit.Scripting.PreProcessorFunctions
             if (parameters.Length == 0)
                 return false.ToIntString();
 
-            var path = parameters[0];
-            if (!Path.IsPathRooted(path))
-                path = Path.GetFullPath(path);
-            return File.Exists(path).ToIntString();
+            return FileActions.Exists(parameters[0]).ToIntString();
         }
     }
 }

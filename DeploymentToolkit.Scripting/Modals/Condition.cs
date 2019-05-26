@@ -1,4 +1,6 @@
-﻿namespace DeploymentToolkit.Scripting.Modals
+﻿using System;
+
+namespace DeploymentToolkit.Scripting.Modals
 {
     public enum CompareType
     {
@@ -33,7 +35,10 @@
 
                         if (CompareType == CompareType.String)
                         {
-                            result = FirstString == SecondString;
+                            if (string.IsNullOrEmpty(FirstString) && string.IsNullOrEmpty(SecondString))
+                                result = true;
+                            else
+                                result = string.Compare(FirstString, SecondString, StringComparison.InvariantCulture) == 0;
                         }
                         else
                         {
