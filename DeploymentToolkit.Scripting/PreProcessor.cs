@@ -30,13 +30,39 @@ namespace DeploymentToolkit.Scripting
                     break;
 
                 var variableName = part.Substring(0, end);
+
+                var isFunction = false;
+                if(variableName.Contains("("))
+                {
+#if DEBUG && PREPROCESSOR_TRACE
+                    Debug.WriteLine("Function detected");
+#endif
+                    isFunction = true;
+
+                    end = part.IndexOf(')');
+                    if (end == -1)
+                    {
+                        end = part.IndexOf(_separator);
+                        variableName = part.Substring(0, end);
+                        processed = processed.Replace($"${variableName}$", "INCOMPLETE FUNCTION");
+                        break;
+                    }
+
+                    variableName = part.Substring(0, ++end);
+
+#if DEBUG && PREPROCESSOR_TRACE
+                    Debug.WriteLine($"End updated to {end} ({part.Length}, {start})");
+#endif
+                }
+
 #if DEBUG && PREPROCESSOR_TRACE
                 Debug.WriteLine($"Found {variableName}");
-                Debug.WriteLine($"ToProcess: {toProcess}");
 #endif
                 toProcess = toProcess.Substring(end, toProcess.Length - end);
-
-                if (variableName.Contains("("))
+#if DEBUG && PREPROCESSOR_TRACE
+                Debug.WriteLine($"Remaining to Process: {toProcess}");
+#endif
+                if (isFunction)
                 {
                     var variablesStart = variableName.IndexOf('(');
                     var variablesEnd = variableName.IndexOf(')');
@@ -62,7 +88,7 @@ namespace DeploymentToolkit.Scripting
                     if (_functions.ContainsKey(functionName))
                     {
                         // Trim each variable so you can create better visibility in scripts with spaces
-                        var parameters = parameterString.Split(',').Select((p) => p.Trim()).ToArray();
+                        var parameters = ProcessVariables(parameterString.Split(','));
                         processed = processed.Replace($"${variableName}$", _functions[functionName].Invoke(parameters));
                     }
                     else
@@ -83,6 +109,30 @@ namespace DeploymentToolkit.Scripting
             Debug.WriteLine($"Processed: {processed}");
 #endif
             return processed;
+        }
+
+        private static string[] ProcessVariables(string[] variables)
+        {
+            var result = new string[variables.Length];
+            var trimmed = variables.Select((p) => p.Trim()).ToArray();
+            for(var i = 0; i < variables.Length; i++)
+            {
+                var currentVariable = trimmed[i];
+                if(currentVariable.StartsWith("$") && currentVariable.EndsWith("$"))
+                {
+                    var variableName = currentVariable.Trim('$');
+                    Debug.WriteLine($"Inline Variable: '{variableName}'");
+                    if (_variables.ContainsKey(variableName))
+                        result[i] = _variables[variableName].Invoke();
+                    else
+                        result[i] = "VARIABLE NOT FOUND";
+                }
+                else
+                {
+                    result[i] = currentVariable;
+                }
+            }
+            return result;
         }
     }
 }

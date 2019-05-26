@@ -144,7 +144,7 @@ namespace DeploymentToolkit.Scripting
             if (!string.IsNullOrEmpty(toEvaluate))
                 group.Condition = EvaluateCondition(toEvaluate);
             else if (group.SubGroups.Count == 0)
-                throw new ScriptingInvalidGroupException("A group needs to have exactly on conditon or multiple sub-conditions");
+                throw new ScriptingInvalidGroupException("A group needs to have exactly one conditon or multiple sub-conditions");
 
             return endOfThisGroup;
         }

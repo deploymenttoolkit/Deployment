@@ -83,6 +83,14 @@ namespace DeploymentToolkit.Scripting
                     return EnvironmentVariables.IsRunningInTaskSequence.ToIntString();
                 }
             },
+
+            {
+                "WinDir",
+                delegate()
+                {
+                    return Environment.GetEnvironmentVariable("windir");
+                }
+            }
         };
 
         private static int _uniqueEnvironmentCounter = 0;

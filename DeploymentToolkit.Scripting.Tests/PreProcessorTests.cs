@@ -1,5 +1,6 @@
 ﻿using DeploymentToolkit.Scripting;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 
 namespace DeploymentToolkit.Scripting.Tests
@@ -90,6 +91,27 @@ namespace DeploymentToolkit.Scripting.Tests
                 new ExpectedConditon()
                 {
                     Condition = @"$IdoNotExist(Test)$"
+                },
+            };
+
+            foreach (var condition in conditions)
+            {
+                if (condition.ExpectedResult)
+                    Assert.AreEqual(condition.Condition, PreProcessor.Process(condition.Condition));
+                else
+                    Assert.AreNotEqual(condition.Condition, PreProcessor.Process(condition.Condition));
+            }
+        }
+
+        [TestMethod()]
+        public void InlineVariableTest()
+        {
+            var conditions = new List<ExpectedConditon>()
+            {
+                new ExpectedConditon()
+                {
+                    Condition = "('$DirectoryExists($WinDir$)$' == '1')",
+                    ExpectedResult = false
                 },
             };
 
