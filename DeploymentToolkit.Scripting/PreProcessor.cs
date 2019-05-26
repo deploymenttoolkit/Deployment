@@ -121,11 +121,20 @@ namespace DeploymentToolkit.Scripting
                 if(currentVariable.StartsWith("$") && currentVariable.EndsWith("$"))
                 {
                     var variableName = currentVariable.Trim('$');
-                    Debug.WriteLine($"Inline Variable: '{variableName}'");
                     if (_variables.ContainsKey(variableName))
+                    {
                         result[i] = _variables[variableName].Invoke();
+#if DEBUG && PREPROCESSOR_TRACE
+                        Debug.WriteLine($"Inline Variable: '{variableName}' -> '{result[i]}'");
+#endif  
+                    }
                     else
+                    {
+#if DEBUG && PREPROCESSOR_TRACE
+                        Debug.WriteLine($"Invalid inline Variable: '{variableName}'");
+#endif
                         result[i] = "VARIABLE NOT FOUND";
+                    }
                 }
                 else
                 {

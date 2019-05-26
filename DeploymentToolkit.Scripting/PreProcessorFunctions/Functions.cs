@@ -19,6 +19,22 @@ namespace DeploymentToolkit.Scripting
                 "DirectoryExists",
                 DirectoryFunctions.Exists
             },
+            {
+                "DirectoryMove",
+                DirectoryFunctions.MoveDirectory
+            },
+            {
+                "DirectoryCopy",
+                DirectoryFunctions.CopyDirectory
+            },
+            {
+                "DirectoryDelete",
+                DirectoryFunctions.DeleteDirectory
+            },
+            {
+                "DirectoryCreate",
+                DirectoryFunctions.CreateDirectory
+            },
             #endregion
             #region RegistryFunctions
             {

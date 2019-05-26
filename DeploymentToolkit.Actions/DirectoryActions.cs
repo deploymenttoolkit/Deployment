@@ -10,7 +10,7 @@ namespace DeploymentToolkit.Actions
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        public static bool Exists(string path)
+        public static bool DirectoryExists(string path)
         {
             _logger.Trace($"Exists({path})");
             if (string.IsNullOrEmpty(path))

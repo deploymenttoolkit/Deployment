@@ -58,6 +58,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DirectoryTests.cs" />
     <Compile Include="EvaluatorTest.cs" />
     <Compile Include="ExpectedCondition.cs" />
     <Compile Include="ExpectedScript.cs" />
