@@ -1,13 +1,19 @@
-﻿using Microsoft.Win32;
+﻿using DeploymentToolkit.Modals;
+using DeploymentToolkit.RegistryWrapper;
+using Microsoft.Win32;
 using NLog;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace DeploymentToolkit.ToolkitEnvironment
 {
     public static class RegistryManager
     {
         private const string _deploymentsSavePath = @"SOFTWARE\DeploymentToolkit";
+        private const string _applicationUninstallPath = @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
 
         private static Logger _logger = LogManager.GetCurrentClassLogger();
 
@@ -150,6 +156,83 @@ namespace DeploymentToolkit.ToolkitEnvironment
             {
                 _logger.Trace($"No deferal settings found in registry for deployment {uniqueName}. Nothing to delete ...");
             }
+        }
+
+        public static List<UninstallInfo> GetInstalledMSIProgramsByName(string name, bool exact = false)
+        {
+            var installedPrograms = GetInstalledMSIPrograms();
+
+            if (!exact)
+            {
+                var result = new List<UninstallInfo>();
+                var regex = new Regex(name);
+                foreach (var program in installedPrograms)
+                {
+                    if (regex.Match(program.DisplayName).Success)
+                    {
+                        _logger.Trace($"Found match: {program.DisplayName}");
+                        result.Add(program);
+                    }
+                }
+
+                return result;
+            }
+            else
+            {
+                return installedPrograms.Where((p) => string.Compare(p.DisplayName, name, StringComparison.InvariantCulture) == 0).ToList();
+            }
+        }
+
+        public static List<UninstallInfo> GetInstalledMSIPrograms()
+        {
+            var win32Registry = new Win32Registry();
+            var keys = win32Registry.GetSubKeys(_applicationUninstallPath);
+            var msiPrograms = GetInstallMSIProgramsInHive(win32Registry, keys);
+
+            if (Environment.Is64BitOperatingSystem)
+            {
+                var win64Registry = new Win64Registry();
+                var win64Keys = win64Registry.GetSubKeys(_applicationUninstallPath);
+                msiPrograms = msiPrograms.Union(GetInstallMSIProgramsInHive(win64Registry, win64Keys)).ToList();
+            }
+
+            return msiPrograms;
+        }
+
+        private static List<UninstallInfo> GetInstallMSIProgramsInHive(WinRegistryBase registry, string[] keys)
+        {
+            var result = new List<UninstallInfo>();
+
+            foreach(var key in keys)
+            {
+                _logger.Trace($"Processing {key}");
+
+                if(!Guid.TryParse(key, out var productId))
+                {
+                    _logger.Debug($"{key} could not be parsed as guid. Assuming non MSI installation. Skipping");
+                    continue;
+                }
+
+                var keyPath = Path.Combine(_applicationUninstallPath, key);
+                var program = new UninstallInfo()
+                {
+                    DisplayName = registry.GetValue(keyPath, "DisplayName"),
+                    DisplayVersion = registry.GetValue(keyPath, "DisplayVersion"),
+                    Publisher = registry.GetValue(keyPath, "Publisher"),
+                    UninstallString = registry.GetValue(keyPath, "UninstallString"),
+                    ProductId = $@"{{{productId.ToString()}}}"
+                };
+
+                if(!program.UninstallString.ToLower().Contains("msiexec"))
+                {
+                    _logger.Debug($"{key} does not contain 'msiexec' in UninstallString. Skipping");
+                    continue;
+                }
+
+                result.Add(program);
+            }
+
+            return result;
         }
     }
 }

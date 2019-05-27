@@ -111,6 +111,22 @@ namespace DeploymentToolkit.RegistryWrapper
             return false;
         }
 
+        public string[] GetSubKeys(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                throw new ArgumentNullException(nameof(path));
+
+            var key = GetBaseKey(path, out var newPath);
+            var subKey = key.OpenSubKey(newPath);
+            if(subKey != null)
+            {
+                return subKey.GetSubKeyNames();
+            }
+
+            _logger.Warn($"Failed to open {path}: Key not found");
+            return new string[0];
+        }
+
         public bool CreateSubKey(string path, string subKeyName)
         {
             if (string.IsNullOrEmpty(path))
@@ -193,7 +209,7 @@ namespace DeploymentToolkit.RegistryWrapper
             var subKey = key.OpenSubKey(newPath);
             if (subKey != null)
             {
-                return subKey.GetValue(value).ToString();
+                return subKey.GetValue(value)?.ToString() ?? string.Empty;
             }
             _logger.Warn($"Failed to get {value} from {newPath}: Key not found");
             return null;
