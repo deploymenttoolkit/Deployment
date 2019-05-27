@@ -42,6 +42,9 @@ namespace DeploymentToolkit.Uninstaller.MSI
             _commandLine = $"/x \"{UninstallSettings.CommandLine}\" {UninstallSettings.Parameters}";
             // Add the file name for logging
             var logFileName = "DeploymentToolkit-MSI_uninstallation.log";
+            if (!string.IsNullOrEmpty(UninstallSettings.LogFileSuffix))
+                logFileName = $"DeploymentToolkit-MSI_uninstallation_{UninstallSettings.LogFileSuffix}.log";
+
             var path = System.IO.Path.Combine(Logging.LogManager.LogDirectory, logFileName);
             // Beware the space !!!
             _commandLine += $" {ToolkitEnvironment.MSI.DefaultLoggingParameters} \"{path}\"";

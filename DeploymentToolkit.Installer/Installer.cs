@@ -93,7 +93,8 @@ namespace DeploymentToolkit.Installer
                                 SuppressReboot = true,
                                 SupressMSIRestartReturnCode = true,
                                 UseDefaultMSIParameters = true
-                            }
+                            },
+                            LogFileSuffix = match.DisplayName.Replace(' ', '-')
                         });
 
                         uninstaller.OnSequenceCompleted += OnUninstallComplete;

@@ -1,4 +1,5 @@
 ﻿using DeploymentToolkit.Modals.Settings.Install;
+using System.Xml.Serialization;
 
 namespace DeploymentToolkit.Modals.Settings.Uninstall
 {
@@ -13,5 +14,8 @@ namespace DeploymentToolkit.Modals.Settings.Uninstall
         public LogoffSettings LogoffSettings { get; set; }
         public ActiveSetupSettings ActiveSetupSettings { get; set; }
         public CustomActions CustomActions { get; set; }
+
+        [XmlIgnore]
+        public string LogFileSuffix { get; set; }
     }
 }
