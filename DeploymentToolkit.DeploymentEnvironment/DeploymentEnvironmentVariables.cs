@@ -14,6 +14,10 @@ namespace DeploymentToolkit.DeploymentEnvironment
                     _rootDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                 return _rootDirectory;
             }
+            set
+            {
+                _rootDirectory = value;
+            }
         }
 
         private static string _filesDirectory;

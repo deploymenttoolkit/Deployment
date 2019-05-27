@@ -67,11 +67,20 @@ namespace DeploymentToolkit.Deployment
 
             _logger.Trace("Trying to read settings...");
 
-            if(!File.Exists("settings.xml"))
+            if (args.Length != 2)
+            {
+                ExitInstallation("Invalid command line arguments. Use: -i [XML] or -u [XML]", ExitCode.MissingRequiredParameter);
+            }
+
+            var settingsPath = Path.GetFullPath(args[1]);
+            _logger.Trace($"Searching for settings file in {settingsPath}");
+
+            if (!File.Exists(settingsPath))
             {
                 ExitInstallation("settings.xml is missing!", ExitCode.SettingsFileMissing);
             }
 
+            DeploymentEnvironmentVariables.RootDirectory = Path.GetDirectoryName(settingsPath);
             EnvironmentVariables.Configuration = ReadXml<Configuration>("settings.xml");
 
             _logger.Trace("Successfully read settings");
@@ -123,21 +132,22 @@ namespace DeploymentToolkit.Deployment
 
         private static T ReadXml<T>(string fileName)
         {
+            var path = Path.Combine(DeploymentEnvironmentVariables.RootDirectory, fileName);
             try
-            {
-                return XML.ReadXml<T>(fileName);
+            { 
+                return XML.ReadXml<T>(path);
             }
             catch (UnauthorizedAccessException ex)
             {
-                ExitInstallation(ex, $"Failed to read {fileName}. Access to the file denied", ExitCode.FailedToReadSettings);
+                ExitInstallation(ex, $"Failed to read {path}. Access to the file denied", ExitCode.FailedToReadSettings);
             }
             catch (InvalidOperationException ex)
             {
-                ExitInstallation(ex, $"Failed to deserialized {fileName}. Verify that {fileName} is a valid xml file", ExitCode.FailedToReadSettings);
+                ExitInstallation(ex, $"Failed to deserialized {path}. Verify that {path} is a valid xml file", ExitCode.FailedToReadSettings);
             }
             catch (Exception ex)
             {
-                ExitInstallation(ex, $"Failed to read {fileName}", ExitCode.FailedToReadSettings);
+                ExitInstallation(ex, $"Failed to read {path}", ExitCode.FailedToReadSettings);
             }
             return default(T);
         }
