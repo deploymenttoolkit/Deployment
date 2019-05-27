@@ -1,4 +1,5 @@
-﻿using System.Xml.Serialization;
+﻿using System.Collections.Generic;
+using System.Xml.Serialization;
 
 namespace DeploymentToolkit.Modals.Settings.Install
 {
@@ -6,7 +7,7 @@ namespace DeploymentToolkit.Modals.Settings.Install
     public class InstallerUninstallSettings
     {
         public bool IgnoreUninstallErrors { get; set; }
-        [XmlArrayItemAttribute("Item", IsNullable = false)]
-        public string[] Uninstall { get; set; }
+        [XmlArrayItem("Item", IsNullable = false)]
+        public List<UninstallItem> Uninstall { get; set; }
     }
 }

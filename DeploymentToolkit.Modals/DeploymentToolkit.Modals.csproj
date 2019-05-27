@@ -52,6 +52,7 @@
     <Compile Include="IInstallUninstallSequence.cs" />
     <Compile Include="Language.cs" />
     <Compile Include="MSIReturnCode.cs" />
+    <Compile Include="Settings\Install\UninstallItem.cs" />
     <Compile Include="UninstallInfo.cs" />
     <Compile Include="SequenceCompletedEventArgs.cs" />
     <Compile Include="ISequence.cs" />
