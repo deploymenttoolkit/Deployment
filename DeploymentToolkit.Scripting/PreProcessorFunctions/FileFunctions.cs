@@ -10,7 +10,7 @@ namespace DeploymentToolkit.Scripting.PreProcessorFunctions
             if (parameters.Length == 0)
                 return false.ToIntString();
 
-            return FileActions.Exists(parameters[0]).ToIntString();
+            return FileActions.FileExists(parameters[0]).ToIntString();
         }
     }
 }

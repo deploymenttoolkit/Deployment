@@ -1,4 +1,5 @@
 ﻿using NLog;
+using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 
@@ -15,30 +16,51 @@ namespace DeploymentToolkit.Actions.Modals
         public ExectionOrder ExectionOrder { get; set; }
 
         #region Files
-        [XmlElement(ElementName = "FileMove")]
+        [XmlArray(ElementName = "FileMove")]
         public List<FileMove> FileMove { get; set; }
-        [XmlElement(ElementName = "FileCopy")]
+        [XmlArray(ElementName = "FileCopy")]
         public List<FileCopy> FileCopy { get; set; }
-        [XmlElement(ElementName = "FileDelete")]
+        [XmlArray(ElementName = "FileDelete")]
         public List<FileDelete> FileDelete { get; set; }
         #endregion
         #region Directories
-        [XmlElement(ElementName = "DirectoryMove")]
+        [XmlArray(ElementName = "DirectoryMove")]
         public List<DirectoryMove> DirectoryMove { get; set; }
-        [XmlElement(ElementName = "DirectoryCopy")]
+        [XmlArray(ElementName = "DirectoryCopy")]
         public List<DirectoryCopy> DirectoryCopy { get; set; }
-        [XmlElement(ElementName = "DirectoryDelete")]
+        [XmlArray(ElementName = "DirectoryDelete")]
         public List<DirectoryDelete> DirectoryDelete { get; set; }
-        [XmlElement(ElementName = "DirectoryCreate")]
+        [XmlArray(ElementName = "DirectoryCreate")]
         public List<DirectoryCreate> DirectoryCreate { get; set; }
         #endregion
+        #region Registry
+        [XmlArray(ElementName = "RegistryCreateKey")]
+        public List<RegistryCreateKey> RegistryCreateKey { get; set; }
+        [XmlArray(ElementName = "RegistryDeleteKey")]
+        public List<RegistryDeleteKey> RegistryDeleteKey { get; set; }
+        [XmlArray(ElementName = "RegistryDeleteValue")]
+        public List<RegistryDeleteValue> RegistryDeleteValue { get; set; }
+        [XmlArray(ElementName = "RegistrySetValue")]
+        public List<RegistrySetValue> RegistrySetValue { get; set; }
+        #endregion 
         [XmlIgnore()]
         public bool ConditionResults { get; set; }
 
         public void ExecuteActions()
         {
+            ExecuteFileActions();
+
+            ExecuteDirectoryActions();
+
+            ExecuteRegistryActions();
+
+            _logger.Trace($"Execution successfully finished");
+        }
+
+        private void ExecuteFileActions()
+        {
             _logger.Trace($"Executing {FileMove.Count} FileMove actions ...");
-            foreach(var action in FileMove)
+            foreach (var action in FileMove)
             {
                 action.Execute();
             }
@@ -54,7 +76,10 @@ namespace DeploymentToolkit.Actions.Modals
             {
                 action.Execute();
             }
+        }
 
+        private void ExecuteDirectoryActions()
+        {
             _logger.Trace($"Executing {DirectoryMove.Count} DirectoryMove actions ...");
             foreach (var action in DirectoryMove)
             {
@@ -78,8 +103,33 @@ namespace DeploymentToolkit.Actions.Modals
             {
                 action.Execute();
             }
+        }
 
-            _logger.Trace($"Execution successfully finished");
+        private void ExecuteRegistryActions()
+        {
+            _logger.Trace($"Executing {RegistryCreateKey.Count} RegistryCreateKey actions ...");
+            foreach (var action in RegistryCreateKey)
+            {
+                action.Execute();
+            }
+
+            _logger.Trace($"Executing {RegistryDeleteKey.Count} RegistryDeleteKey actions ...");
+            foreach (var action in RegistryDeleteKey)
+            {
+                action.Execute();
+            }
+
+            _logger.Trace($"Executing {RegistryDeleteValue.Count} RegistryDeleteValue actions ...");
+            foreach (var action in RegistryDeleteValue)
+            {
+                action.Execute();
+            }
+
+            _logger.Trace($"Executing {RegistrySetValue.Count} RegistrySetValue actions ...");
+            foreach (var action in RegistrySetValue)
+            {
+                action.Execute();
+            }
         }
     }
 }
