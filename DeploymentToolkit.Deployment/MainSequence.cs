@@ -83,7 +83,7 @@ namespace DeploymentToolkit.Deployment
         {
             if(e.SequenceSuccessful)
             {
-                _logger.Info("Sequence reported a successful install");
+                _logger.Info("Sequence reported a successful deployment");
 
                 if(EnvironmentVariables.ActiveSequence.CustomActions?.Actions?.Count > 0)
                 {
@@ -307,6 +307,10 @@ namespace DeploymentToolkit.Deployment
                             _logger.Trace("No BeforeDeployment actions found");
                     }
 
+                    _logger.Trace("Executing BeforeSequenceBegin ...");
+                    SubSequence.BeforeSequenceBegin();
+
+                    _logger.Trace("Executing SequenceBegin ...");
                     SubSequence.SequenceBegin();
                 }
                 catch(Exception ex)

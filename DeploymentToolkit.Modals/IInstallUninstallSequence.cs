@@ -12,5 +12,7 @@ namespace DeploymentToolkit.Modals
         RestartSettings RestartSettings { get; }
         LogoffSettings LogoffSettings { get; }
         CustomActions CustomActions { get; }
+
+        void BeforeSequenceBegin();
     }
 }

@@ -47,5 +47,10 @@ namespace DeploymentToolkit.Uninstaller
         public abstract void SequenceBegin();
 
         public abstract void SequenceEnd();
+
+        public void BeforeSequenceBegin()
+        {
+
+        }
     }
 }
