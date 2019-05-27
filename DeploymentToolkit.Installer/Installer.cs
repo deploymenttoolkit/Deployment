@@ -81,7 +81,7 @@ namespace DeploymentToolkit.Installer
 
                     foreach(var match in matches)
                     {
-                        _logger.Trace($"Uninstalling {match.ProductId}");
+                        _logger.Info($"Uninstalling [{match.ProductId}] {match.DisplayName}");
 
                         _uninstallCompleted = false;
 
