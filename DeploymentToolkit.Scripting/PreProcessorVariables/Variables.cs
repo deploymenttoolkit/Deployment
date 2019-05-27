@@ -1,4 +1,5 @@
-﻿using DeploymentToolkit.Scripting.Extensions;
+﻿using DeploymentToolkit.DeploymentEnvironment;
+using DeploymentToolkit.Scripting.Extensions;
 using DeploymentToolkit.ToolkitEnvironment;
 using DeploymentToolkit.ToolkitEnvironment.Exceptions;
 using System;
@@ -50,6 +51,7 @@ namespace DeploymentToolkit.Scripting
                     }
                     catch(DeploymentToolkitInstallPathNotFoundException)
                     {
+                        _logger.Warn("Failed to get DeploymentToolkitInstallation Path. Invalid installation?");
                         return "";
                     }
                 }
@@ -58,15 +60,7 @@ namespace DeploymentToolkit.Scripting
                 "DT_FilesPath",
                 delegate()
                 {
-                    // TODO: Add the right path
-                    try
-                    {
-                        return EnvironmentVariables.DeploymentToolkitInstallPath;
-                    }
-                    catch(DeploymentToolkitInstallPathNotFoundException)
-                    {
-                        return "";
-                    }
+                    return DeploymentEnvironmentVariables.FilesDirectory;
                 }
             },
             {

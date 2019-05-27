@@ -71,6 +71,10 @@
       <Project>{0059F67C-809E-4811-995D-4647BB520C99}</Project>
       <Name>DeploymentToolkit.Actions</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DeploymentToolkit.DeploymentEnvironment\DeploymentToolkit.DeploymentEnvironment.csproj">
+      <Project>{4EA54C46-9DBE-4872-9820-E24D2A88FB39}</Project>
+      <Name>DeploymentToolkit.DeploymentEnvironment</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DeploymentToolkit.Environment\DeploymentToolkit.ToolkitEnvironment.csproj">
       <Project>{94c074c7-cae2-423e-84b7-80d5b74602bb}</Project>
       <Name>DeploymentToolkit.ToolkitEnvironment</Name>

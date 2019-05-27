@@ -28,7 +28,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
                 if (_deploymentToolkitInstallPath != null)
                     return _deploymentToolkitInstallPath;
 
-                var installPath = System.Environment.GetEnvironmentVariable("DTInstallPath", EnvironmentVariableTarget.Machine);
+                var installPath = Environment.GetEnvironmentVariable("DTInstallPath", EnvironmentVariableTarget.Machine);
                 if (installPath == null)
                 {
                     var currentDirectory = Directory.GetCurrentDirectory();
