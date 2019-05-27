@@ -7,18 +7,20 @@ namespace DeploymentToolkit.Scripting
     public static partial class PreProcessor
     {
         private const string _separator = "$";
+
+        private const string _trueString = "'true'";
+        private const string _trueInt = "'1'";
+        private const string _falseString = "'false'";
+        private const string _falseInt = "'0'";
+
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         public static string Process(string data)
         {
-            // Nothing to process
-            if (!data.Contains(_separator))
-                return data;
-
             var processed = data;
             var toProcess = data;
 
-            do
+            while (toProcess.Contains(_separator))
             {
                 var start = toProcess.IndexOf(_separator);
                 if (start == -1)
@@ -104,7 +106,12 @@ namespace DeploymentToolkit.Scripting
                         processed = processed.Replace($"${variableName}$", "VARIABLE NOT FOUND");
                 }
             }
-            while (toProcess.Contains(_separator));
+
+            if (processed.Contains(_trueString))
+                processed = processed.Replace(_trueString, _trueInt);
+            if (processed.Contains(_falseString))
+                processed = processed.Replace(_falseString, _falseInt);
+
 #if DEBUG && PREPROCESSOR_TRACE
             Debug.WriteLine($"Processed: {processed}");
 #endif

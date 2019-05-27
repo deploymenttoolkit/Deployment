@@ -125,6 +125,30 @@ namespace DeploymentToolkit.Scripting.Tests
         }
 
         [TestMethod()]
+        public void StringToIntTest()
+        {
+            var conditions = new List<ExpectedConditon>()
+            {
+                new ExpectedConditon()
+                {
+                    Condition = "('true' == '1')",
+                    ExpectedResult = true
+                },
+                new ExpectedConditon()
+                {
+                    Condition = "('false' == '0')",
+                    ExpectedResult = true
+                }
+            };
+
+            foreach (var condition in conditions)
+            {
+                var preProcessed = PreProcessor.Process(condition.Condition);
+                Assert.AreEqual(condition.ExpectedResult, Evaluation.Evaluate(preProcessed));
+            }
+        }
+
+        [TestMethod()]
         public void AddVariableTest()
         {
             var scripts = new List<ExpectedScript>()
