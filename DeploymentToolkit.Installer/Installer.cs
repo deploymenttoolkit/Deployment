@@ -2,10 +2,13 @@
 using DeploymentToolkit.Modals.Settings;
 using DeploymentToolkit.Modals.Settings.Install;
 using DeploymentToolkit.Modals.Settings.Uninstall;
+using DeploymentToolkit.RegistryWrapper;
 using DeploymentToolkit.ToolkitEnvironment;
 using DeploymentToolkit.Uninstaller.MSI;
+using Microsoft.Win32;
 using NLog;
 using System;
+using System.IO;
 using System.Threading;
 
 namespace DeploymentToolkit.Installer
@@ -55,6 +58,85 @@ namespace DeploymentToolkit.Installer
         public void BeforeSequenceComplete(bool success)
         {
             _logger.Trace($"Running BeforeSequenceComplete actions ...");
+
+            if(!success)
+            {
+                _logger.Debug("Install was not successfull. Skipping actions");
+                return;
+            }
+
+            if(InstallSettings.ActiveSetupSettings != null && InstallSettings.ActiveSetupSettings.UseActiveSetup)
+            {
+                ProcessActiveSetup();
+            }
+        }
+
+        private void ProcessActiveSetup()
+        {
+            _logger.Trace("Setting up ActiveSetup ...");
+
+            var activeSetupSettings = InstallSettings.ActiveSetupSettings;
+
+            if (string.IsNullOrEmpty(activeSetupSettings.Name))
+            {
+                if (InstallerType == InstallerType.Executable)
+                    activeSetupSettings.Name = UniqueName;
+                else
+                    activeSetupSettings.Name = MSI.ProductCode;
+            }
+
+            if (string.IsNullOrEmpty(activeSetupSettings.CommandLine))
+            {
+                if (InstallerType == InstallerType.Executable)
+                {
+                    _logger.Warn("No ActiveSetup entry created. Commandline cannot be empty");
+                    return;
+                }
+
+                activeSetupSettings.CommandLine = $"msiexec.exe {MSI.ActiveSetupParameters} {MSI.ProductCode} {MSI.DefaultSilentParameters}";
+            }
+
+            if (string.IsNullOrEmpty(activeSetupSettings.Version))
+            {
+                if (InstallerType == InstallerType.Executable)
+                    activeSetupSettings.Version = EnvironmentVariables.Configuration.Version;
+                else
+                    activeSetupSettings.Version = MSI.ProductVersion;
+            }
+
+            _logger.Info($"Creating ActiveSetup entry for [{activeSetupSettings.Version}]{activeSetupSettings.Name} and command line '{activeSetupSettings.CommandLine}'");
+
+            var registry = new Win64Registry();
+            try
+            {
+                if (!registry.CreateSubKey(MSI.ActiveSetupPath, activeSetupSettings.Name))
+                {
+                    _logger.Error("Failed to create active setup entry");
+                    return;
+                }
+
+                var activeSetupEntryPath = Path.Combine(MSI.ActiveSetupPath, activeSetupSettings.Name);
+                if (!registry.SetValue(activeSetupEntryPath, "StubPath", activeSetupSettings.CommandLine, RegistryValueKind.String))
+                {
+                    _logger.Error("Failed to set StubPath");
+                    registry.DeleteSubKey(MSI.ActiveSetupPath, activeSetupSettings.Name);
+                }
+
+                if (!registry.SetValue(activeSetupEntryPath, "Version", activeSetupSettings.Version.Replace('.', ','), RegistryValueKind.String))
+                {
+                    _logger.Error("Failed to set Version");
+                    registry.DeleteSubKey(MSI.ActiveSetupPath, activeSetupSettings.Name);
+                }
+            }
+            catch(Exception ex)
+            {
+                _logger.Error(ex, "Failed to create ActiveSetup entry");
+                
+                // Delete the key if it was created
+                registry.DeleteSubKey(MSI.ActiveSetupPath, activeSetupSettings.Name);
+            }
+
+            _logger.Info("ActiveSetup entry successfully created");
         }
 
         public void BeforeSequenceBegin()
