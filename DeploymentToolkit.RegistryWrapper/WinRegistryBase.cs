@@ -156,11 +156,11 @@ namespace DeploymentToolkit.RegistryWrapper
             var subKey = key.OpenSubKey(newPath, true);
             if (subKey != null)
             {
-                subKey.DeleteSubKeyTree(subKeyName);
+                subKey.DeleteSubKeyTree(subKeyName, false);
                 return true;
             }
-            _logger.Warn($"Failed to delete {subKeyName} from {newPath}: Key not found");
-            return false;
+            // If the whole key doesn't exists then the subKey for sure does not too. So we can return true here
+            return true;
         }
 
         public bool HasValue(string path, string value)

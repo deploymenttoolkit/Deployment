@@ -2,6 +2,7 @@
 using DeploymentToolkit.Modals.Settings;
 using DeploymentToolkit.Modals.Settings.Install;
 using DeploymentToolkit.Modals.Settings.Uninstall;
+using DeploymentToolkit.RegistryWrapper;
 using DeploymentToolkit.ToolkitEnvironment;
 using NLog;
 using System;
@@ -55,7 +56,59 @@ namespace DeploymentToolkit.Uninstaller
 
         public void BeforeSequenceComplete(bool success)
         {
+            _logger.Trace("Running BeforeSequenceComplete actions ...");
 
+            if (UninstallSettings.ActiveSetupSettings != null && UninstallSettings.ActiveSetupSettings.UseActiveSetup)
+            {
+                ProcessActiveSetup();
+            }
+        }
+
+        private void ProcessActiveSetup()
+        {
+            _logger.Trace("Deleting ActiveSetup entry ...");
+
+            var activeSetupSettings = UninstallSettings.ActiveSetupSettings;
+
+            if (string.IsNullOrEmpty(activeSetupSettings.Name))
+            {
+                if (UninstallerType == UninstallerType.Executable)
+                    activeSetupSettings.Name = UniqueName;
+                else
+                    activeSetupSettings.Name = MSI.ProductCode;
+            }
+
+            var registry = new Win64Registry();
+            try
+            {
+                _logger.Trace("Deleting Machine keys ...");
+                if (!registry.DeleteSubKey(MSI.ActiveSetupPath, activeSetupSettings.Name))
+                {
+                    _logger.Error("Failed to delete active setup entry");
+                    return;
+                }
+
+                _logger.Trace("Deleting User keys ...");
+                var users = registry.GetSubKeys("HKEY_USERS");
+                foreach(var sId in users)
+                {
+                    if (sId == ".DEFAULT")
+                        continue;
+
+                    if (sId.EndsWith("_Classes"))
+                        continue;
+
+                    _logger.Trace($"Processing {sId}");
+
+                    registry.DeleteSubKey(string.Format(MSI.ActiveSetupUserPath, sId), activeSetupSettings.Name);
+                }
+
+                _logger.Info("Successfully deleted ActiveSetup keys");
+            }
+            catch(Exception ex)
+            {
+                _logger.Error(ex, "Failed to delete ActiveSetup entry");
+            }
         }
     }
 }
