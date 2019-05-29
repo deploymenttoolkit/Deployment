@@ -81,6 +81,8 @@ namespace DeploymentToolkit.Installer.Executable
                 _logger.Info($"Return code was 0. Assuming successful installation");
             }
 
+            BeforeSequenceComplete(successful);
+
             OnSequenceCompleted?.BeginInvoke(
                 this,
                 new SequenceCompletedEventArgs()

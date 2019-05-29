@@ -81,6 +81,8 @@ namespace DeploymentToolkit.Uninstaller.Executable
                 _logger.Info($"Return code was 0. Assuming successful uninstallation");
             }
 
+            BeforeSequenceComplete(successful);
+
             OnSequenceCompleted?.BeginInvoke(
                 this,
                 new SequenceCompletedEventArgs()

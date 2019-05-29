@@ -52,5 +52,10 @@ namespace DeploymentToolkit.Uninstaller
         {
 
         }
+
+        public void BeforeSequenceComplete(bool success)
+        {
+
+        }
     }
 }

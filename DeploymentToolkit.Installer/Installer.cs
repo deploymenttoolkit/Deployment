@@ -52,6 +52,11 @@ namespace DeploymentToolkit.Installer
 
         public abstract void SequenceEnd();
 
+        public void BeforeSequenceComplete(bool success)
+        {
+            _logger.Trace($"Running BeforeSequenceComplete actions ...");
+        }
+
         public void BeforeSequenceBegin()
         {
             _logger.Trace($"Running BeforeSequenceBegin actions ...");

@@ -92,6 +92,7 @@ namespace DeploymentToolkit.Installer.MSI
             if(!Enum.TryParse<MSIReturnCode>(_installerProcess.ExitCode.ToString(), true, out var exitCode))
             {
                 _logger.Error($"Failed to decode return code ({_installerProcess.ExitCode}). Passing return code straight to parent...");
+                BeforeSequenceComplete(false);
                 OnSequenceCompleted?.BeginInvoke(
                     this,
                     new SequenceCompletedEventArgs()
@@ -172,6 +173,8 @@ namespace DeploymentToolkit.Installer.MSI
                     }
                     break;
             }
+
+            BeforeSequenceComplete(installCompletedEventArgs.SequenceSuccessful);
 
             OnSequenceCompleted?.BeginInvoke(
                 this,

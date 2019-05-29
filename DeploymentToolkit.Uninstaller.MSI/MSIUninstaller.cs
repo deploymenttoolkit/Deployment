@@ -92,6 +92,7 @@ namespace DeploymentToolkit.Uninstaller.MSI
             if (!Enum.TryParse<MSIReturnCode>(_uninstallerProcess.ExitCode.ToString(), true, out var exitCode))
             {
                 _logger.Error($"Failed to decode return code ({_uninstallerProcess.ExitCode}). Passing return code straight to parent...");
+                BeforeSequenceComplete(false);
                 OnSequenceCompleted?.BeginInvoke(
                     this,
                     new SequenceCompletedEventArgs()
@@ -172,6 +173,8 @@ namespace DeploymentToolkit.Uninstaller.MSI
                     }
                     break;
             }
+
+            BeforeSequenceComplete(uninstallCompletedEventArgs.SequenceSuccessful);
 
             OnSequenceCompleted?.BeginInvoke(
                 this,

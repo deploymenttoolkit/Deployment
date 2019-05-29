@@ -14,5 +14,6 @@ namespace DeploymentToolkit.Modals
         CustomActions CustomActions { get; }
 
         void BeforeSequenceBegin();
+        void BeforeSequenceComplete(bool success);
     }
 }
