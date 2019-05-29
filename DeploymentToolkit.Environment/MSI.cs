@@ -8,5 +8,7 @@
         public const string DefaultUninstallParameters = "/qn";
 
         public const string DefaultLoggingParameters = "/L*v";
+
+        public const string ActiveSetupParameters = "/fcu";
     }
 }
