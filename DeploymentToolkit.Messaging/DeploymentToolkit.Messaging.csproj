@@ -52,6 +52,7 @@
     <Compile Include="Events\NewMessageEventArgs.cs" />
     <Compile Include="IMessage.cs" />
     <Compile Include="MessageId.cs" />
+    <Compile Include="Messages\AbortMessage.cs" />
     <Compile Include="Messages\BasicMessage.cs" />
     <Compile Include="Messages\CloseApplicationsMessage.cs" />
     <Compile Include="Messages\ContinueMessage.cs" />

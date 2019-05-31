@@ -162,6 +162,22 @@ namespace DeploymentToolkit.Messaging
                                 }
                                 break;
 
+                            case MessageId.AbortDeployment:
+                                {
+                                    var message = Serializer.DeserializeMessage<AbortMessage>(data);
+                                    OnNewMessage?.BeginInvoke(
+                                        this,
+                                        new NewMessageEventArgs()
+                                        {
+                                            MessageId = basicMessage.MessageId,
+                                            Message = message
+                                        },
+                                        OnNewMessage.EndInvoke,
+                                        null
+                                    );
+                                }
+                                break;
+
                             default:
                                 {
                                     _logger.Warn($"Unhandeld message of type {basicMessage.MessageId}");

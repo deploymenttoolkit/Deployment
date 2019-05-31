@@ -24,6 +24,8 @@ namespace DeploymentToolkit.Deployment
 
         private PipeClientManager _pipeClient;
 
+        private SequenceCompletedEventArgs _subSequenceResult;
+
         public MainSequence(IInstallUninstallSequence subSequence)
         {
             _logger.Trace("Sequence initializing...");
@@ -81,7 +83,9 @@ namespace DeploymentToolkit.Deployment
 
         private void OnSubSequenceInstallCompleted(object sender, SequenceCompletedEventArgs e)
         {
-            if(e.SequenceSuccessful)
+            _subSequenceResult = e;
+
+            if (e.SequenceSuccessful)
             {
                 _logger.Info("Sequence reported a successful deployment");
 
@@ -433,7 +437,7 @@ namespace DeploymentToolkit.Deployment
 
         private void OnNewMessage(object sender, NewMessageEventArgs e)
         {
-            _logger.Trace($"Receive message of type {e.MessageId}");
+            _logger.Trace($"Received message of type {e.MessageId}");
 
             switch(e.MessageId)
             {
@@ -503,6 +507,26 @@ namespace DeploymentToolkit.Deployment
                                 ReturnCode = 3010, // Restart return code
                                 SequenceSuccessful = true,
                                 ForceRestart = true
+                            });
+                        }
+                    }
+                    break;
+
+                case MessageId.AbortDeployment:
+                    {
+                        var message = e.Message as AbortMessage;
+
+                        if(message.DeploymentStep == DeploymentStep.Restart)
+                        {
+                            // User chose to restart later
+                            _logger.Trace("4: User choose to restart later");
+
+                            Cleanup();
+
+                            OnSequenceCompleted?.Invoke(sender, new SequenceCompletedEventArgs()
+                            {
+                                ReturnCode = _subSequenceResult.ReturnCode,
+                                SequenceSuccessful = true,
                             });
                         }
                     }

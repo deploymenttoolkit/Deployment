@@ -124,6 +124,32 @@ namespace DeploymentToolkit.Messaging
                     }
                     break;
 
+                case MessageId.AbortDeployment:
+                    {
+                        var message = e.Message as AbortMessage;
+                        lock (_messageLock)
+                        {
+                            if(message.DeploymentStep == DeploymentStep.Restart)
+                            {
+                                if (_hasReceivedRestartMessage)
+                                {
+                                    _logger.Trace($"Ignoring restart answer from session {client.SessionId} as there was already a prior response");
+                                    return;
+                                }
+
+                                _hasReceivedRestartMessage = true;
+                            }
+                        }
+
+                        OnNewMessage.BeginInvoke(
+                            client,
+                            e,
+                            OnNewMessage.EndInvoke,
+                            null
+                        );
+                    }
+                    break;
+
                 case MessageId.DeferDeployment:
                     {
                         lock (_messageLock)

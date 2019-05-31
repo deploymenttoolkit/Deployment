@@ -30,6 +30,7 @@
 
         // Server <-  Client
         ContinueDeployment,
+        AbortDeployment,
 
         // Server  -> Client
         DeferDeployment,
