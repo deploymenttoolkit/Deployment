@@ -19,6 +19,8 @@
         DeploymentError,
         // Server  -> Client
         DeploymentRestart,
+        // Server  -> Client
+        DeploymentLogoff,
 
         // IFEObl  -> Client
         ExecutionBlocked,

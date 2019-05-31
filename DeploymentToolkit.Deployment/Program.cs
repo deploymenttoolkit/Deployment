@@ -300,8 +300,13 @@ namespace DeploymentToolkit.Deployment
                 _logger.Info($"Exit code {e.ReturnCode}");
                 GlobalExitCode = e.ReturnCode;
 
-                _logger.Info("Sequence completed. Cleaning up...");
-                // TODO: Cleanup tasks??
+                _logger.Info("Sequence completed.");
+                
+
+                if(e.ForceRestart)
+                {
+                    _logger.Info("Restart forced. Restarting in 10 seconds ...");
+                }
             }
             catch (Exception ex)
             {

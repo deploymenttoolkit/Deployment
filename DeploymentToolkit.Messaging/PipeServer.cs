@@ -202,6 +202,22 @@ namespace DeploymentToolkit.Messaging
                         }
                         break;
 
+                    case MessageId.DeploymentLogoff:
+                        {
+                            var message = Serializer.DeserializeMessage<DeploymentLogoffMessage>(data);
+                            OnNewMessage?.BeginInvoke(
+                                this,
+                                new NewMessageEventArgs()
+                                {
+                                    MessageId = simpleMessage.MessageId,
+                                    Message = message
+                                },
+                                OnNewMessage.EndInvoke,
+                                null
+                            );
+                        }
+                        break;
+
                     case MessageId.CloseApplications:
                         {
                             var message = Serializer.DeserializeMessage<CloseApplicationsMessage>(data);

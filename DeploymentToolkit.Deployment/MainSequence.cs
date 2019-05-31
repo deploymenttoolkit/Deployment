@@ -496,6 +496,26 @@ namespace DeploymentToolkit.Deployment
                             OnSequenceCompleted?.Invoke(sender, new SequenceCompletedEventArgs()
                             {
                                 ReturnCode = 3010, // Restart return code
+                                SequenceSuccessful = true,
+                                ForceRestart = true
+                            });
+                        }
+                        else if(message.DeploymentStep == DeploymentStep.Logoff)
+                        {
+                            _logger.Trace("5: User chose to logoff");
+
+                            Cleanup();
+
+                            _logger.Trace("Notifying all tray apps about logoff");
+
+                            _pipeClient.SendMessage(new DeploymentLogoffMessage()
+                            {
+                                TimeUntilForceLogoff = EnvironmentVariables.ActiveSequence.LogoffSettings.TimeUntilForcedLogoff
+                            });
+
+                            OnSequenceCompleted?.Invoke(sender, new SequenceCompletedEventArgs()
+                            {
+                                ReturnCode = 0,
                                 SequenceSuccessful = true
                             });
                         }

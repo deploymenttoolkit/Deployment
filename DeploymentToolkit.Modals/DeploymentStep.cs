@@ -5,6 +5,7 @@
         Welcome,
         DeferDeployment,
         CloseApplications,
-        Restart
+        Restart,
+        Logoff
     }
 }

@@ -13,5 +13,7 @@ namespace DeploymentToolkit.Modals
 
         public List<Exception> SequenceErrors { get; set; } = new List<Exception>();
         public List<Exception> SequenceWarnings { get; set; } = new List<Exception>();
+
+        public bool ForceRestart { get; set; }
     }
 }

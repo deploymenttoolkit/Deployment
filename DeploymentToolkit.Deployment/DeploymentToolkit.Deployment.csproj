@@ -135,6 +135,10 @@
       <Project>{1F774A30-E6F9-4BFD-B535-D7509D4C0A0F}</Project>
       <Name>DeploymentToolkit.Uninstaller</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DeploymentToolkit.Util\DeploymentToolkit.Util.csproj">
+      <Project>{aebbe655-c600-4b78-8617-fa3921f33afa}</Project>
+      <Name>DeploymentToolkit.Util</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
