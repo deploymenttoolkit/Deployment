@@ -137,7 +137,13 @@ namespace DeploymentToolkit.Deployment
                     }
                     else if (logoffSettings != null && logoffSettings.ForceLogoff)
                     {
-                        // TODO: Implement
+                        _logger.Trace("Force logoff specified. Showing logoff dialog ...");
+                        _pipeClient.SendMessage(new DeploymentLogoffMessage()
+                        {
+                            TimeUntilForceLogoff = logoffSettings.TimeUntilForcedLogoff
+                        });
+                        
+                        // We can continue with the finishing of the deployment as the TrayApp takes care of the logoff
                     }
                 }
             }
@@ -483,7 +489,6 @@ namespace DeploymentToolkit.Deployment
                             // User choose to do the install now
                             _logger.Trace("3: User choose to continue with installation");
 
-                            // If no applications are running, then proceed with installation
                             StartDeployment();
                         }
                         else if(message.DeploymentStep == DeploymentStep.Restart)
@@ -502,16 +507,10 @@ namespace DeploymentToolkit.Deployment
                         }
                         else if(message.DeploymentStep == DeploymentStep.Logoff)
                         {
+                            // User choose to logoff
                             _logger.Trace("5: User chose to logoff");
 
                             Cleanup();
-
-                            _logger.Trace("Notifying all tray apps about logoff");
-
-                            _pipeClient.SendMessage(new DeploymentLogoffMessage()
-                            {
-                                TimeUntilForceLogoff = EnvironmentVariables.ActiveSequence.LogoffSettings.TimeUntilForcedLogoff
-                            });
 
                             OnSequenceCompleted?.Invoke(sender, new SequenceCompletedEventArgs()
                             {

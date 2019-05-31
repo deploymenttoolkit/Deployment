@@ -16,6 +16,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace DeploymentToolkit.Deployment
 {
@@ -302,10 +303,15 @@ namespace DeploymentToolkit.Deployment
 
                 _logger.Info("Sequence completed.");
                 
-
                 if(e.ForceRestart)
                 {
                     _logger.Info("Restart forced. Restarting in 10 seconds ...");
+                    // TODO: This has to be extracted into seperate process
+                    //Task.Factory.StartNew(async () =>
+                    //{
+                    //    await Task.Delay(10 * 1000);
+                    //    Utils.PowerUtil.Restart();
+                    //});
                 }
             }
             catch (Exception ex)
