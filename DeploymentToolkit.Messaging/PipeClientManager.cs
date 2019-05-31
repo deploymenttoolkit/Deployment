@@ -33,6 +33,8 @@ namespace DeploymentToolkit.Messaging
 
         private readonly object _messageLock = new object();
         private bool _hasReceivedDeferMessage = false;
+        private bool _hasReceivedCloseMessage = false;
+        private bool _hasReceivedRestartMessage = false;
 
         public PipeClientManager()
         {
@@ -85,7 +87,7 @@ namespace DeploymentToolkit.Messaging
                             {
                                 if(_hasReceivedDeferMessage)
                                 {
-                                    _logger.Trace($"Ignoring answer from session {client.SessionId} as there was already a prior response");
+                                    _logger.Trace($"Ignoring defer answer from session {client.SessionId} as there was already a prior response");
                                     return;
                                 }
 
@@ -93,11 +95,23 @@ namespace DeploymentToolkit.Messaging
                             }
                             else if(message.DeploymentStep == DeploymentStep.CloseApplications)
                             {
-                                // TODO
+                                if(_hasReceivedCloseMessage)
+                                {
+                                    _logger.Trace($"Ignoring close apps answer from session {client.SessionId} as there was already a prior response");
+                                    return;
+                                }
+
+                                _hasReceivedCloseMessage = true;
                             }
                             else if(message.DeploymentStep == DeploymentStep.Restart)
                             {
-                                // TODO
+                                if (_hasReceivedRestartMessage)
+                                {
+                                    _logger.Trace($"Ignoring restart answer from session {client.SessionId} as there was already a prior response");
+                                    return;
+                                }
+
+                                _hasReceivedRestartMessage = true;
                             }
                         }
 
