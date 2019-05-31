@@ -505,19 +505,6 @@ namespace DeploymentToolkit.Deployment
                                 ForceRestart = true
                             });
                         }
-                        else if(message.DeploymentStep == DeploymentStep.Logoff)
-                        {
-                            // User choose to logoff
-                            _logger.Trace("5: User chose to logoff");
-
-                            Cleanup();
-
-                            OnSequenceCompleted?.Invoke(sender, new SequenceCompletedEventArgs()
-                            {
-                                ReturnCode = 0,
-                                SequenceSuccessful = true
-                            });
-                        }
                     }
                     break;
             }
