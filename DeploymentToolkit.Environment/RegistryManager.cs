@@ -310,12 +310,6 @@ namespace DeploymentToolkit.ToolkitEnvironment
                         _logger.Error($"Failed to set Message in '{currentErrorPath}");
                         return;
                     }
-
-                    if (!registry.SetValue(currentErrorPath, "StackTrace", currentError.StackTrace, RegistryValueKind.String))
-                    {
-                        _logger.Error($"Failed to set StackTrace in '{currentErrorPath}");
-                        return;
-                    }
                 }
             }
 
@@ -342,12 +336,6 @@ namespace DeploymentToolkit.ToolkitEnvironment
                     if (!registry.SetValue(currentWarningPath, "Message", currentWarning.Message, RegistryValueKind.String))
                     {
                         _logger.Error($"Failed to set Message in '{currentWarningPath}");
-                        return;
-                    }
-
-                    if (!registry.SetValue(currentWarningPath, "StackTrace", currentWarning.StackTrace, RegistryValueKind.String))
-                    {
-                        _logger.Error($"Failed to set StackTrace in '{currentWarningPath}");
                         return;
                     }
                 }
