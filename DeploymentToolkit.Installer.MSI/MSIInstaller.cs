@@ -2,6 +2,7 @@
 using DeploymentToolkit.Modals.Settings.Install;
 using NLog;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace DeploymentToolkit.Installer.MSI
@@ -99,7 +100,11 @@ namespace DeploymentToolkit.Installer.MSI
                     {
                         // We don't know the exit code so it's probably a non default exit code. Meaning it probably failed
                         SequenceSuccessful = false,
-                        ReturnCode = _installerProcess.ExitCode
+                        ReturnCode = _installerProcess.ExitCode,
+                        SequenceErrors = new List<Exception>()
+                        {
+                            new Exception($"Failed to decode return code ({_installerProcess.ExitCode}). Assuming installation failure")
+                        }
                     },
                     OnSequenceCompleted.EndInvoke,
                     null
