@@ -306,7 +306,7 @@ namespace DeploymentToolkit.Deployment
                 
                 if(
                     e.ForceRestart || // Restart requested by GUI
-                    (EnvironmentVariables.ActiveSequence.RestartSettings.ForceRestart && !EnvironmentVariables.IsGUIEnabled) // Restart enforced by config and no GUI available
+                    (EnvironmentVariables.ActiveSequence.RestartSettings.ForceRestart && !EnvironmentVariables.IsGUIEnabled && !EnvironmentVariables.IsRunningInTaskSequence) // Restart enforced by config and no GUI available
                 )
                 {
                     _logger.Info("Restart forced. Spawning restart process ...");
