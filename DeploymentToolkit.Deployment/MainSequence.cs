@@ -332,6 +332,16 @@ namespace DeploymentToolkit.Deployment
                         _pipeClient.SendMessage(new BasicMessage(MessageId.DeploymentError));
                     }
                     _logger.Error(ex, "Error during installation");
+
+                    OnSequenceCompleted.Invoke(this, new SequenceCompletedEventArgs()
+                    {
+                        SequenceSuccessful = false,
+                        ReturnCode = -1,
+                        SequenceErrors = new List<Exception>()
+                        {
+                            ex
+                        }
+                    });
                 }
             }, TaskCreationOptions.LongRunning);
         }
