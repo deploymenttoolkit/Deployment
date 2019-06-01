@@ -119,6 +119,10 @@
       <Project>{EC3FEDB7-4FC0-4DCF-A08F-F1DE2DC49E00}</Project>
       <Name>DeploymentToolkit.Modals</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DeploymentToolkit.Restart\DeploymentToolkit.Restart.csproj">
+      <Project>{574ae079-0011-44ce-8e47-55f18c0f8ad1}</Project>
+      <Name>DeploymentToolkit.Restart</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DeploymentToolkit.Scripting\DeploymentToolkit.Scripting.csproj">
       <Project>{AD620098-DF03-45B9-9B91-7E1DD13BC86C}</Project>
       <Name>DeploymentToolkit.Scripting</Name>
