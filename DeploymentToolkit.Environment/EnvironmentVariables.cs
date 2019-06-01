@@ -12,7 +12,16 @@ namespace DeploymentToolkit.ToolkitEnvironment
     public static partial class EnvironmentVariables
     {
         public static SequenceType ActiveSequenceType;
-        public static IInstallUninstallSequence ActiveSequence;
+        private static IInstallUninstallSequence _activeSequence;
+        public static IInstallUninstallSequence ActiveSequence
+        {
+            get => _activeSequence;
+            set
+            {
+                _activeSequence = value;
+                RegistryManager.SetActiveSequence(value);
+            }
+        }
 
         public static Configuration Configuration;
         public static InstallSettings InstallSettings;
@@ -72,6 +81,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
 
         public static void Initialize()
         {
+            RegistryManager.VerifyRegistry();
             CheckRunningInTaskSequence();
         }
 

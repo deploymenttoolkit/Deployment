@@ -119,7 +119,7 @@ namespace DeploymentToolkit.Actions
             try
             {
                 var registry = GetRegistry(architecture);
-                return registry.GetValue(path, valueName);
+                return registry.GetValue(path, valueName)?.ToString() ?? string.Empty;
             }
             catch(Exception ex)
             {

@@ -180,7 +180,7 @@ namespace DeploymentToolkit.RegistryWrapper
             return false;
         }
 
-        public bool SetValue(string path, string name, string value, RegistryValueKind valueKind)
+        public bool SetValue(string path, string name, object value, RegistryValueKind valueKind)
         {
             if (string.IsNullOrEmpty(path))
                 throw new ArgumentNullException(nameof(path));
@@ -198,7 +198,7 @@ namespace DeploymentToolkit.RegistryWrapper
             return false;
         }
 
-        public string GetValue(string path, string value)
+        public object GetValue(string path, string value)
         {
             if (string.IsNullOrEmpty(path))
                 throw new ArgumentNullException(nameof(path));
@@ -209,7 +209,7 @@ namespace DeploymentToolkit.RegistryWrapper
             var subKey = key.OpenSubKey(newPath);
             if (subKey != null)
             {
-                return subKey.GetValue(value)?.ToString() ?? string.Empty;
+                return subKey.GetValue(value);
             }
             _logger.Warn($"Failed to get {value} from {newPath}: Key not found");
             return null;

@@ -12,12 +12,30 @@ namespace DeploymentToolkit.ToolkitEnvironment
 {
     public static class RegistryManager
     {
+        private const string _deploymentToolkitRegistryPath = @"HKEY_LOCAL_MACHINE\SOFTWARE\DeploymentToolkit";
+        private const string _deploymentToolkitActiveSequence = "ActiveSequence";
+        private const string _deploymentToolkitHistory = "History";
+
         private const string _deploymentsSavePath = @"SOFTWARE\DeploymentToolkit";
         private const string _applicationUninstallPath = @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
 
         private static Logger _logger = LogManager.GetCurrentClassLogger();
 
         private static string _lastDeploymentRegistryKeyPath;
+
+        internal static void VerifyRegistry()
+        {
+            _logger.Trace("Verifying registry ...");
+
+            var registry = new Win64Registry();
+            if(!registry.CreateSubKey(Path.GetDirectoryName(_deploymentToolkitRegistryPath), Path.GetFileName(_deploymentToolkitRegistryPath)))
+            {
+                _logger.Fatal("Failed to validate registry");
+                throw new Exception("Registry corrupt?");
+            }
+
+            _logger.Trace("Successfully verified registry");
+        }
 
         private static bool GetDeploymentRegistryKey(string deploymentName, out RegistryKey deploymentRegistryKey)
         {
@@ -158,6 +176,184 @@ namespace DeploymentToolkit.ToolkitEnvironment
             }
         }
 
+        internal static void SetActiveSequence(IInstallUninstallSequence sequence)
+        {
+            _logger.Trace($"Updating ActiveSequence in registry ...");
+
+            var registry = new Win64Registry();
+            var path = Path.Combine(_deploymentToolkitRegistryPath, _deploymentToolkitActiveSequence);
+
+            if(!registry.CreateSubKey(_deploymentToolkitRegistryPath, _deploymentToolkitActiveSequence))
+            {
+                _logger.Error($"Failed to create '{_deploymentToolkitActiveSequence}' key in '{_deploymentToolkitRegistryPath}'");
+                return;
+            }
+
+            if(!registry.SetValue(path, "Name", sequence.UniqueName, RegistryValueKind.String))
+            {
+                _logger.Error($"Failed to set Name in '{path}'");
+                return;
+            }
+
+            if (!registry.SetValue(path, "Type", EnvironmentVariables.ActiveSequenceType.ToString(), RegistryValueKind.String))
+            {
+                _logger.Error($"Failed to set Type in '{path}'");
+                return;
+            }
+
+            if(!registry.SetValue(path, "StartTime", DateTime.Now.ToFileTime().ToString(), RegistryValueKind.String))
+            {
+                _logger.Error($"Failed to set StartTime in '{path}'");
+                return;
+            }
+
+            _logger.Trace("ActiveSequence set");
+        }
+
+        public static void SetSequenceComplete(SequenceCompletedEventArgs sequenceCompletedEventArgs)
+        {
+            _logger.Trace("Deleting ActiveSequence keys ...");
+
+            var registry = new Win64Registry();
+
+            var startTime = registry.GetValue(Path.Combine(_deploymentToolkitRegistryPath, _deploymentToolkitActiveSequence), "StartTime");
+            if(startTime == null)
+            {
+                _logger.Warn("Failed to get startTime from ActiveSequence");
+                startTime = string.Empty;
+            }
+
+            if(!registry.DeleteSubKey(_deploymentToolkitRegistryPath, _deploymentToolkitActiveSequence))
+            {
+                _logger.Error($"Failed to delete '{_deploymentToolkitActiveSequence}' from '{_deploymentToolkitRegistryPath}'");
+                return;
+            }
+
+            _logger.Trace($"Updating Sequence history ...");
+
+            var subKeyName = DateTime.Now.ToFileTime().ToString();
+
+            if(!registry.CreateSubKey(_deploymentToolkitRegistryPath, _deploymentToolkitHistory))
+            {
+                _logger.Error($"Failed to create '{_deploymentToolkitHistory}' in '{_deploymentToolkitRegistryPath}'");
+                return;
+            }
+
+            var historyPath = Path.Combine(_deploymentToolkitRegistryPath, _deploymentToolkitHistory);
+            if (!registry.CreateSubKey(historyPath, subKeyName))
+            {
+                _logger.Error($"Failed to create '{subKeyName}' in '{historyPath}'");
+                return;
+            }
+
+            var path = Path.Combine(_deploymentToolkitRegistryPath, _deploymentToolkitHistory, subKeyName);
+
+            var activeSequence = EnvironmentVariables.ActiveSequence;
+            if(!registry.SetValue(path, "Name", activeSequence.UniqueName, RegistryValueKind.String))
+            {
+                _logger.Error($"Failed to set Name in '{path}'");
+                return;
+            }
+
+            if (!registry.SetValue(path, "Type", EnvironmentVariables.ActiveSequenceType.ToString(), RegistryValueKind.String))
+            {
+                _logger.Error($"Failed to set Type in '{path}'");
+                return;
+            }
+
+            if (!registry.SetValue(path, "StartTime", startTime.ToString(), RegistryValueKind.String))
+            {
+                _logger.Error($"Failed to set StartTime in '{path}'");
+                return;
+            }
+
+            if (!registry.SetValue(path, "EndTime", DateTime.Now.ToFileTime().ToString(), RegistryValueKind.String))
+            {
+                _logger.Error($"Failed to set EndTime in '{path}'");
+                return;
+            }
+
+            if(!registry.SetValue(path, "ExitCode", sequenceCompletedEventArgs.ReturnCode, RegistryValueKind.DWord))
+            {
+                _logger.Error($"Failed to set ExitCode in '{path}");
+                return;
+            }
+
+            if (!registry.SetValue(path, "Successful", sequenceCompletedEventArgs.SequenceSuccessful, RegistryValueKind.DWord))
+            {
+                _logger.Error($"Failed to set Successful in '{path}");
+                return;
+            }
+
+            if (sequenceCompletedEventArgs.CountErrors > 0)
+            {
+                if (!registry.CreateSubKey(path, "Errors"))
+                {
+                    _logger.Error($"Failed to create Errors in '{path}");
+                    return;
+                }
+
+                var errorPath = Path.Combine(path, "Errors");
+                for (var i = 0; i < sequenceCompletedEventArgs.CountErrors; i++)
+                {
+                    if (!registry.CreateSubKey(errorPath, i.ToString()))
+                    {
+                        _logger.Error($"Failed to create in '{errorPath}'");
+                        continue;
+                    }
+
+                    var currentError = sequenceCompletedEventArgs.SequenceErrors[i];
+                    var currentErrorPath = Path.Combine(errorPath, i.ToString());
+
+                    if (!registry.SetValue(currentErrorPath, "Message", currentError.Message, RegistryValueKind.String))
+                    {
+                        _logger.Error($"Failed to set Message in '{currentErrorPath}");
+                        return;
+                    }
+
+                    if (!registry.SetValue(currentErrorPath, "StackTrace", currentError.StackTrace, RegistryValueKind.String))
+                    {
+                        _logger.Error($"Failed to set StackTrace in '{currentErrorPath}");
+                        return;
+                    }
+                }
+            }
+
+            if (sequenceCompletedEventArgs.CountWarnings > 0)
+            {
+                if (!registry.CreateSubKey(path, "Warnings"))
+                {
+                    _logger.Error($"Failed to create Warnings in '{path}");
+                    return;
+                }
+
+                var warningPath = Path.Combine(path, "Warnings");
+                for (var i = 0; i < sequenceCompletedEventArgs.CountWarnings; i++)
+                {
+                    if (!registry.CreateSubKey(warningPath, i.ToString()))
+                    {
+                        _logger.Error($"Failed to create in '{warningPath}'");
+                        continue;
+                    }
+
+                    var currentWarning = sequenceCompletedEventArgs.SequenceWarnings[i];
+                    var currentWarningPath = Path.Combine(warningPath, i.ToString());
+
+                    if (!registry.SetValue(currentWarningPath, "Message", currentWarning.Message, RegistryValueKind.String))
+                    {
+                        _logger.Error($"Failed to set Message in '{currentWarningPath}");
+                        return;
+                    }
+
+                    if (!registry.SetValue(currentWarningPath, "StackTrace", currentWarning.StackTrace, RegistryValueKind.String))
+                    {
+                        _logger.Error($"Failed to set StackTrace in '{currentWarningPath}");
+                        return;
+                    }
+                }
+            }
+        }
+
         public static List<UninstallInfo> GetInstalledMSIProgramsByName(string name, bool exact = false)
         {
             var installedPrograms = GetInstalledMSIPrograms();
@@ -216,10 +412,10 @@ namespace DeploymentToolkit.ToolkitEnvironment
                 var keyPath = Path.Combine(_applicationUninstallPath, key);
                 var program = new UninstallInfo()
                 {
-                    DisplayName = registry.GetValue(keyPath, "DisplayName"),
-                    DisplayVersion = registry.GetValue(keyPath, "DisplayVersion"),
-                    Publisher = registry.GetValue(keyPath, "Publisher"),
-                    UninstallString = registry.GetValue(keyPath, "UninstallString"),
+                    DisplayName = registry.GetValue(keyPath, "DisplayName")?.ToString() ?? string.Empty,
+                    DisplayVersion = registry.GetValue(keyPath, "DisplayVersion")?.ToString() ?? string.Empty,
+                    Publisher = registry.GetValue(keyPath, "Publisher")?.ToString() ?? string.Empty,
+                    UninstallString = registry.GetValue(keyPath, "UninstallString")?.ToString() ?? string.Empty,
                     ProductId = $@"{{{productId.ToString()}}}"
                 };
 

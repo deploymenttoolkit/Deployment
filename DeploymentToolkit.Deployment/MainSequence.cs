@@ -29,8 +29,12 @@ namespace DeploymentToolkit.Deployment
         public MainSequence(IInstallUninstallSequence subSequence)
         {
             _logger.Trace("Sequence initializing...");
-            EnvironmentVariables.ActiveSequence = subSequence;
+
+            _logger.Trace("Preparing environment...");
+            EnvironmentVariables.Initialize();
+
             EnvironmentVariables.ActiveSequenceType = subSequence is Installer.Installer ? SequenceType.Installation : SequenceType.Uninstallation;
+            EnvironmentVariables.ActiveSequence = subSequence;
             _logger.Trace($"Sequence is {EnvironmentVariables.ActiveSequenceType}");
 
             _logger.Trace("Setting event...");
@@ -63,9 +67,6 @@ namespace DeploymentToolkit.Deployment
         public void SequenceBegin()
         {
             _logger.Trace("Sequence started");
-
-            _logger.Trace("Preparing environment...");
-            EnvironmentVariables.Initialize();
 
             if (!EnableGUI())
             {

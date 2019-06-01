@@ -17,7 +17,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace DeploymentToolkit.Deployment
 {
@@ -301,6 +300,9 @@ namespace DeploymentToolkit.Deployment
             {
                 _logger.Info($"Exit code {e.ReturnCode}");
                 GlobalExitCode = e.ReturnCode;
+
+                _logger.Trace("Marking sequence as complete");
+                RegistryManager.SetSequenceComplete(e);
 
                 _logger.Info("Sequence completed.");
                 
