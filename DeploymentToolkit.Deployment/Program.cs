@@ -11,6 +11,7 @@ using DeploymentToolkit.Uninstaller.Executable;
 using DeploymentToolkit.Uninstaller.MSI;
 using NLog;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -303,15 +304,24 @@ namespace DeploymentToolkit.Deployment
 
                 _logger.Info("Sequence completed.");
                 
-                if(e.ForceRestart)
+                if(
+                    e.ForceRestart || // Restart requested by GUI
+                    (EnvironmentVariables.ActiveSequence.RestartSettings.ForceRestart && !EnvironmentVariables.IsGUIEnabled) // Restart enforced by config and no GUI available
+                )
                 {
-                    _logger.Info("Restart forced. Restarting in 10 seconds ...");
-                    // TODO: This has to be extracted into seperate process
-                    //Task.Factory.StartNew(async () =>
-                    //{
-                    //    await Task.Delay(10 * 1000);
-                    //    Utils.PowerUtil.Restart();
-                    //});
+                    _logger.Info("Restart forced. Spawning restart process ...");
+                    var process = new Process()
+                    {
+                        StartInfo = new ProcessStartInfo()
+                        {
+                            FileName = EnvironmentVariables.DeploymentToolkitRestartExePath,
+                            CreateNoWindow = true,
+                            WindowStyle = ProcessWindowStyle.Hidden
+                        }
+                    };
+                    process.Start();
+
+                    _logger.Info($"Spawned restart process with id {process.Id} in session {process.SessionId}");
                 }
             }
             catch (Exception ex)

@@ -20,6 +20,15 @@ namespace DeploymentToolkit.ToolkitEnvironment
 
         private static Logger _logger = LogManager.GetCurrentClassLogger();
 
+        private const string _deploymentToolkitRestartExeName = "DeploymentToolkit.Restart.exe";
+        private const string _deploymentToolkitDeploymentExeName = "DeploymentToolkit.Deployment.exe";
+
+        private static readonly string[] _requiredToolkitFiles = new string[]
+        {
+            _deploymentToolkitRestartExeName,
+            _deploymentToolkitDeploymentExeName
+        };
+
         private static string _deploymentToolkitInstallPath = null;
         public static string DeploymentToolkitInstallPath
         {
@@ -32,21 +41,32 @@ namespace DeploymentToolkit.ToolkitEnvironment
                 if (installPath == null)
                 {
                     var currentDirectory = Directory.GetCurrentDirectory();
-                    var debuggerPath = Path.Combine(currentDirectory, "DeploymentToolkit.Deployment.exe"); //We should check here for all exe files (e.g. DeploymentToolkit.Debugger.exe)
-                    if (File.Exists(debuggerPath))
+                    foreach(var file in _requiredToolkitFiles)
                     {
-                        installPath = currentDirectory;
+                        var debuggerPath = Path.Combine(currentDirectory, file);
+                        if (!File.Exists(debuggerPath))
+                        {
+                            // Maybe add more options later??
+                            // Like a registry entry with the install path other than an EnvironmentVariable
+                            throw new DeploymentToolkitInstallPathNotFoundException("DeploymentToolkit installation path could not be found", file);
+                        }
                     }
-                    else
-                    {
-                        // Maybe add more options later??
-                        // Like a registry entry with the install path other than an EnvironmentVariable
-                        throw new DeploymentToolkitInstallPathNotFoundException("DeploymentToolkit installation path could not be found", "DeploymentToolkit.Deployment.exe");
-                    }
+                    installPath = currentDirectory;
                 }
 
                 _deploymentToolkitInstallPath = installPath;
                 return _deploymentToolkitInstallPath;
+            }
+        }
+
+        private static string _deploymentToolkitRestartExePath = null;
+        public static string DeploymentToolkitRestartExePath
+        {
+            get
+            {
+                if (_deploymentToolkitRestartExePath == null)
+                    _deploymentToolkitRestartExePath = Path.Combine(DeploymentToolkitInstallPath, _deploymentToolkitRestartExeName);
+                return _deploymentToolkitRestartExePath;
             }
         }
 
