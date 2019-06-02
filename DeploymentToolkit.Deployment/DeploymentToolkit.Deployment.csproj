@@ -127,6 +127,10 @@
       <Project>{AD620098-DF03-45B9-9B91-7E1DD13BC86C}</Project>
       <Name>DeploymentToolkit.Scripting</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DeploymentToolkit.Unblocker\DeploymentToolkit.Unblocker.csproj">
+      <Project>{2d115754-8b3b-4890-9472-2580c09c3a36}</Project>
+      <Name>DeploymentToolkit.Unblocker</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DeploymentToolkit.Uninstaller.Executable\DeploymentToolkit.Uninstaller.Executable.csproj">
       <Project>{A0E7F558-00A9-41B6-9B8B-125A102BDB57}</Project>
       <Name>DeploymentToolkit.Uninstaller.Executable</Name>
