@@ -19,6 +19,9 @@ namespace DeploymentToolkit.Messaging
         internal readonly string TrayAppExeNameLowered;
         internal const string TrayAppExeNameWithoutExtension = "DeploymentToolkit.TrayApp";
 
+        private const int _trayAppStartTimeOut = 5000;
+        private static int _trayAppRetrys = 3;
+
         private Logger _logger = LogManager.GetCurrentClassLogger();
 
         private ManagementEventWatcher _startWatcher;
@@ -41,9 +44,23 @@ namespace DeploymentToolkit.Messaging
             TrayAppExeNameLowered = TrayAppExeName.ToLower();
 
             var processes = Process.GetProcessesByName(TrayAppExeNameWithoutExtension);
-            if(processes.Length == 0)
+            while(processes.Length == 0 && _trayAppRetrys-- > 0)
             {
-                _logger.Info("There is currently no tray app running on this system");
+                _logger.Debug("There is currently no tray app running on this system");
+
+                // Start tray apps if not running
+                Util.WindowsEventLog.RequestTrayAppStart();
+
+                _logger.Trace("Waiting for start ...");
+                System.Threading.Thread.Sleep(_trayAppStartTimeOut);
+
+                _logger.Trace("Scanning for tray apps ...");
+                processes = Process.GetProcessesByName(TrayAppExeNameWithoutExtension);
+            }
+
+            if(_trayAppRetrys == 0)
+            {
+                _logger.Info("Failed to start tray apps");
             }
             else
             {

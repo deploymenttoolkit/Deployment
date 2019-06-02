@@ -24,7 +24,7 @@ namespace DeploymentToolkit.Util
         public static void RequestTrayAppStart()
         {
             _logger.Trace("Requesting start of all tray apps ...");
-            _eventLog.WriteEntry("Tray App start request", EventLogEntryType.Information);
+            _eventLog.WriteEntry("Tray App start request", EventLogEntryType.Information, 42, 42);
         }
     }
 }

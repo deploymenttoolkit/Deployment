@@ -66,6 +66,10 @@ namespace DeploymentToolkit.Deployment
 
             _logger.Info($"Initialized {Namespace} v{Version}");
 
+            // This has to happen quite early as it can take some time for the eventlog to be fully registered
+            _logger.Trace("Ensuring WindowsEventLog ...");
+            Util.WindowsEventLog.Ensure();
+
             _logger.Trace("Trying to read settings...");
 
             if (args.Length != 2)
