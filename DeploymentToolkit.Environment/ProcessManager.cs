@@ -182,9 +182,12 @@ namespace DeploymentToolkit.ToolkitEnvironment
                 return;
             }
 
+            _logger.Info($"Unblocking {apps.Count} apps ...");
             try
             {
                 UnblockExecution(apps.ToArray());
+
+                _logger.Info("Successfully unblocked");
             }
             catch (Exception ex)
             {
