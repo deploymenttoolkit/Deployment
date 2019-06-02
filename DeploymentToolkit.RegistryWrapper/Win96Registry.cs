@@ -88,7 +88,7 @@ namespace DeploymentToolkit.RegistryWrapper
             }
         }
 
-        public static void SetValue(RegistryHive hive, string path, string subKeyName, string name, string value)
+        public static void SetValue(RegistryHive hive, string path, string subKeyName, string name, object value)
         {
             _logger.Trace($"SetValue({hive}, {path}, {subKeyName}, {name}, {value})");
             if (string.IsNullOrEmpty(path))
@@ -99,15 +99,13 @@ namespace DeploymentToolkit.RegistryWrapper
             SetValue(hive, Path.Combine(path, subKeyName), name, value);
         }
 
-        public static void SetValue(RegistryHive hive, string path, string name, string value)
+        public static void SetValue(RegistryHive hive, string path, string name, object value)
         {
             _logger.Trace($"SetValue({hive}, {path}, {name}, {value})");
             if (string.IsNullOrEmpty(path))
                 throw new ArgumentNullException(nameof(path));
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
-            if (string.IsNullOrEmpty(value))
-                throw new ArgumentNullException(nameof(value));
 
             var hives = GetBaseKey(hive);
             foreach(var regHive in hives)

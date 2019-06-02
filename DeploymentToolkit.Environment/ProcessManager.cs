@@ -120,6 +120,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
                         _logger.Trace($"Blocking execution of {executableName}");
                         Win96Registry.CreateSubKey(RegistryHive.LocalMachine, _blockExecutionSubKey, executableName);
                         Win96Registry.SetValue(RegistryHive.LocalMachine, _blockExecutionSubKey, executableName, "Debugger", _debuggerPath);
+                        Win96Registry.SetValue(RegistryHive.LocalMachine, _blockExecutionSubKey, executableName, "DT_BLOCK", 0x01);
                     }
                     catch (Exception ex)
                     {
