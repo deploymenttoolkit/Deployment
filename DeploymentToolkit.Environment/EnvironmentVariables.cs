@@ -31,11 +31,13 @@ namespace DeploymentToolkit.ToolkitEnvironment
 
         private const string _deploymentToolkitRestartExeName = "DeploymentToolkit.Restart.exe";
         private const string _deploymentToolkitDeploymentExeName = "DeploymentToolkit.Deployment.exe";
+        private const string _deploymentToolkitBlockerExeName = "DeploymentToolkit.Blocker.exe";
 
         private static readonly string[] _requiredToolkitFiles = new string[]
         {
             _deploymentToolkitRestartExeName,
-            _deploymentToolkitDeploymentExeName
+            _deploymentToolkitDeploymentExeName,
+            _deploymentToolkitBlockerExeName
         };
 
         private static string _deploymentToolkitInstallPath = null;
@@ -76,6 +78,16 @@ namespace DeploymentToolkit.ToolkitEnvironment
                 if (_deploymentToolkitRestartExePath == null)
                     _deploymentToolkitRestartExePath = Path.Combine(DeploymentToolkitInstallPath, _deploymentToolkitRestartExeName);
                 return _deploymentToolkitRestartExePath;
+            }
+        }
+        private static string _deploymentToolkitBlockerExePath = null;
+        public static string DeploymentToolkitBlockerExePath
+        {
+            get
+            {
+                if (_deploymentToolkitBlockerExePath == null)
+                    _deploymentToolkitBlockerExePath = Path.Combine(DeploymentToolkitInstallPath, _deploymentToolkitBlockerExeName);
+                return _deploymentToolkitBlockerExePath;
             }
         }
 
