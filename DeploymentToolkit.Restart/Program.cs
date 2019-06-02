@@ -6,15 +6,27 @@ namespace DeploymentToolkit.Restart
 {
     class Program
     {
+        private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+
         static void Main(string[] args)
         {
-            Console.WriteLine("Restarting in 10 Seconds ...");
+            try
+            {
+                Logging.LogManager.Initialize("Unblocker");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to initialize logger: {ex}");
+                Environment.Exit(-1);
+            }
+
+            _logger.Info("Restarting in 10 Seconds ...");
             for(var i = 10; i != 0; i--)
             {
-                Console.WriteLine(i);
+                _logger.Info($"{i} ...");
                 Thread.Sleep(1000);
             }
-            Console.WriteLine("Restarting ...");
+            _logger.Info("Restarting ...");
 
             PowerUtil.Restart();
         }

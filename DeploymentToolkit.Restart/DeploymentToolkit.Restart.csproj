@@ -33,6 +33,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\DeploymentToolkit.Logging\bin\Debug\NLog.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -50,6 +54,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\DeploymentToolkit.Logging\DeploymentToolkit.Logging.csproj">
+      <Project>{8bce8c64-7c10-498f-beb2-8804b191aea7}</Project>
+      <Name>DeploymentToolkit.Logging</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DeploymentToolkit.Util\DeploymentToolkit.Util.csproj">
       <Project>{AEBBE655-C600-4B78-8617-FA3921F33AFA}</Project>
       <Name>DeploymentToolkit.Util</Name>
