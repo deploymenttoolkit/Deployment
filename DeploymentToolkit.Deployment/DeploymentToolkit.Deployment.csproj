@@ -87,6 +87,14 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\DeploymentToolkit.Blocker\DeploymentToolkit.Blocker.csproj">
+      <Project>{0fd003a3-0c57-4c77-96fa-140b6d83a1a2}</Project>
+      <Name>DeploymentToolkit.Blocker</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\DeploymentToolkit.Debugger\DeploymentToolkit.Debugger.csproj">
+      <Project>{ee27d0dc-f1b3-426f-86bd-c8146944f9c9}</Project>
+      <Name>DeploymentToolkit.Debugger</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DeploymentToolkit.Actions\DeploymentToolkit.Actions.csproj">
       <Project>{0059F67C-809E-4811-995D-4647BB520C99}</Project>
       <Name>DeploymentToolkit.Actions</Name>
