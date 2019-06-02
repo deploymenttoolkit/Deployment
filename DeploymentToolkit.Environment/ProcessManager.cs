@@ -20,7 +20,6 @@ namespace DeploymentToolkit.ToolkitEnvironment
 
         private static Logger _logger = LogManager.GetCurrentClassLogger();
 
-        // We probably need to extend this to 64 bit and 32 bit registry. Depending if the process is started as 64 bit or 32 bit the key is created on a differen position (WOW64Node shit)
         private static readonly string _blockExecutionSubKey = @"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options";
         private static readonly string _debuggerPath = Path.Combine(EnvironmentVariables.DeploymentToolkitInstallPath, "DeploymentToolkit.Debugger.exe");
 
@@ -172,6 +171,74 @@ namespace DeploymentToolkit.ToolkitEnvironment
                 _logger.Error(ex, "Failed to unblock exection of executables");
                 return false;
             }
+        }
+
+        public static void UnblockAllDTBlockedApps()
+        {
+            var apps = GetAllDTBlockedApps();
+            if(apps.Count == 0)
+            {
+                _logger.Info("No apps to unblock");
+                return;
+            }
+
+            try
+            {
+                UnblockExecution(apps.ToArray());
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, $"Failed to unblock execution of apps");
+            }
+        }
+
+        private static List<string> GetAllDTBlockedApps()
+        {
+            var result = new List<string>();
+            try
+            {
+                var fullPath = Path.Combine("HKEY_LOCAL_MACHINE", _blockExecutionSubKey);
+                var win32Registry = new Win32Registry();
+                var subKeys = win32Registry.GetSubKeys(fullPath);
+
+                foreach(var key in subKeys)
+                {
+                    if (IsKeyBlockedByDT(win32Registry, fullPath, key))
+                        result.Add(key);
+                }
+
+                if(Environment.Is64BitOperatingSystem)
+                {
+                    var win64Registry = new Win64Registry();
+                    var win64SubKeys = win64Registry.GetSubKeys(fullPath);
+
+                    foreach(var key in subKeys)
+                    {
+                        if (!IsKeyBlockedByDT(win64Registry, fullPath, key))
+                            continue;
+
+                        if (result.Contains(key))
+                            continue;
+
+                        result.Add(key);
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                _logger.Error(ex, "Failed to get blocked apps");
+            }
+            return result;
+        }
+
+        private static bool IsKeyBlockedByDT(WinRegistryBase registry, string path, string subKeyName)
+        {
+            var subKey = registry.OpenSubKey(path, subKeyName);
+            if(subKey != null)
+            {
+                return subKey.GetValue("DT_BLOCK", null) != null;
+            }
+            return false;
         }
     }
 }
