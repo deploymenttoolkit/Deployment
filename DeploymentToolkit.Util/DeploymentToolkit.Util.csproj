@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="WindowsEventLog.cs" />
     <Compile Include="ExitReason.cs" />
     <Compile Include="PowerUtil.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
