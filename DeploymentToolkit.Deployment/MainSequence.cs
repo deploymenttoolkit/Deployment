@@ -363,7 +363,7 @@ namespace DeploymentToolkit.Deployment
                 _logger.Trace("Evaluating defer settings...");
                 if (deferSettings.DeadlineAsDate != DateTime.MinValue && deferSettings.DeadlineAsDate < DateTime.Now)
                 {
-                    _logger.Trace("Deadline reached. Not showing defer window");
+                    _logger.Info("Deadline reached. Not showing defer window");
                     // Deadline is reached so don't show defer window
                     showDeferWindow = false;
                 }
@@ -373,7 +373,7 @@ namespace DeploymentToolkit.Deployment
                     _logger.Trace($"{remainingDays} remaining days for user to install {EnvironmentVariables.ActiveSequence.UniqueName}");
                     if (remainingDays <= 0)
                     {
-                        _logger.Trace("No days left for the user to install. Not showing defer window");
+                        _logger.Info("No days left for the user to install. Not showing defer window");
                         // There are no remaining days so don't show defer window
                         showDeferWindow = false;
                     }
