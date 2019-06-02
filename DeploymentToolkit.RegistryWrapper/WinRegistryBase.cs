@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using NLog;
 using System;
+using System.IO;
 using System.Linq;
 
 namespace DeploymentToolkit.RegistryWrapper
@@ -89,7 +90,7 @@ namespace DeploymentToolkit.RegistryWrapper
                     return HKEY_USERS;
 
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(path), "Invalid or not supported hive");
+                    throw new ArgumentOutOfRangeException(nameof(path), $"Invalid or not supported hive ({hive})");
             }
         }
 
@@ -145,6 +146,34 @@ namespace DeploymentToolkit.RegistryWrapper
             return false;
         }
 
+        public RegistryKey CreateSubKey(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                throw new ArgumentNullException(nameof(path));
+
+            var key = GetBaseKey(path, out var newPath);
+            return key.CreateSubKey(newPath, true);
+        }
+
+        public RegistryKey OpenSubKey(string path, string subKeyName)
+        {
+            if (string.IsNullOrEmpty(path))
+                throw new ArgumentNullException(nameof(path));
+            if (string.IsNullOrEmpty(nameof(subKeyName)))
+                throw new ArgumentNullException(nameof(subKeyName));
+
+            return OpenSubKey(Path.Combine(path, subKeyName));
+        }
+
+        public RegistryKey OpenSubKey(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                throw new ArgumentNullException(nameof(path));
+
+            var key = GetBaseKey(path, out var newPath);
+            return key.OpenSubKey(newPath, true);
+        }
+
         public bool DeleteSubKey(string path, string subKeyName)
         {
             if (string.IsNullOrEmpty(path))
@@ -152,14 +181,16 @@ namespace DeploymentToolkit.RegistryWrapper
             if (string.IsNullOrEmpty(nameof(subKeyName)))
                 throw new ArgumentNullException(nameof(subKeyName));
 
+            return DeleteSubKey(Path.Combine(path, subKeyName));
+        }
+
+        public bool DeleteSubKey(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                throw new ArgumentNullException(nameof(path));
+
             var key = GetBaseKey(path, out var newPath);
-            var subKey = key.OpenSubKey(newPath, true);
-            if (subKey != null)
-            {
-                subKey.DeleteSubKeyTree(subKeyName, false);
-                return true;
-            }
-            // If the whole key doesn't exists then the subKey for sure does not too. So we can return true here
+            key.DeleteSubKeyTree(newPath, false);
             return true;
         }
 

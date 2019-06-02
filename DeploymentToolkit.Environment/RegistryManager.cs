@@ -15,11 +15,13 @@ namespace DeploymentToolkit.ToolkitEnvironment
         private const string _deploymentToolkitRegistryPath = @"HKEY_LOCAL_MACHINE\SOFTWARE\DeploymentToolkit";
         private const string _deploymentToolkitActiveSequence = "ActiveSequence";
         private const string _deploymentToolkitHistory = "History";
+        private const string _deploymentToolkitDeployments = "Deployments";
 
-        private const string _deploymentsSavePath = @"SOFTWARE\DeploymentToolkit";
         private const string _applicationUninstallPath = @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
 
         private static Logger _logger = LogManager.GetCurrentClassLogger();
+
+        private static Win64Registry _registry = new Win64Registry();
 
         private static string _lastDeploymentRegistryKeyPath;
 
@@ -39,8 +41,8 @@ namespace DeploymentToolkit.ToolkitEnvironment
 
         private static bool GetDeploymentRegistryKey(string deploymentName, out RegistryKey deploymentRegistryKey)
         {
-            _lastDeploymentRegistryKeyPath = Path.Combine(_deploymentsSavePath, deploymentName);
-            deploymentRegistryKey = Registry.LocalMachine.OpenSubKey(_lastDeploymentRegistryKeyPath);
+            _lastDeploymentRegistryKeyPath = Path.Combine(_deploymentToolkitRegistryPath, _deploymentToolkitDeployments, deploymentName);
+            deploymentRegistryKey = _registry.OpenSubKey(_lastDeploymentRegistryKeyPath);
 
             if (deploymentRegistryKey == null)
                 return false;
@@ -123,7 +125,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
             if (deploymentExists)
             {
                 _logger.Trace($"{deploymentRegistryPath} already exists. Deleting...");
-                Registry.LocalMachine.DeleteSubKeyTree(deploymentRegistryPath);
+                _registry.DeleteSubKey(deploymentRegistryPath);
             }
 
             if(deferalSettings.DeadlineAsDate == DateTime.MinValue && deferalSettings.Days <= 0)
@@ -133,7 +135,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
             }
 
             _logger.Trace($"Creating '{deploymentRegistryPath}' ...");
-            var deploymentRegistryKey = Registry.LocalMachine.CreateSubKey(deploymentRegistryPath);
+            var deploymentRegistryKey = _registry.CreateSubKey(deploymentRegistryPath);
 
             if (deferalSettings.Days > 0)
             {
@@ -163,7 +165,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
                 _logger.Trace($"{deploymentRegistryPath} exists. Deleting...");
                 try
                 {
-                    Registry.LocalMachine.DeleteSubKey(deploymentRegistryPath);
+                    _registry.DeleteSubKey(deploymentRegistryPath);
                 }
                 catch(Exception ex)
                 {
