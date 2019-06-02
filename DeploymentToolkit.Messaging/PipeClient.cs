@@ -86,7 +86,8 @@ namespace DeploymentToolkit.Messaging
                 var message = new DeploymentInformationMessage()
                 {
                     SequenceType = EnvironmentVariables.ActiveSequenceType,
-                    DeploymentName = EnvironmentVariables.Configuration.Name
+                    DeploymentName = EnvironmentVariables.Configuration.Name,
+                    DisplaySettings = EnvironmentVariables.Configuration.DisplaySettings
                 };
                 var messageData = Serializer.SerializeMessage(message);
                 SendMessage(messageData);
