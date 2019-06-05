@@ -44,12 +44,13 @@ namespace DeploymentToolkit.Messaging
             TrayAppExeNameLowered = TrayAppExeName.ToLower();
 
             var processes = Process.GetProcessesByName(TrayAppExeNameWithoutExtension);
-            while(processes.Length == 0 && _trayAppRetrys-- > 0)
+            while (processes.Length == 0 && _trayAppRetrys-- > 0)
             {
-                _logger.Debug("There is currently no tray app running on this system");
+                _logger.Info($"There is currently no tray app running on this system. Trying to start tray apps. Retries left: {_trayAppRetrys}");
 
                 // Start tray apps if not running
                 Util.WindowsEventLog.RequestTrayAppStart();
+                Util.ProcessUtil.StartTrayAppForAllLoggedOnUsers();
 
                 _logger.Trace("Waiting for start ...");
                 System.Threading.Thread.Sleep(_trayAppStartTimeOut);
@@ -58,7 +59,7 @@ namespace DeploymentToolkit.Messaging
                 processes = Process.GetProcessesByName(TrayAppExeNameWithoutExtension);
             }
 
-            if(_trayAppRetrys == 0)
+            if (_trayAppRetrys == 0)
             {
                 _logger.Info("Failed to start tray apps");
             }
@@ -92,17 +93,17 @@ namespace DeploymentToolkit.Messaging
                 _logger.Warn("Received message from unknown source");
                 return;
             }
-            
-            switch(e.MessageId)
+
+            switch (e.MessageId)
             {
                 case MessageId.ContinueDeployment:
                     {
                         var message = e.Message as ContinueMessage;
-                        lock(_messageLock)
+                        lock (_messageLock)
                         {
-                            if(message.DeploymentStep == DeploymentStep.DeferDeployment)
+                            if (message.DeploymentStep == DeploymentStep.DeferDeployment)
                             {
-                                if(_hasReceivedDeferMessage)
+                                if (_hasReceivedDeferMessage)
                                 {
                                     _logger.Trace($"Ignoring defer answer from session {client.SessionId} as there was already a prior response");
                                     return;
@@ -110,9 +111,9 @@ namespace DeploymentToolkit.Messaging
 
                                 _hasReceivedDeferMessage = true;
                             }
-                            else if(message.DeploymentStep == DeploymentStep.CloseApplications)
+                            else if (message.DeploymentStep == DeploymentStep.CloseApplications)
                             {
-                                if(_hasReceivedCloseMessage)
+                                if (_hasReceivedCloseMessage)
                                 {
                                     _logger.Trace($"Ignoring close apps answer from session {client.SessionId} as there was already a prior response");
                                     return;
@@ -120,7 +121,7 @@ namespace DeploymentToolkit.Messaging
 
                                 _hasReceivedCloseMessage = true;
                             }
-                            else if(message.DeploymentStep == DeploymentStep.Restart)
+                            else if (message.DeploymentStep == DeploymentStep.Restart)
                             {
                                 if (_hasReceivedRestartMessage)
                                 {
@@ -146,7 +147,7 @@ namespace DeploymentToolkit.Messaging
                         var message = e.Message as AbortMessage;
                         lock (_messageLock)
                         {
-                            if(message.DeploymentStep == DeploymentStep.Restart)
+                            if (message.DeploymentStep == DeploymentStep.Restart)
                             {
                                 if (_hasReceivedRestartMessage)
                                 {
@@ -194,7 +195,7 @@ namespace DeploymentToolkit.Messaging
 
         private void MonitorWMI()
         {
-            if(_startWatcher != null)
+            if (_startWatcher != null)
             {
                 _startWatcher.Dispose();
                 _startWatcher = null;
@@ -227,7 +228,7 @@ namespace DeploymentToolkit.Messaging
                     try
                     {
                         var client = new PipeClient(processId);
-                        if(client.IsConnected)
+                        if (client.IsConnected)
                         {
                             _clients.Add(
                                 processId,
@@ -235,7 +236,7 @@ namespace DeploymentToolkit.Messaging
                             );
                         }
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         _logger.Error(ex, $"Failed to process {processId}");
                     }
@@ -258,7 +259,7 @@ namespace DeploymentToolkit.Messaging
                         _clients[processId].Dispose();
                         _clients.Remove(processId);
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         _logger.Error(ex, $"Failed to process {processId}");
                     }
@@ -291,7 +292,7 @@ namespace DeploymentToolkit.Messaging
             _stopWatcher?.Dispose();
 
             _logger.Trace("Stopping clients...");
-            foreach(var client in _clients.Values)
+            foreach (var client in _clients.Values)
             {
                 client.Dispose();
             }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace DeploymentToolkit.Utils
+namespace DeploymentToolkit.Util
 {
     public static class PowerUtil
     {
@@ -19,7 +19,7 @@ namespace DeploymentToolkit.Utils
                     return false;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.Fatal(ex, "Failed to adjust token");
                 return false;

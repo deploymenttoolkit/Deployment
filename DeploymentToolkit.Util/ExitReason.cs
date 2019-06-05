@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DeploymentToolkit.Utils
+namespace DeploymentToolkit.Util
 {
     [Flags]
     public enum ExitReason : uint

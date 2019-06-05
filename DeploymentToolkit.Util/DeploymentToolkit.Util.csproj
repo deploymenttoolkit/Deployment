@@ -44,12 +44,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ProcessCreationFlags.cs" />
+    <Compile Include="ProcessUtil.cs" />
     <Compile Include="WindowsEventLog.cs" />
     <Compile Include="ExitReason.cs" />
     <Compile Include="PowerUtil.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShutdownReason.cs" />
     <Compile Include="TokenAdjuster.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DeploymentToolkit.Environment\DeploymentToolkit.ToolkitEnvironment.csproj">
+      <Project>{94c074c7-cae2-423e-84b7-80d5b74602bb}</Project>
+      <Name>DeploymentToolkit.ToolkitEnvironment</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

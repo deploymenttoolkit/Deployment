@@ -32,12 +32,14 @@ namespace DeploymentToolkit.ToolkitEnvironment
         private const string _deploymentToolkitRestartExeName = "DeploymentToolkit.Restart.exe";
         private const string _deploymentToolkitDeploymentExeName = "DeploymentToolkit.Deployment.exe";
         private const string _deploymentToolkitBlockerExeName = "DeploymentToolkit.Blocker.exe";
+        private const string _deploymentToolkitTrayExeName = "DeploymentToolkit.TrayApp.exe";
 
         private static readonly string[] _requiredToolkitFiles = new string[]
         {
             _deploymentToolkitRestartExeName,
             _deploymentToolkitDeploymentExeName,
-            _deploymentToolkitBlockerExeName
+            _deploymentToolkitBlockerExeName,
+            _deploymentToolkitTrayExeName
         };
 
         private static string _deploymentToolkitInstallPath = null;
@@ -52,7 +54,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
                 if (installPath == null)
                 {
                     var currentDirectory = Directory.GetCurrentDirectory();
-                    foreach(var file in _requiredToolkitFiles)
+                    foreach (var file in _requiredToolkitFiles)
                     {
                         var debuggerPath = Path.Combine(currentDirectory, file);
                         if (!File.Exists(debuggerPath))
@@ -88,6 +90,16 @@ namespace DeploymentToolkit.ToolkitEnvironment
                 if (_deploymentToolkitBlockerExePath == null)
                     _deploymentToolkitBlockerExePath = Path.Combine(DeploymentToolkitInstallPath, _deploymentToolkitBlockerExeName);
                 return _deploymentToolkitBlockerExePath;
+            }
+        }
+        private static string _deploymentToolkitTrayExePath = null;
+        public static string DeploymentToolkitTrayExePath
+        {
+            get
+            {
+                if (_deploymentToolkitTrayExePath == null)
+                    _deploymentToolkitTrayExePath = Path.Combine(DeploymentToolkitInstallPath, _deploymentToolkitTrayExeName);
+                return _deploymentToolkitTrayExePath;
             }
         }
 

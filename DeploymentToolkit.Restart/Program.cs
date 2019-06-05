@@ -1,4 +1,4 @@
-﻿using DeploymentToolkit.Utils;
+﻿using DeploymentToolkit.Util;
 using System;
 using System.Threading;
 
@@ -21,7 +21,7 @@ namespace DeploymentToolkit.Restart
             }
 
             _logger.Info("Restarting in 10 Seconds ...");
-            for(var i = 10; i != 0; i--)
+            for (var i = 10; i != 0; i--)
             {
                 _logger.Info($"{i} ...");
                 Thread.Sleep(1000);
