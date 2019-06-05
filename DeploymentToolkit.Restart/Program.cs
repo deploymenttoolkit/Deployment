@@ -12,7 +12,7 @@ namespace DeploymentToolkit.Restart
         {
             try
             {
-                Logging.LogManager.Initialize("Unblocker");
+                Logging.LogManager.Initialize("Restart");
             }
             catch (Exception ex)
             {
