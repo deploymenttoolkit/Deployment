@@ -103,7 +103,7 @@ namespace DeploymentToolkit.RegistryWrapper
 
             var key = GetBaseKey(path, out var newPath);
             var subKey = key.OpenSubKey(newPath);
-            if(subKey != null)
+            if (subKey != null)
             {
                 return subKey.GetSubKeyNames().Contains(subKeyName);
             }
@@ -119,7 +119,7 @@ namespace DeploymentToolkit.RegistryWrapper
 
             var key = GetBaseKey(path, out var newPath);
             var subKey = key.OpenSubKey(newPath);
-            if(subKey != null)
+            if (subKey != null)
             {
                 return subKey.GetSubKeyNames();
             }
@@ -137,7 +137,7 @@ namespace DeploymentToolkit.RegistryWrapper
 
             var key = GetBaseKey(path, out var newPath);
             var subKey = key.OpenSubKey(newPath, true);
-            if(subKey != null)
+            if (subKey != null)
             {
                 subKey.CreateSubKey(subKeyName);
                 return true;
@@ -155,23 +155,24 @@ namespace DeploymentToolkit.RegistryWrapper
             return key.CreateSubKey(newPath, true);
         }
 
-        public RegistryKey OpenSubKey(string path, string subKeyName)
+        public RegistryKey OpenSubKey(string path, string subKeyName, bool writeable = true)
         {
             if (string.IsNullOrEmpty(path))
                 throw new ArgumentNullException(nameof(path));
             if (string.IsNullOrEmpty(nameof(subKeyName)))
                 throw new ArgumentNullException(nameof(subKeyName));
 
-            return OpenSubKey(Path.Combine(path, subKeyName));
+            return OpenSubKey(Path.Combine(path, subKeyName), writeable);
         }
 
-        public RegistryKey OpenSubKey(string path)
+        public RegistryKey OpenSubKey(string path, bool writeable = true)
         {
             if (string.IsNullOrEmpty(path))
                 throw new ArgumentNullException(nameof(path));
 
             var key = GetBaseKey(path, out var newPath);
-            return key.OpenSubKey(newPath, true);
+            _logger.Trace($"Opening '{key}\\{newPath}'");
+            return key.OpenSubKey(newPath, writeable);
         }
 
         public bool DeleteSubKey(string path, string subKeyName)

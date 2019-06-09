@@ -66,7 +66,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
             {
                 try
                 {
-                    var subKey = _registry.OpenSubKey(path, key);
+                    var subKey = _registry.OpenSubKey(path, key, false);
 
                     var deploymentEndDate = (string)subKey.GetValue("DeploymentEndDate", string.Empty);
                     var deploymentDeadlineString = (string)subKey.GetValue("DeploymentDeadline", string.Empty);
