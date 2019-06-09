@@ -44,8 +44,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="NativeMethod.cs" />
     <Compile Include="ProcessCreationFlags.cs" />
     <Compile Include="ProcessUtil.cs" />
+    <Compile Include="Structs\LUID.cs" />
+    <Compile Include="Structs\LUID_AND_ATTRIBUTES.cs" />
+    <Compile Include="Structs\PROCESS_INFORMATION.cs" />
+    <Compile Include="Structs\SECURITY_ATTRIBUTES.cs" />
+    <Compile Include="Structs\SECURITY_IMPERSONATION_LEVEL.cs" />
+    <Compile Include="Structs\STARTUPINFO.cs" />
+    <Compile Include="Structs\TOKEN_PRIVILEGES.cs" />
+    <Compile Include="Structs\TOKEN_TYPE.cs" />
+    <Compile Include="Structs\_PRIVILEGE_SET.cs" />
     <Compile Include="WindowsEventLog.cs" />
     <Compile Include="ExitReason.cs" />
     <Compile Include="PowerUtil.cs" />
