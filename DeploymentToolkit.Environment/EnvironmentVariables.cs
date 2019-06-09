@@ -34,6 +34,8 @@ namespace DeploymentToolkit.ToolkitEnvironment
         private const string _deploymentToolkitBlockerExeName = "DeploymentToolkit.Blocker.exe";
         private const string _deploymentToolkitTrayExeName = "DeploymentToolkit.TrayApp.exe";
 
+        public static string DeploymentToolkitTrayExeName { get => _deploymentToolkitTrayExeName; }
+
         private static readonly string[] _requiredToolkitFiles = new string[]
         {
             _deploymentToolkitRestartExeName,

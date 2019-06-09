@@ -183,7 +183,7 @@ namespace DeploymentToolkit.Util
             }
         }
 
-        internal static List<IntPtr> GetLoggedOnUserTokens()
+        internal static List<IntPtr> GetLoggedOnUserTokens(IEnumerable<int> excludeSessions)
         {
             var result = new List<IntPtr>();
 
@@ -198,6 +198,12 @@ namespace DeploymentToolkit.Util
             foreach (var group in grouped)
             {
                 var sessionId = group.Key;
+                if (excludeSessions.Contains(sessionId))
+                {
+                    _logger.Trace($"Skipping session {sessionId}");
+                    continue;
+                }
+
                 var handle = group.First().Handle;
                 var token = IntPtr.Zero;
 
