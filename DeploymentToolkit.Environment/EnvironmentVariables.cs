@@ -32,6 +32,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
         private const string _deploymentToolkitRestartExeName = "DeploymentToolkit.Restart.exe";
         private const string _deploymentToolkitDeploymentExeName = "DeploymentToolkit.Deployment.exe";
         private const string _deploymentToolkitBlockerExeName = "DeploymentToolkit.Blocker.exe";
+        private const string _deploymentToolkitUnblockerExeName = "DeploymentToolkit.Unblocker.exe";
         private const string _deploymentToolkitTrayExeName = "DeploymentToolkit.TrayApp.exe";
 
         public static string DeploymentToolkitTrayExeName { get => _deploymentToolkitTrayExeName; }
@@ -41,6 +42,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
             _deploymentToolkitRestartExeName,
             _deploymentToolkitDeploymentExeName,
             _deploymentToolkitBlockerExeName,
+            _deploymentToolkitUnblockerExeName,
             _deploymentToolkitTrayExeName
         };
 
@@ -92,6 +94,16 @@ namespace DeploymentToolkit.ToolkitEnvironment
                 if (_deploymentToolkitBlockerExePath == null)
                     _deploymentToolkitBlockerExePath = Path.Combine(DeploymentToolkitInstallPath, _deploymentToolkitBlockerExeName);
                 return _deploymentToolkitBlockerExePath;
+            }
+        }
+        private static string _deploymentToolkitUnblockerExePath = null;
+        public static string DeploymentToolkitUnblockerExePath
+        {
+            get
+            {
+                if (_deploymentToolkitUnblockerExePath == null)
+                    _deploymentToolkitUnblockerExePath = Path.Combine(DeploymentToolkitInstallPath, _deploymentToolkitUnblockerExeName);
+                return _deploymentToolkitUnblockerExePath;
             }
         }
         private static string _deploymentToolkitTrayExePath = null;
