@@ -40,6 +40,7 @@ namespace DeploymentToolkit.Messaging
         /// Value: PipeClient(Manager)
         /// </summary>
         private Dictionary<int, PipeClient> _clients = new Dictionary<int, PipeClient>();
+        private string _lastSentMessage = null;
 
         private readonly object _messageLock = new object();
         private bool _hasReceivedDeferMessage = false;
@@ -274,6 +275,12 @@ namespace DeploymentToolkit.Messaging
                                 client
                             );
 
+                            if (!string.IsNullOrEmpty(_lastSentMessage))
+                            {
+                                // Send the last message to the client
+                                client.SendMessage(_lastSentMessage);
+                            }
+
                             OnTrayStarted?.BeginInvoke(
                                 this,
                                 null,
@@ -331,6 +338,8 @@ namespace DeploymentToolkit.Messaging
                     client.SendMessage(data);
                     _logger.Trace($"Sent message to {client.SessionId}");
                 }
+
+                _lastSentMessage = data;
             }
 
             if (message is DeferMessage)
