@@ -29,6 +29,9 @@ namespace DeploymentToolkit.ToolkitEnvironment
 
         private static Logger _logger = LogManager.GetCurrentClassLogger();
 
+        public const int DeploymentToolkitStepTimout = 600;
+        public const int DeploymentToolkitStepExtraTime = 30;
+
         private const string _deploymentToolkitRestartExeName = "DeploymentToolkit.Restart.exe";
         private const string _deploymentToolkitDeploymentExeName = "DeploymentToolkit.Deployment.exe";
         private const string _deploymentToolkitBlockerExeName = "DeploymentToolkit.Blocker.exe";

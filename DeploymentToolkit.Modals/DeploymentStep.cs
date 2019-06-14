@@ -2,9 +2,11 @@
 {
     public enum DeploymentStep
     {
+        Start,
         Welcome,
         DeferDeployment,
         CloseApplications,
-        Restart
+        Restart,
+        End
     }
 }

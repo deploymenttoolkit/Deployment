@@ -6,5 +6,6 @@ namespace DeploymentToolkit.Messaging.Events
     {
         public MessageId MessageId { get; set; }
         public IMessage Message { get; set; }
+        public bool Simulated { get; set; } = false;
     }
 }

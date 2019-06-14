@@ -15,6 +15,11 @@ namespace DeploymentToolkit.Messaging
         public int ConnectedClients => _clients.Count;
         public event EventHandler<NewMessageEventArgs> OnNewMessage;
 
+        internal event EventHandler OnTrayStarted;
+        internal event EventHandler OnTrayStopped;
+
+        internal DeploymentStep ExpectedResponse;
+
         internal const string TrayAppExeName = "DeploymentToolkit.TrayApp.exe";
         internal readonly string TrayAppExeNameLowered;
         internal const string TrayAppExeNameWithoutExtension = "DeploymentToolkit.TrayApp";
@@ -22,7 +27,9 @@ namespace DeploymentToolkit.Messaging
         private const int _trayAppStartTimeOut = 5000;
         private static int _trayAppRetrys = 3;
 
-        private Logger _logger = LogManager.GetCurrentClassLogger();
+        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
+        private readonly TimeoutManager _timeoutManager;
 
         private ManagementEventWatcher _startWatcher;
         private ManagementEventWatcher _stopWatcher;
@@ -44,19 +51,9 @@ namespace DeploymentToolkit.Messaging
             TrayAppExeNameLowered = TrayAppExeName.ToLower();
 
             var processes = Process.GetProcessesByName(TrayAppExeNameWithoutExtension);
-            while (processes.Length == 0 && _trayAppRetrys-- > 0)
+            if (processes.Length == 0)
             {
-                _logger.Info($"There is currently no tray app running on this system. Trying to start tray apps. Retries left: {_trayAppRetrys}");
-
-                // Start tray apps if not running
-                Util.WindowsEventLog.RequestTrayAppStart();
-                Util.ProcessUtil.StartTrayAppForAllLoggedOnUsers();
-
-                _logger.Trace("Waiting for start ...");
-                System.Threading.Thread.Sleep(_trayAppStartTimeOut);
-
-                _logger.Trace("Scanning for tray apps ...");
-                processes = Process.GetProcessesByName(TrayAppExeNameWithoutExtension);
+                TryStartTray(true);
             }
 
             if (_trayAppRetrys == 0)
@@ -65,6 +62,8 @@ namespace DeploymentToolkit.Messaging
             }
             else
             {
+                processes = Process.GetProcessesByName(TrayAppExeNameWithoutExtension);
+
                 _logger.Info($"Found {processes.Length} running instances of {TrayAppExeName}");
                 foreach (var process in processes)
                 {
@@ -80,20 +79,60 @@ namespace DeploymentToolkit.Messaging
                     }
                 }
                 _logger.Info($"Successfully connected to {_clients.Count} tray apps");
+
+                _logger.Trace("Starting TimeoutManager ...");
+                _timeoutManager = new TimeoutManager(this);
             }
 
             _logger.Info($"Watching for new starts or stopps of {TrayAppExeName}");
             MonitorWMI();
         }
 
+        internal void TryStartTray(bool startup = false)
+        {
+            _trayAppRetrys = 3;
+
+            if (!startup)
+            {
+                System.Threading.Thread.Sleep(_trayAppStartTimeOut);
+            }
+
+            var processes = Process.GetProcessesByName(TrayAppExeNameWithoutExtension);
+            while (processes.Length == 0 && _trayAppRetrys-- > 0)
+            {
+                _logger.Info($"There is currently no tray app running on this system. Trying to start tray apps. Retries left: {_trayAppRetrys}");
+
+                // Start tray apps if not running
+                Util.WindowsEventLog.RequestTrayAppStart();
+                Util.ProcessUtil.StartTrayAppForAllLoggedOnUsers();
+
+                _logger.Trace("Waiting for start ...");
+                System.Threading.Thread.Sleep(_trayAppStartTimeOut);
+
+                _logger.Trace("Scanning for tray apps ...");
+                processes = Process.GetProcessesByName(TrayAppExeNameWithoutExtension);
+            }
+        }
+
+        internal void FakeReceivedMessage(NewMessageEventArgs e)
+        {
+            _logger.Debug($"Faking receive of {e.MessageId}");
+            e.Simulated = true;
+
+            OnNewMessageReceived(null, e);
+        }
+
         private void OnNewMessageReceived(object sender, NewMessageEventArgs e)
         {
-            if (!(sender is PipeClient client))
+
+            if (!(sender is PipeClient) && !e.Simulated)
             {
+
                 _logger.Warn("Received message from unknown source");
                 return;
             }
 
+            var client = (PipeClient)sender;
             switch (e.MessageId)
             {
                 case MessageId.ContinueDeployment:
@@ -234,6 +273,13 @@ namespace DeploymentToolkit.Messaging
                                 processId,
                                 client
                             );
+
+                            OnTrayStarted?.BeginInvoke(
+                                this,
+                                null,
+                                OnTrayStarted.EndInvoke,
+                                null
+                            );
                         }
                     }
                     catch (Exception ex)
@@ -258,6 +304,13 @@ namespace DeploymentToolkit.Messaging
                     {
                         _clients[processId].Dispose();
                         _clients.Remove(processId);
+
+                        OnTrayStopped?.BeginInvoke(
+                            this,
+                            null,
+                            OnTrayStopped.EndInvoke,
+                            null
+                        );
                     }
                     catch (Exception ex)
                     {
@@ -279,6 +332,15 @@ namespace DeploymentToolkit.Messaging
                     _logger.Trace($"Sent message to {client.SessionId}");
                 }
             }
+
+            if (message is DeferMessage)
+                ExpectedResponse = DeploymentStep.DeferDeployment;
+            else if (message is CloseApplicationsMessage)
+                ExpectedResponse = DeploymentStep.CloseApplications;
+            else if (message is DeploymentRestartMessage)
+                ExpectedResponse = DeploymentStep.Restart;
+            else if (message.MessageId == MessageId.DeploymentError || message.MessageId == MessageId.DeploymentSuccess)
+                ExpectedResponse = DeploymentStep.End;
         }
 
         public void Dispose()
