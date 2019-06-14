@@ -275,6 +275,8 @@ namespace DeploymentToolkit.Messaging
                                 client
                             );
 
+                            client.OnNewMessage += OnNewMessageReceived;
+
                             if (!string.IsNullOrEmpty(_lastSentMessage))
                             {
                                 // Send the last message to the client
