@@ -59,25 +59,16 @@ namespace DeploymentToolkit.Messaging
 
             if (_trayAppRetrys == 0)
             {
-                _logger.Info("Failed to start tray apps");
+                _logger.Warn("Failed to start tray apps");
             }
             else
             {
                 processes = Process.GetProcessesByName(TrayAppExeNameWithoutExtension);
 
-                _logger.Info($"Found {processes.Length} running instances of {TrayAppExeName}");
+                _logger.Debug($"Found {processes.Length} running instances of {TrayAppExeName}");
                 foreach (var process in processes)
                 {
-                    var clientPipe = new PipeClient(process.Id);
-                    if (clientPipe.IsConnected)
-                    {
-                        _clients.Add(
-                            process.Id,
-                            clientPipe
-                        );
-
-                        clientPipe.OnNewMessage += OnNewMessageReceived;
-                    }
+                    TryStartClient(process.Id, out _);
                 }
                 _logger.Info($"Successfully connected to {_clients.Count} tray apps");
 
@@ -233,6 +224,22 @@ namespace DeploymentToolkit.Messaging
             }
         }
 
+        private bool TryStartClient(int processId, out PipeClient client)
+        {
+            client = new PipeClient(processId);
+            if (client.IsConnected)
+            {
+                _clients.Add(
+                    processId,
+                    client
+                );
+
+                client.OnNewMessage += OnNewMessageReceived;
+                return true;
+            }
+            return false;
+        }
+
         private void MonitorWMI()
         {
             if (_startWatcher != null)
@@ -267,16 +274,8 @@ namespace DeploymentToolkit.Messaging
                 {
                     try
                     {
-                        var client = new PipeClient(processId);
-                        if (client.IsConnected)
+                        if (TryStartClient(processId, out var client))
                         {
-                            _clients.Add(
-                                processId,
-                                client
-                            );
-
-                            client.OnNewMessage += OnNewMessageReceived;
-
                             if (!string.IsNullOrEmpty(_lastSentMessage))
                             {
                                 // Send the last message to the client
