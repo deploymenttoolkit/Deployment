@@ -61,8 +61,10 @@ namespace DeploymentToolkit.Deployment
             catch (Exception ex)
             {
                 Console.WriteLine($"Failed to initialize logger: {ex}");
+#if DEBUG
                 Console.ReadKey();
-                Environment.Exit((int)ExitCode.FailedToInitilizeLogger);
+#endif
+                ExitInstallation("Failed to intialize Logger", ExitCode.FailedToInitilizeLogger);
             }
 
             _logger.Info($"Initialized {Namespace} v{Version}");
