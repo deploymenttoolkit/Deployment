@@ -18,11 +18,29 @@ namespace DeploymentToolkit.Messaging
         internal event EventHandler OnTrayStarted;
         internal event EventHandler OnTrayStopped;
 
-        internal DeploymentStep ExpectedResponse;
+        internal DeploymentStep CurrentStep = DeploymentStep.Start;
 
-        internal const string TrayAppExeName = "DeploymentToolkit.TrayApp.exe";
-        internal readonly string TrayAppExeNameLowered;
-        internal const string TrayAppExeNameWithoutExtension = "DeploymentToolkit.TrayApp";
+        internal string TrayAppExeName => ToolkitEnvironment.EnvironmentVariables.DeploymentToolkitTrayExeName;
+        private string _trayAppExeNameLowered;
+        internal string TrayAppExeNameLowered
+        {
+            get
+            {
+                if (_trayAppExeNameLowered == null)
+                    _trayAppExeNameLowered = TrayAppExeName.ToLower();
+                return _trayAppExeNameLowered;
+            }
+        }
+        private string _trayAppExeNameWithoutExtension;
+        internal string TrayAppExeNameWithoutExtension
+        {
+            get
+            {
+                if (_trayAppExeNameWithoutExtension == null)
+                    _trayAppExeNameWithoutExtension = System.IO.Path.GetFileNameWithoutExtension(TrayAppExeName);
+                return _trayAppExeNameWithoutExtension;
+            }
+        }
 
         private const int _trayAppStartTimeOut = 5000;
         private static int _trayAppRetrys = 3;
@@ -49,8 +67,6 @@ namespace DeploymentToolkit.Messaging
 
         public PipeClientManager()
         {
-            TrayAppExeNameLowered = TrayAppExeName.ToLower();
-
             var processes = Process.GetProcessesByName(TrayAppExeNameWithoutExtension);
             if (processes.Length == 0)
             {
@@ -76,7 +92,7 @@ namespace DeploymentToolkit.Messaging
                 _timeoutManager = new TimeoutManager(this);
             }
 
-            _logger.Info($"Watching for new starts or stopps of {TrayAppExeName}");
+            _logger.Debug($"Watching for new starts or stopps of {TrayAppExeName}");
             MonitorWMI();
         }
 
@@ -254,6 +270,12 @@ namespace DeploymentToolkit.Messaging
             _startWatcher.EventArrived += OnProcessStarted;
             _startWatcher.Start();
 
+            if (_stopWatcher != null)
+            {
+                _stopWatcher.Dispose();
+                _stopWatcher = null;
+            }
+
             _stopWatcher = new ManagementEventWatcher(
                 new WqlEventQuery("SELECT * FROM Win32_ProcessStopTrace")
             );
@@ -268,7 +290,7 @@ namespace DeploymentToolkit.Messaging
             _logger.Trace($"New process started: [{processId}] {processName}");
             if (processName.ToLower() == TrayAppExeNameLowered)
             {
-                _logger.Info("New Tray app started. Initiating connection...");
+                _logger.Debug("New Tray app started. Initiating connection...");
 
                 lock (_collectionLock)
                 {
@@ -305,7 +327,7 @@ namespace DeploymentToolkit.Messaging
             _logger.Trace($"Process ended: [{processId}] {processName}");
             if (_clients.ContainsKey(processId))
             {
-                _logger.Info($"Tray app closed. Disposing pipe");
+                _logger.Debug($"Tray app closed. Disposing pipe");
                 lock (_collectionLock)
                 {
                     try
@@ -344,13 +366,13 @@ namespace DeploymentToolkit.Messaging
             }
 
             if (message is DeferMessage)
-                ExpectedResponse = DeploymentStep.DeferDeployment;
+                CurrentStep = DeploymentStep.DeferDeployment;
             else if (message is CloseApplicationsMessage)
-                ExpectedResponse = DeploymentStep.CloseApplications;
+                CurrentStep = DeploymentStep.CloseApplications;
             else if (message is DeploymentRestartMessage)
-                ExpectedResponse = DeploymentStep.Restart;
+                CurrentStep = DeploymentStep.Restart;
             else if (message.MessageId == MessageId.DeploymentError || message.MessageId == MessageId.DeploymentSuccess)
-                ExpectedResponse = DeploymentStep.End;
+                CurrentStep = DeploymentStep.End;
         }
 
         public void Dispose()

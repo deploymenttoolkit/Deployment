@@ -44,7 +44,7 @@ namespace DeploymentToolkit.Messaging
             {
                 _logger.Debug($"Timeout thread started");
 
-                var lastExpectedResponse = _pipeClientManager.ExpectedResponse;
+                var lastExpectedResponse = _pipeClientManager.CurrentStep;
 
                 while (true)
                 {
@@ -56,7 +56,7 @@ namespace DeploymentToolkit.Messaging
                         return;
                     }
 
-                    var expectedResponse = _pipeClientManager.ExpectedResponse;
+                    var expectedResponse = _pipeClientManager.CurrentStep;
                     _logger.Trace($"Checking for timeouts for dialog {expectedResponse}...");
 
                     if (_timeoutDeadline == default(DateTime) || lastExpectedResponse != expectedResponse)
@@ -79,7 +79,7 @@ namespace DeploymentToolkit.Messaging
                         MessageId = MessageId.ContinueDeployment,
                         Message = new ContinueMessage()
                         {
-                            DeploymentStep = _pipeClientManager.ExpectedResponse
+                            DeploymentStep = _pipeClientManager.CurrentStep
                         }
                     });
                 }
@@ -91,7 +91,7 @@ namespace DeploymentToolkit.Messaging
         {
             var timeout = 0;
             var activeSequence = EnvironmentVariables.ActiveSequence;
-            var expectedResponse = _pipeClientManager.ExpectedResponse;
+            var expectedResponse = _pipeClientManager.CurrentStep;
             switch (expectedResponse)
             {
                 case DeploymentStep.CloseApplications:
@@ -168,9 +168,9 @@ namespace DeploymentToolkit.Messaging
 
             var lastExpectedResponse = DeploymentStep.Start;
 
-            while (_pipeClientManager.ExpectedResponse != DeploymentStep.End)
+            while (_pipeClientManager.CurrentStep != DeploymentStep.End)
             {
-                var expectedResponse = _pipeClientManager.ExpectedResponse;
+                var expectedResponse = _pipeClientManager.CurrentStep;
                 _logger.Trace($"Current expected answer: {expectedResponse}");
 
 
