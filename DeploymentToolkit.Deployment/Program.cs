@@ -9,6 +9,7 @@ using DeploymentToolkit.ToolkitEnvironment;
 using DeploymentToolkit.ToolkitEnvironment.Exceptions;
 using DeploymentToolkit.Uninstaller.Executable;
 using DeploymentToolkit.Uninstaller.MSI;
+using DeploymentToolkit.Util;
 using NLog;
 using System;
 using System.Diagnostics;
@@ -57,7 +58,7 @@ namespace DeploymentToolkit.Deployment
             {
                 Logging.LogManager.Initialize("Deployment");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine($"Failed to initialize logger: {ex}");
                 Console.ReadKey();
@@ -68,7 +69,7 @@ namespace DeploymentToolkit.Deployment
 
             // This has to happen quite early as it can take some time for the eventlog to be fully registered
             _logger.Trace("Ensuring WindowsEventLog ...");
-            Util.WindowsEventLog.Ensure();
+            WindowsEventLog.Ensure();
 
             _logger.Trace("Trying to read settings...");
 
@@ -102,7 +103,7 @@ namespace DeploymentToolkit.Deployment
             {
                 _logger.Info($"DT-Installation Path: {EnvironmentVariables.DeploymentToolkitInstallPath}");
             }
-            catch(DeploymentToolkitInstallPathNotFoundException)
+            catch (DeploymentToolkitInstallPathNotFoundException)
             {
                 ExitInstallation($"Could not get installation path of the deployment toolkit", ExitCode.DeploymentToolkitInstallPathNotFound);
             }
@@ -111,7 +112,7 @@ namespace DeploymentToolkit.Deployment
 
             var arguments = args.ToList();
             var isInstallation = arguments.Any(argument => argument.ToLower() == "--install" || argument.ToLower() == "-i");
-            if(isInstallation)
+            if (isInstallation)
             {
                 Install();
             }
@@ -139,8 +140,8 @@ namespace DeploymentToolkit.Deployment
         {
             var path = Path.Combine(DeploymentEnvironmentVariables.RootDirectory, fileName);
             try
-            { 
-                return XML.ReadXml<T>(path);
+            {
+                return Xml.ReadXml<T>(path);
             }
             catch (UnauthorizedAccessException ex)
             {
@@ -174,11 +175,11 @@ namespace DeploymentToolkit.Deployment
 #endif
             Environment.Exit((int)exitCode);
         }
-        
+
         public static void Uninstall()
         {
             _logger.Info("Detected uninstall command line. Selected 'Uninstall' as deployment");
-            if(EnvironmentVariables.Configuration.UninstallSettings == null)
+            if (EnvironmentVariables.Configuration.UninstallSettings == null)
             {
                 _logger.Trace("No uninstall arguments specified in settings.xml. Looking for uninstall.xml");
                 if (!File.Exists("uninstall.xml"))
@@ -309,8 +310,8 @@ namespace DeploymentToolkit.Deployment
                 RegistryManager.SetSequenceComplete(e);
 
                 _logger.Info("Sequence completed.");
-                
-                if(
+
+                if (
                     e.ForceRestart || // Restart requested by GUI
                     (EnvironmentVariables.ActiveSequence.RestartSettings.ForceRestart && !EnvironmentVariables.IsGUIEnabled && !EnvironmentVariables.IsRunningInTaskSequence) // Restart enforced by config and no GUI available
                 )
@@ -365,7 +366,7 @@ namespace DeploymentToolkit.Deployment
                 // With MSI uninstallation its also possible to uninstall via GUID
                 var regex = new Regex(@"(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}");
                 var match = regex.Match(commandLine);
-                if(match.Success)
+                if (match.Success)
                 {
                     _logger.Trace("Detected MSI GUID. Not verifying existence of MSI file");
                     return true;

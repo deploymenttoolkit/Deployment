@@ -1,15 +1,13 @@
 ﻿using System.IO;
 using System.Xml.Serialization;
 
-namespace DeploymentToolkit.Modals.Settings
+namespace DeploymentToolkit.Util
 {
-    public static class XML
+    public static class Xml
     {
         public static T ReadXml<T>(string path)
         {
             path = Path.GetFullPath(path);
-            var fileName = Path.GetFileName(path);
-
             var xmlReader = new XmlSerializer(typeof(T));
             var text = File.ReadAllText(path);
             using (var stringReader = new StringReader(text))

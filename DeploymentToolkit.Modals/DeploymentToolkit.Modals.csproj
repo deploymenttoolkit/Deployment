@@ -70,7 +70,6 @@
     <Compile Include="Settings\Install\RestartSettings.cs" />
     <Compile Include="Settings\Install\UninstallSettings.cs" />
     <Compile Include="Settings\Uninstall\UninstallSettings.cs" />
-    <Compile Include="Settings\XML.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DeploymentToolkit.Actions\DeploymentToolkit.Actions.csproj">
