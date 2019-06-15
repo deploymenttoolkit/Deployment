@@ -143,7 +143,7 @@ namespace DeploymentToolkit.Messaging
                         {
                             if (message.DeploymentStep == DeploymentStep.DeferDeployment)
                             {
-                                if (_hasReceivedDeferMessage)
+                                if (_hasReceivedDeferMessage && !e.Simulated)
                                 {
                                     _logger.Trace($"Ignoring defer answer from session {client.SessionId} as there was already a prior response");
                                     return;
@@ -153,7 +153,7 @@ namespace DeploymentToolkit.Messaging
                             }
                             else if (message.DeploymentStep == DeploymentStep.CloseApplications)
                             {
-                                if (_hasReceivedCloseMessage)
+                                if (_hasReceivedCloseMessage && !e.Simulated)
                                 {
                                     _logger.Trace($"Ignoring close apps answer from session {client.SessionId} as there was already a prior response");
                                     return;
@@ -163,7 +163,7 @@ namespace DeploymentToolkit.Messaging
                             }
                             else if (message.DeploymentStep == DeploymentStep.Restart)
                             {
-                                if (_hasReceivedRestartMessage)
+                                if (_hasReceivedRestartMessage && !e.Simulated)
                                 {
                                     _logger.Trace($"Ignoring restart answer from session {client.SessionId} as there was already a prior response");
                                     return;
@@ -189,7 +189,7 @@ namespace DeploymentToolkit.Messaging
                         {
                             if (message.DeploymentStep == DeploymentStep.Restart)
                             {
-                                if (_hasReceivedRestartMessage)
+                                if (_hasReceivedRestartMessage && !e.Simulated)
                                 {
                                     _logger.Trace($"Ignoring restart answer from session {client.SessionId} as there was already a prior response");
                                     return;

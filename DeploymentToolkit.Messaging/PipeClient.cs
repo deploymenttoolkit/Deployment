@@ -34,7 +34,7 @@ namespace DeploymentToolkit.Messaging
         {
             var pipeName = $"DT_{processId}";
 
-            _logger.Info($"Trying to connect to {pipeName}");
+            _logger.Debug($"Trying to connect to {pipeName}");
 
             try
             {
@@ -47,7 +47,7 @@ namespace DeploymentToolkit.Messaging
 
                 IsConnected = true;
 
-                _logger.Info($"Successfuly connected to {pipeName}");
+                _logger.Debug($"Successfuly connected to {pipeName}");
             }
             catch (TimeoutException)
             {
@@ -70,7 +70,7 @@ namespace DeploymentToolkit.Messaging
 
             var data = _reader.ReadLine();
             var connectMessage = Serializer.DeserializeMessage<InitialConnectMessage>(data);
-            if(connectMessage == null)
+            if (connectMessage == null)
             {
                 _logger.Error("Inital connect message was null!");
             }
@@ -93,7 +93,7 @@ namespace DeploymentToolkit.Messaging
                 SendMessage(messageData);
 
                 _logger.Trace("Starting background worker ...");
-                _backgroundWorker = new Thread(delegate()
+                _backgroundWorker = new Thread(delegate ()
                 {
                     Receive();
                 });
@@ -194,7 +194,7 @@ namespace DeploymentToolkit.Messaging
                 while (_receiverPipe.IsConnected);
             }
             catch (ThreadAbortException) { }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.Error(ex, "Error while receiving messages");
             }
