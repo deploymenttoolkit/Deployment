@@ -385,6 +385,9 @@ namespace DeploymentToolkit.Messaging
             _stopWatcher?.Stop();
             _stopWatcher?.Dispose();
 
+            _logger.Trace("Stopping TimeoutManager ...");
+            _timeoutManager?.Dispose();
+
             _logger.Trace("Stopping clients...");
             foreach (var client in _clients.Values)
             {

@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace DeploymentToolkit.Messaging
 {
-    internal class TimeoutManager
+    internal class TimeoutManager : IDisposable
     {
         private const int _simulationSleepTime = 1000;
         private const int _threadSleepTime = 30000;
@@ -201,6 +201,17 @@ namespace DeploymentToolkit.Messaging
             }
 
             _logger.Trace("Deployment ended");
+        }
+
+        public void Dispose()
+        {
+            _timeoutThread?.Abort();
+
+            if (_isSimulating)
+            {
+                _logger.Debug("Aborting Simulation ...");
+                _pipeClientManager.CurrentStep = DeploymentStep.End;
+            }
         }
     }
 }
