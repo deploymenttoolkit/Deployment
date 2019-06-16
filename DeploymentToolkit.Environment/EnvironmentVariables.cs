@@ -79,6 +79,23 @@ namespace DeploymentToolkit.ToolkitEnvironment
             }
         }
 
+        private static string _deploymentToolkitSettingsPath;
+        public static string DeploymentToolkitSettingsPath
+        {
+            get
+            {
+                if (_deploymentToolkitSettingsPath == null)
+                {
+                    _deploymentToolkitSettingsPath = Path.Combine(DeploymentToolkitInstallPath, "Config");
+
+                    if (!Directory.Exists(_deploymentToolkitSettingsPath))
+                        Directory.CreateDirectory(_deploymentToolkitSettingsPath);
+                }
+
+                return _deploymentToolkitSettingsPath;
+            }
+        }
+
         private static string _deploymentToolkitRestartExePath = null;
         public static string DeploymentToolkitRestartExePath
         {
