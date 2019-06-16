@@ -8,13 +8,13 @@ namespace DeploymentToolkit.ToolkitEnvironment
     {
         public const string SuppressReboot = "/norestart REBOOT=ReallySuppress";
 
-        public const string DefaultSilentParameters = "/qn";
-        public const string DefaultInstallParameters = "/qn";
-        public const string DefaultUninstallParameters = "/qn";
+        public static string DefaultSilentParameters = "/qn";
+        public static string DefaultInstallParameters = "/qn";
+        public static string DefaultUninstallParameters = "/qn";
 
-        public const string DefaultLoggingParameters = "/L*v";
+        public static string DefaultLoggingParameters = "/L*v";
 
-        public const string ActiveSetupParameters = "/fcu";
+        public static string ActiveSetupParameters = "/fcu";
         public const string ActiveSetupPath = @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Active Setup\Installed Components";
         public const string ActiveSetupUserPath = @"HKEY_USERS\{0}\SOFTWARE\Microsoft\Active Setup\Installed Components";
 
@@ -23,7 +23,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
         {
             get
             {
-                if(string.IsNullOrEmpty(_productCode))
+                if (string.IsNullOrEmpty(_productCode))
                     ReadMSI();
                 return _productCode;
             }
@@ -54,7 +54,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
 
         private static void ReadMSI()
         {
-            if(EnvironmentVariables.ActiveSequenceType == SequenceType.Installation)
+            if (EnvironmentVariables.ActiveSequenceType == SequenceType.Installation)
             {
                 ReadMSI(EnvironmentVariables.InstallSettings.CommandLine);
             }

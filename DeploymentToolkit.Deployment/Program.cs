@@ -25,6 +25,8 @@ namespace DeploymentToolkit.Deployment
     {
         public static int GlobalExitCode = (int)ExitCode.ExitOK;
 
+        public static DeploymentSettings Settings;
+
         private static string _namespace;
         internal static string Namespace
         {
@@ -110,6 +112,9 @@ namespace DeploymentToolkit.Deployment
                 ExitInstallation($"Could not get installation path of the deployment toolkit", ExitCode.DeploymentToolkitInstallPathNotFound);
             }
 
+            _logger.Trace("Reading deployment settings ...");
+            ApplyGlobalSettings();
+
             _logger.Trace("Parsing command line arguments...");
 
             var arguments = args.ToList();
@@ -136,6 +141,27 @@ namespace DeploymentToolkit.Deployment
             Console.ReadKey();
 #endif
             Environment.Exit(GlobalExitCode);
+        }
+
+        private static void ApplyGlobalSettings()
+        {
+            Settings = ToolkitEnvironment.Settings.GetDeploymentSettings();
+
+            if (Settings.MSI != null)
+            {
+                var msiSettings = Settings.MSI;
+
+                if (!string.IsNullOrEmpty(msiSettings.ActiveSetupParameters))
+                    MSI.ActiveSetupParameters = msiSettings.ActiveSetupParameters;
+                if (!string.IsNullOrEmpty(msiSettings.DefaultInstallParameters))
+                    MSI.DefaultInstallParameters = msiSettings.DefaultInstallParameters;
+                if (!string.IsNullOrEmpty(msiSettings.DefaultLoggingParameters))
+                    MSI.DefaultLoggingParameters = msiSettings.DefaultLoggingParameters;
+                if (!string.IsNullOrEmpty(msiSettings.DefaultSilentParameters))
+                    MSI.DefaultSilentParameters = msiSettings.DefaultSilentParameters;
+                if (!string.IsNullOrEmpty(msiSettings.DefaultUninstallParameters))
+                    MSI.DefaultUninstallParameters = msiSettings.DefaultUninstallParameters;
+            }
         }
 
         private static T ReadXml<T>(string fileName)

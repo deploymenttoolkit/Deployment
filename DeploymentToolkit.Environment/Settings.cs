@@ -75,5 +75,10 @@ namespace DeploymentToolkit.ToolkitEnvironment
         {
             return GetSettings<BlockerSettings>("Blocker") ?? new BlockerSettings();
         }
+
+        public static DeploymentSettings GetDeploymentSettings()
+        {
+            return GetSettings<DeploymentSettings>("Deployment") ?? new DeploymentSettings();
+        }
     }
 }
