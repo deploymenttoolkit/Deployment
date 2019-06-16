@@ -2,8 +2,8 @@
 {
     public class BlockerSettings
     {
-        public string ForegroundColor { get; set; }
+        public string ForegroundColor { get; set; } = string.Empty;
 
-        public string BackgroundColor { get; set; }
+        public string BackgroundColor { get; set; } = string.Empty;
     }
 }

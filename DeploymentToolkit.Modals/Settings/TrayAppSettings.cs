@@ -3,7 +3,7 @@
     public class TrayAppSettings
     {
         public bool EnableAppList { get; set; }
-        public string BackgroundColor { get; set; }
-        public string ForegroundColor { get; set; }
+        public string BackgroundColor { get; set; } = string.Empty;
+        public string ForegroundColor { get; set; } = string.Empty;
     }
 }
