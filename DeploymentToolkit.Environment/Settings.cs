@@ -70,5 +70,10 @@ namespace DeploymentToolkit.ToolkitEnvironment
         {
             return GetSettings<TrayAppSettings>("TrayApp") ?? new TrayAppSettings();
         }
+
+        public static BlockerSettings GetBlockerSettings()
+        {
+            return GetSettings<BlockerSettings>("Blocker") ?? new BlockerSettings();
+        }
     }
 }

@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.cs" />
+    <Compile Include="Settings\BlockerSettings.cs" />
     <Compile Include="CustomActions.cs" />
     <Compile Include="CustomVariables.cs" />
     <Compile Include="DeferedDeployment.cs" />
