@@ -29,7 +29,7 @@ namespace DeploymentToolkit.Util
             }
 
             _logger.Trace($"Trying to start Tray App in {session.Count} sessions ...");
-            StartProcessInSessions(session, EnvironmentVariables.DeploymentToolkitTrayExePath, "--startup");
+            StartProcessInSessions(session, EnvironmentVariables.DeploymentToolkitTrayExePath, "--startup --requested");
         }
 
         private static List<IntPtr> GetLoggedOnUserTokens(IEnumerable<int> excludeSessions)
