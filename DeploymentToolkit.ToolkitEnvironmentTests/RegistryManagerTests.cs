@@ -15,7 +15,7 @@ namespace DeploymentToolkit.ToolkitEnvironment.Tests
             Assert.IsNotNull(programs, "Exception getting programs");
             Assert.IsTrue(programs.Count > 0, "No programs found");
 
-            foreach(var program in programs)
+            foreach (var program in programs)
             {
                 Assert.IsTrue(program.UninstallString.ToLower().Contains("msiexec"), "Invalid MSI");
                 Assert.IsTrue(Guid.TryParse(program.ProductId, out var guid), "Invalid ProductId");
@@ -33,7 +33,7 @@ namespace DeploymentToolkit.ToolkitEnvironment.Tests
             Assert.IsNotNull(programs, "Exception getting programs");
             Assert.IsTrue(programs.Count > 0, "Visual Studio not found");
 
-            foreach(var program in programs)
+            foreach (var program in programs)
             {
                 Assert.IsTrue(program.UninstallString.ToLower().Contains("msiexec"), "Invalid MSI");
                 Assert.IsTrue(Guid.TryParse(program.ProductId, out var guid), "Invalid ProductId");
