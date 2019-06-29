@@ -28,12 +28,24 @@ namespace DeploymentToolkit.Scripting
                 DirectoryFunctions.CopyDirectory
             },
             {
+                "DirectoryCopyForAllUsers",
+                DirectoryFunctions.CopyDirectoryForAllUsers
+            },
+            {
                 "DirectoryDelete",
                 DirectoryFunctions.DeleteDirectory
             },
             {
+                "DirectoryDeleteForAllUsers",
+                DirectoryFunctions.DeleteDirectoryForAllUsers
+            },
+            {
                 "DirectoryCreate",
                 DirectoryFunctions.CreateDirectory
+            },
+            {
+                "DirectoryCreateForAllUsers",
+                DirectoryFunctions.CreateDirectoryForAllUsers
             },
             #endregion
             #region RegistryFunctions
