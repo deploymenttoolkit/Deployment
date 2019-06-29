@@ -13,6 +13,26 @@ namespace DeploymentToolkit.Scripting
                 "FileExists",
                 FileFunctions.Exists
             },
+            {
+                "FileMove",
+                FileFunctions.MoveFile
+            },
+            {
+                "FileCopy",
+                FileFunctions.CopyFile
+            },
+            {
+                "FileCopyForAllUsers",
+                FileFunctions.CopyFileForAllUsers
+            },
+            {
+                "DeleteFile",
+                FileFunctions.DeleteFile
+            },
+            {
+                "DeleteFileForAllUsers",
+                FileFunctions.DeleteFileForAllUsers
+            },
             #endregion
             #region DirectoryFunctions
             {
