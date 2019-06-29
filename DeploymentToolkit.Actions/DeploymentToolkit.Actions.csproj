@@ -71,6 +71,7 @@
     <Compile Include="Utils\PowerUtil.cs" />
     <Compile Include="Utils\ShutdownReason.cs" />
     <Compile Include="Utils\TokenAdjuster.cs" />
+    <Compile Include="Utils\User.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DeploymentToolkit.DeploymentEnvironment\DeploymentToolkit.DeploymentEnvironment.csproj">
