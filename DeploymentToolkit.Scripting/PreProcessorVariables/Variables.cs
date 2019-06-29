@@ -108,6 +108,12 @@ namespace DeploymentToolkit.Scripting
                 foreach (DictionaryEntry environmentVariable in variables)
                 {
                     var name = (string)environmentVariable.Key;
+
+                    if (name.Contains("("))
+                        name = name.Replace("(", "[");
+                    if (name.Contains(")"))
+                        name = name.Replace(")", "]");
+
                     var value = (string)environmentVariable.Value;
                     if (_variables.ContainsKey(name))
                     {
@@ -164,6 +170,11 @@ namespace DeploymentToolkit.Scripting
                 throw new ArgumentNullException(nameof(script));
             if (string.IsNullOrEmpty(environment))
                 environment = "UNIQUE";
+
+            if (name.Contains("("))
+                name = name.Replace("(", "[");
+            if (name.Contains(")"))
+                name = name.Replace(")", "]");
 
             if (_variables.ContainsKey(name))
             {

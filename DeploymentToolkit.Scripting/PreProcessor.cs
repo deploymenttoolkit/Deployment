@@ -14,14 +14,19 @@ namespace DeploymentToolkit.Scripting
 
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
+        private static object _environmentLock = new object();
         private static bool _isEnvironmentInitialized = false;
 
         public static string Process(string data)
         {
-            if (_isEnvironmentInitialized)
+            lock (_environmentLock)
             {
-                _logger.Trace("Initializing Environment ...");
-                InitializeEnvironment();
+                if (!_isEnvironmentInitialized)
+                {
+                    _isEnvironmentInitialized = true;
+                    _logger.Trace("Initializing Environment ...");
+                    InitializeEnvironment();
+                }
             }
 
             var processed = data;

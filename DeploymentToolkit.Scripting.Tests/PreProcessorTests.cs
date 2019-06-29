@@ -1,6 +1,6 @@
-﻿using DeploymentToolkit.Scripting;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace DeploymentToolkit.Scripting.Tests
@@ -149,6 +149,36 @@ namespace DeploymentToolkit.Scripting.Tests
         }
 
         [TestMethod()]
+        public void EnvironmentVariablesTest()
+        {
+            var environmentVariables = Environment.GetEnvironmentVariables();
+
+            foreach (DictionaryEntry variable in environmentVariables)
+            {
+                var name = (string)variable.Key;
+                var value = (string)variable.Value;
+
+                // Since () indicates a function with parameters we replace all () with [] in environmentvariables
+                // So programfiles(x86) becomes programfiles[x86]
+                if (name.Contains("("))
+                    name = name.Replace("(", "[");
+                if (name.Contains(")"))
+                    name = name.Replace(")", "]");
+
+                if (value.Contains("true"))
+                    value = value.Replace("true", "1");
+                if (value.Contains("fales"))
+                    value = value.Replace("false", "0");
+
+                var condition = $"('${name}$' == '{variable.Value}')";
+                var expectedResult = $"('{value}' == '{value}')";
+
+                var preProcessed = PreProcessor.Process(condition);
+                Assert.AreEqual(preProcessed, expectedResult, $"Preprocessed '{preProcessed}' does not match expected result of '{expectedResult}'. Condition: {condition}");
+            }
+        }
+
+        [TestMethod()]
         public void AddVariableTest()
         {
             var scripts = new List<ExpectedScript>()
@@ -230,7 +260,7 @@ namespace DeploymentToolkit.Scripting.Tests
                 }
             };
 
-            foreach(var script in scripts)
+            foreach (var script in scripts)
             {
                 var result = PreProcessor.AddVariable(script.Name, script.Script, script.Environment);
                 Assert.AreEqual(script.Result, result);
