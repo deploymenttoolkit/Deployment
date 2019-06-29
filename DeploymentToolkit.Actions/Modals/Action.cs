@@ -10,6 +10,8 @@ namespace DeploymentToolkit.Actions.Modals
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
+        private readonly Guid Id = Guid.NewGuid();
+
         [XmlIgnore]
         public List<IExecutableAction> Actions { get; set; } = new List<IExecutableAction>();
 
@@ -39,6 +41,17 @@ namespace DeploymentToolkit.Actions.Modals
             }
 
             _logger.Trace($"Execution successfully finished");
+        }
+
+        public override bool Equals(object obj)
+        {
+            var action = obj as Action;
+            return action != null && Id.Equals(action.Id);
+        }
+
+        public override int GetHashCode()
+        {
+            return 2108858624 + EqualityComparer<Guid>.Default.GetHashCode(Id);
         }
     }
 }
