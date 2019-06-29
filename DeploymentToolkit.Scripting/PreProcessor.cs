@@ -1,5 +1,4 @@
 ﻿using NLog;
-using System.Diagnostics;
 using System.Linq;
 
 namespace DeploymentToolkit.Scripting
@@ -15,8 +14,16 @@ namespace DeploymentToolkit.Scripting
 
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
+        private static bool _isEnvironmentInitialized = false;
+
         public static string Process(string data)
         {
+            if (_isEnvironmentInitialized)
+            {
+                _logger.Trace("Initializing Environment ...");
+                InitializeEnvironment();
+            }
+
             var processed = data;
             var toProcess = data;
 
@@ -34,7 +41,7 @@ namespace DeploymentToolkit.Scripting
                 var variableName = part.Substring(0, end);
 
                 var isFunction = false;
-                if(variableName.Contains("("))
+                if (variableName.Contains("("))
                 {
 #if DEBUG && PREPROCESSOR_TRACE
                     Debug.WriteLine("Function detected");
@@ -76,7 +83,7 @@ namespace DeploymentToolkit.Scripting
                     }
 
                     var parameterString = variableName.Substring(variablesStart, variablesEnd - variablesStart).TrimStart('(').TrimEnd(')');
-                    if(string.IsNullOrEmpty(parameterString))
+                    if (string.IsNullOrEmpty(parameterString))
                     {
                         processed = processed.Replace($"${variableName}$", "MISSING PARAMETERS");
                         continue;
@@ -122,10 +129,10 @@ namespace DeploymentToolkit.Scripting
         {
             var result = new string[variables.Length];
             var trimmed = variables.Select((p) => p.Trim()).ToArray();
-            for(var i = 0; i < variables.Length; i++)
+            for (var i = 0; i < variables.Length; i++)
             {
                 var currentVariable = trimmed[i];
-                if(currentVariable.StartsWith("$") && currentVariable.EndsWith("$"))
+                if (currentVariable.StartsWith("$") && currentVariable.EndsWith("$"))
                 {
                     var variableName = currentVariable.Trim('$');
                     if (_variables.ContainsKey(variableName))

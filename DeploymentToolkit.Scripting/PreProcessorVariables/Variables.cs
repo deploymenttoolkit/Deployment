@@ -3,8 +3,8 @@ using DeploymentToolkit.Scripting.Extensions;
 using DeploymentToolkit.ToolkitEnvironment;
 using DeploymentToolkit.ToolkitEnvironment.Exceptions;
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Management.Automation;
 
 namespace DeploymentToolkit.Scripting
@@ -87,6 +87,48 @@ namespace DeploymentToolkit.Scripting
             }
         };
 
+        private static void InitializeEnvironment()
+        {
+            AddEnvironmentVariables();
+        }
+
+        private static void AddEnvironmentVariables()
+        {
+            _logger.Trace($"Adding EnvironmentVariables ...");
+
+            try
+            {
+                var variables = Environment.GetEnvironmentVariables();
+                if (variables == null || variables.Count == 0)
+                {
+                    _logger.Trace("No EnvironmentVariables found");
+                    return;
+                }
+
+                foreach (DictionaryEntry environmentVariable in variables)
+                {
+                    var name = (string)environmentVariable.Key;
+                    var value = (string)environmentVariable.Value;
+                    if (_variables.ContainsKey(name))
+                    {
+                        _logger.Warn($"Cannot add environmentvariable {name} as it already exists");
+                        continue;
+                    }
+
+                    _variables.Add(name, delegate ()
+                    {
+                        return value;
+                    });
+                    _logger.Trace($"Added '{name}' with value of '{value}'");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Failed to add EnvironmentVariables");
+            }
+        }
+
         private static int _uniqueEnvironmentCounter = 0;
         private static readonly Dictionary<string, PowerShell> _powershellEnvironments = new Dictionary<string, PowerShell>();
 
@@ -104,7 +146,7 @@ namespace DeploymentToolkit.Scripting
                     powerShell.Value?.Dispose();
                 }
                 catch (ObjectDisposedException) { }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     _logger.Warn(ex, $"Failed to dispose powershell environment ({powerShell.Key})");
                     hadException = true;
@@ -129,7 +171,7 @@ namespace DeploymentToolkit.Scripting
                 return false;
             }
 
-            if(environment == "UNIQUE")
+            if (environment == "UNIQUE")
             {
                 environment = GetUniqueEnvironmentName();
             }
