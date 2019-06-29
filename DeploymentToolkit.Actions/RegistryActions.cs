@@ -9,6 +9,9 @@ namespace DeploymentToolkit.Actions
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
+        private static readonly Win32Registry _win32Registry = new Win32Registry();
+        private static readonly Win64Registry _win64Registry = new Win64Registry();
+
         public enum Architecture : byte
         {
             Win32,
@@ -19,11 +22,11 @@ namespace DeploymentToolkit.Actions
         {
             if (architecture == Architecture.Win32)
             {
-                return new Win32Registry();
+                return _win32Registry;
             }
             else if (architecture == Architecture.Win64)
             {
-                return new Win64Registry();
+                return _win64Registry;
             }
             throw new Exception("Invalid architecture");
         }
@@ -41,7 +44,7 @@ namespace DeploymentToolkit.Actions
                 var registry = GetRegistry(architecture);
                 return registry.SubKeyExists(path, keyName);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.Error(ex, $"Failed to check for existence of {path}");
                 return false;
@@ -61,7 +64,7 @@ namespace DeploymentToolkit.Actions
                 var registry = GetRegistry(architecture);
                 return registry.CreateSubKey(path, keyName);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.Error(ex, $"Failed to create key {keyName} in {path}");
                 return false;
@@ -101,7 +104,7 @@ namespace DeploymentToolkit.Actions
                 var registry = GetRegistry(architecture);
                 return registry.HasValue(path, valueName);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.Error(ex, $"Failed to get {valueName} in {path}");
                 return false;
@@ -121,7 +124,7 @@ namespace DeploymentToolkit.Actions
                 var registry = GetRegistry(architecture);
                 return registry.GetValue(path, valueName)?.ToString() ?? string.Empty;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.Error(ex, $"Failed to get value of {valueName} in {path}");
                 return null;
@@ -135,13 +138,13 @@ namespace DeploymentToolkit.Actions
                 throw new ArgumentNullException(nameof(path));
             if (string.IsNullOrEmpty(valueName))
                 throw new ArgumentNullException(nameof(valueName));
-        
+
             try
             {
                 var registry = GetRegistry(architecture);
                 return registry.SetValue(path, valueName, value, valueType);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.Error(ex, $"Failed to set value of {valueName}");
                 return false;
@@ -161,7 +164,7 @@ namespace DeploymentToolkit.Actions
                 var registry = GetRegistry(architecture);
                 return registry.DeleteValue(path, valueName);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.Error(ex, $"Failed to delete {valueName} in {path}");
                 return false;
