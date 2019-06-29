@@ -51,6 +51,9 @@
     <Compile Include="Extensions\DirectoryExtensions.cs" />
     <Compile Include="FileActions.cs" />
     <Compile Include="Modals\Action.cs" />
+    <Compile Include="Modals\Actions\DirectoryCopyForAllUsers.cs" />
+    <Compile Include="Modals\Actions\DirectoryCreateForAllUsers.cs" />
+    <Compile Include="Modals\Actions\DirectoryDeleteForAllUsers.cs" />
     <Compile Include="Modals\Actions\FileCopyForAllUsers.cs" />
     <Compile Include="Modals\Actions\FileDeleteForAllUsers.cs" />
     <Compile Include="Modals\Actions\RegistryCreateKey.cs" />

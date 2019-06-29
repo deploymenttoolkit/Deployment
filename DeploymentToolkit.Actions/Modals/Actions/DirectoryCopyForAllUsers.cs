@@ -2,8 +2,8 @@
 
 namespace DeploymentToolkit.Actions.Modals.Actions
 {
-    [XmlRoot(ElementName = "DirectoryCopyForAllUsers")]
-    public class DirectoryCopyForAllUsers : IExecutableAction
+    [XmlRoot(ElementName = "DirectoryCopy")]
+    public class DirectoryCopy : IExecutableAction
     {
         [XmlAttribute(AttributeName = "Source")]
         public string Source { get; set; }
@@ -14,14 +14,9 @@ namespace DeploymentToolkit.Actions.Modals.Actions
         [XmlAttribute(AttributeName = "Recursive")]
         public bool Recursive { get; set; }
 
-        [XmlAttribute(AttributeName = "IncludeDefaultProfile")]
-        public bool IncludeDefaultProfile { get; set; }
-        [XmlAttribute(AttributeName = "IncludePublicProfile")]
-        public bool IncludePublicProfile { get; set; }
-
         public bool Execute()
         {
-            return DirectoryActions.CopyDirectoryForAllUsers(Source, Target, Overwrite, Recursive, IncludeDefaultProfile, IncludePublicProfile);
+            return DirectoryActions.CopyDirectory(Source, Target, Overwrite, Recursive);
         }
     }
 }
