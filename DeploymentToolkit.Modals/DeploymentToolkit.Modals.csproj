@@ -60,6 +60,7 @@
     <Compile Include="Settings\DeploymentSettings.cs" />
     <Compile Include="Settings\Install\UninstallItem.cs" />
     <Compile Include="Settings\TrayAppSettings.cs" />
+    <Compile Include="Settings\SettingsProcessor.cs" />
     <Compile Include="UninstallInfo.cs" />
     <Compile Include="SequenceCompletedEventArgs.cs" />
     <Compile Include="ISequence.cs" />

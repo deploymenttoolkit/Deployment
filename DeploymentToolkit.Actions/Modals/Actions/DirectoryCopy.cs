@@ -1,9 +1,9 @@
 ﻿using System.Xml.Serialization;
 
-namespace DeploymentToolkit.Actions.Modals
+namespace DeploymentToolkit.Actions.Modals.Actions
 {
-    [XmlRoot(ElementName = "FileCopy")]
-    public class FileCopy : IExecutableAction
+    [XmlRoot(ElementName = "DirectoryCopy")]
+    public class DirectoryCopy : IExecutableAction
     {
         [XmlAttribute(AttributeName = "Source")]
         public string Source { get; set; }
@@ -11,10 +11,12 @@ namespace DeploymentToolkit.Actions.Modals
         public string Target { get; set; }
         [XmlAttribute(AttributeName = "Overwrite")]
         public bool Overwrite { get; set; }
+        [XmlAttribute(AttributeName = "Recursive")]
+        public bool Recursive { get; set; }
 
         public bool Execute()
         {
-            return FileActions.CopyFile(Source, Target, Overwrite);
+            return DirectoryActions.CopyDirectory(Source, Target, Overwrite, Recursive);
         }
     }
 }

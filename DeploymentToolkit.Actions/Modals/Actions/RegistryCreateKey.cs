@@ -1,10 +1,10 @@
 ﻿using System.Xml.Serialization;
 using static DeploymentToolkit.Actions.RegistryActions;
 
-namespace DeploymentToolkit.Actions.Modals
+namespace DeploymentToolkit.Actions.Modals.Actions
 {
-    [XmlRoot(ElementName = "RegistryDeleteKey")]
-    public class RegistryDeleteKey : IExecutableAction
+    [XmlRoot(ElementName = "RegistryCreateKey")]
+    public class RegistryCreateKey : IExecutableAction
     {
         [XmlAttribute(AttributeName = "Architecture")]
         public Architecture Architecture { get; set; }
@@ -15,7 +15,7 @@ namespace DeploymentToolkit.Actions.Modals
 
         public bool Execute()
         {
-            return DeleteKey(Architecture, Path, KeyName);
+            return CreateKey(Architecture, Path, KeyName);
         }
     }
 }

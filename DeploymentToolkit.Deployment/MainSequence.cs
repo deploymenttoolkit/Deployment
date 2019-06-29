@@ -32,8 +32,8 @@ namespace DeploymentToolkit.Deployment
 
             _logger.Trace("Preparing environment...");
             EnvironmentVariables.Initialize();
-
             EnvironmentVariables.ActiveSequenceType = subSequence is Installer.Installer ? SequenceType.Installation : SequenceType.Uninstallation;
+
             EnvironmentVariables.ActiveSequence = subSequence;
             _logger.Trace($"Sequence is {EnvironmentVariables.ActiveSequenceType}");
 
@@ -44,16 +44,16 @@ namespace DeploymentToolkit.Deployment
             {
                 var customVariables = EnvironmentVariables.Configuration.CustomVariables.Variables;
                 _logger.Trace($"Processing {customVariables.Count} CustomVariables...");
-                foreach(var variable in customVariables)
+                foreach (var variable in customVariables)
                 {
-                    if(string.IsNullOrEmpty(variable.Name) || string.IsNullOrEmpty(variable.Script))
+                    if (string.IsNullOrEmpty(variable.Name) || string.IsNullOrEmpty(variable.Script))
                     {
                         _logger.Warn($"Invalid CustomVariable ({variable.Name}/{variable.Script})");
                         _logger.Warn("Variable has been skipped");
                         continue;
                     }
 
-                    if(!PreProcessor.AddVariable(variable.Name, variable.Script, variable.Environment))
+                    if (!PreProcessor.AddVariable(variable.Name, variable.Script, variable.Environment))
                     {
                         _logger.Warn($"Failed to add {variable.Name} as variable. Check prior logs for more information");
                     }
@@ -90,10 +90,10 @@ namespace DeploymentToolkit.Deployment
             {
                 _logger.Info("Sequence reported a successful deployment");
 
-                if(EnvironmentVariables.ActiveSequence.CustomActions?.Actions?.Count > 0)
+                if (EnvironmentVariables.ActiveSequence.CustomActions?.Actions?.Count > 0)
                 {
                     var actions = EnvironmentVariables.ActiveSequence.CustomActions.Actions.Where((a) => a.ExectionOrder == ExectionOrder.AfterDeployment).ToList();
-                    if(actions.Count > 0)
+                    if (actions.Count > 0)
                     {
                         _logger.Trace("Running AfterDeployment actions ...");
                         var afterDeploymentActions = EvaluateCustomActions(actions);
@@ -106,7 +106,7 @@ namespace DeploymentToolkit.Deployment
                                 {
                                     action.ExecuteActions();
                                 }
-                                catch(Exception ex)
+                                catch (Exception ex)
                                 {
                                     _logger.Error(ex, $"Error during execution of CustomAction");
                                 }
@@ -123,7 +123,7 @@ namespace DeploymentToolkit.Deployment
                     RegistryManager.RemoveDeploymentDeferalSettings();
                 }
 
-                if(EnvironmentVariables.IsGUIEnabled)
+                if (EnvironmentVariables.IsGUIEnabled)
                 {
                     // Informing tray apps about successful installation
                     _pipeClient.SendMessage(new BasicMessage(MessageId.DeploymentSuccess));
@@ -147,7 +147,7 @@ namespace DeploymentToolkit.Deployment
                         {
                             TimeUntilForceLogoff = logoffSettings.TimeUntilForcedLogoff
                         });
-                        
+
                         // We can continue with the finishing of the deployment as the TrayApp takes care of the logoff
                     }
                 }
@@ -220,7 +220,7 @@ namespace DeploymentToolkit.Deployment
                 _logger.Trace("Disconnecting from TrayApps...");
                 _pipeClient?.Dispose();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.Error(ex, "Failed to disconnect from TrayApps");
             }
@@ -230,7 +230,7 @@ namespace DeploymentToolkit.Deployment
 
         public bool EnableGUI()
         {
-            if(!EnvironmentVariables.IsGUIEnabled)
+            if (!EnvironmentVariables.IsGUIEnabled)
             {
                 _logger.Info("GUI mode is not enabled");
                 return false;
@@ -246,7 +246,7 @@ namespace DeploymentToolkit.Deployment
                 return false;
             }
 
-            if(_pipeClient.ConnectedClients == 0)
+            if (_pipeClient.ConnectedClients == 0)
             {
                 // TODO: We are watching for starts and exits of the tray app. Maybe this is a bad idea to just assume no tray app will ever run during the installation ...
                 _logger.Warn("No tray apps running. Can't continue with GUI deployment");
@@ -292,7 +292,7 @@ namespace DeploymentToolkit.Deployment
                         _pipeClient.SendMessage(new BasicMessage(MessageId.DeploymentStarted));
                     }
 
-                    if(EnvironmentVariables.ActiveSequence.CustomActions?.Actions?.Count > 0)
+                    if (EnvironmentVariables.ActiveSequence.CustomActions?.Actions?.Count > 0)
                     {
                         _logger.Trace("Running BeforeDeployment actions ...");
                         var actions = EnvironmentVariables.ActiveSequence.CustomActions.Actions.Where((a) => a.ExectionOrder == ExectionOrder.BeforeDeployment && a.ConditionResults).ToList();
@@ -301,13 +301,13 @@ namespace DeploymentToolkit.Deployment
                             _logger.Trace("Evaluating BeforeDeploymentActions ...");
                             var beforeDeploymentActions = EvaluateCustomActions(actions);
                             _logger.Trace($"Executing {beforeDeploymentActions.Count} actions ...");
-                            foreach(var action in beforeDeploymentActions)
+                            foreach (var action in beforeDeploymentActions)
                             {
                                 try
                                 {
                                     action.ExecuteActions();
                                 }
-                                catch(Exception ex)
+                                catch (Exception ex)
                                 {
                                     _logger.Error(ex, "Error during execution of CustomAction");
                                 }
@@ -324,9 +324,9 @@ namespace DeploymentToolkit.Deployment
                     _logger.Trace("Executing SequenceBegin ...");
                     SubSequence.SequenceBegin();
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
-                    if(EnvironmentVariables.IsGUIEnabled)
+                    if (EnvironmentVariables.IsGUIEnabled)
                     {
                         _logger.Trace("Informing tray apps about installation error");
                         _pipeClient.SendMessage(new BasicMessage(MessageId.DeploymentError));
@@ -403,7 +403,7 @@ namespace DeploymentToolkit.Deployment
             var showCloseApplicationsWindow = true;
             var closeApplicationsSettings = EnvironmentVariables.ActiveSequence.CloseProgramsSettings;
 
-            if(closeApplicationsSettings.Close.Length == 0)
+            if (closeApplicationsSettings.Close.Length == 0)
             {
                 showCloseApplicationsWindow = false;
                 _logger.Trace($"No applications specified to close");
@@ -414,14 +414,14 @@ namespace DeploymentToolkit.Deployment
                 _logger.Trace($"Procceses running: {showCloseApplicationsWindow} ({openProcesses.Count}/{closeApplicationsSettings.Close.Length})");
             }
 
-            if(showCloseApplicationsWindow)
+            if (showCloseApplicationsWindow)
             {
                 // There seems to be at least one application running on that list. Notify tray app
                 _logger.Trace("Showing close applications window to user(s)");
                 var message = new CloseApplicationsMessage()
                 {
                     ApplicationNames = closeApplicationsSettings.Close,
-                    TimeUntilForceClose  = closeApplicationsSettings.TimeUntilForcedClose
+                    TimeUntilForceClose = closeApplicationsSettings.TimeUntilForcedClose
                 };
                 _pipeClient.SendMessage(message);
             }
@@ -450,7 +450,7 @@ namespace DeploymentToolkit.Deployment
         {
             _logger.Trace($"Received message of type {e.MessageId}");
 
-            switch(e.MessageId)
+            switch (e.MessageId)
             {
                 case MessageId.DeferDeployment:
                     {
@@ -473,7 +473,7 @@ namespace DeploymentToolkit.Deployment
                     {
                         var message = e.Message as ContinueMessage;
 
-                        if(message.DeploymentStep == DeploymentStep.Welcome)
+                        if (message.DeploymentStep == DeploymentStep.Welcome)
                         {
                             _logger.Trace("1: User choose to continue with installation");
 
@@ -488,7 +488,7 @@ namespace DeploymentToolkit.Deployment
                             // If no applications are running, then proceed with installation
                             StartDeployment();
                         }
-                        else if(message.DeploymentStep == DeploymentStep.DeferDeployment)
+                        else if (message.DeploymentStep == DeploymentStep.DeferDeployment)
                         {
                             // User chose to do the install now
                             _logger.Trace("2: User choose to continue with installation");
@@ -499,14 +499,14 @@ namespace DeploymentToolkit.Deployment
                             // If no applications are running, then proceed with installation
                             StartDeployment();
                         }
-                        else if(message.DeploymentStep == DeploymentStep.CloseApplications)
+                        else if (message.DeploymentStep == DeploymentStep.CloseApplications)
                         {
                             // User choose to do the install now
                             _logger.Trace("3: User choose to continue with installation");
 
                             StartDeployment();
                         }
-                        else if(message.DeploymentStep == DeploymentStep.Restart)
+                        else if (message.DeploymentStep == DeploymentStep.Restart)
                         {
                             // User choose to restart (or time ran out whatever)
                             _logger.Trace("4: User choose to restart");
@@ -527,7 +527,7 @@ namespace DeploymentToolkit.Deployment
                     {
                         var message = e.Message as AbortMessage;
 
-                        if(message.DeploymentStep == DeploymentStep.Restart)
+                        if (message.DeploymentStep == DeploymentStep.Restart)
                         {
                             // User chose to restart later
                             _logger.Trace("4: User choose to restart later");

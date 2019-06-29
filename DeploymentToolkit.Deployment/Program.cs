@@ -90,8 +90,12 @@ namespace DeploymentToolkit.Deployment
                 ExitInstallation("settings.xml is missing!", ExitCode.SettingsFileMissing);
             }
 
+            var arguments = args.ToList();
+            var isInstallation = arguments.Any(argument => argument.ToLower() == "--install" || argument.ToLower() == "-i");
+            var isUninstallation = arguments.Any(argument => argument.ToLower() == "--uninstall" || argument.ToLower() == "-u");
+
             DeploymentEnvironmentVariables.RootDirectory = Path.GetDirectoryName(settingsPath);
-            EnvironmentVariables.Configuration = ReadXml<Configuration>("settings.xml");
+            EnvironmentVariables.Configuration = ReadXml<Configuration>(settingsPath);
 
             _logger.Trace("Successfully read settings");
 
@@ -117,15 +121,12 @@ namespace DeploymentToolkit.Deployment
 
             _logger.Trace("Parsing command line arguments...");
 
-            var arguments = args.ToList();
-            var isInstallation = arguments.Any(argument => argument.ToLower() == "--install" || argument.ToLower() == "-i");
             if (isInstallation)
             {
                 Install();
             }
             else
             {
-                var isUninstallation = arguments.Any(argument => argument.ToLower() == "--uninstall" || argument.ToLower() == "-u");
                 if (isUninstallation)
                 {
                     Uninstall();
@@ -169,7 +170,7 @@ namespace DeploymentToolkit.Deployment
             var path = Path.Combine(DeploymentEnvironmentVariables.RootDirectory, fileName);
             try
             {
-                return Xml.ReadXml<T>(path);
+                return SettingsProcessor.ReadSettings<T>(path);
             }
             catch (UnauthorizedAccessException ex)
             {
@@ -210,11 +211,12 @@ namespace DeploymentToolkit.Deployment
             if (EnvironmentVariables.Configuration.UninstallSettings == null)
             {
                 _logger.Trace("No uninstall arguments specified in settings.xml. Looking for uninstall.xml");
-                if (!File.Exists("uninstall.xml"))
+                var uninstallXmlPath = Path.Combine(DeploymentEnvironmentVariables.RootDirectory, "uninstall.xml");
+                if (!File.Exists(uninstallXmlPath))
                     ExitInstallation("uninstall.xml is missing", ExitCode.UninstallFileMissing);
 
                 _logger.Trace("Found uninstall.xml. Reading...");
-                EnvironmentVariables.UninstallSettings = ReadXml<UninstallSettings>("uninstall.xml");
+                EnvironmentVariables.UninstallSettings = ReadXml<UninstallSettings>(uninstallXmlPath);
                 _logger.Trace("Successfully read uninstall.xml");
             }
             else
@@ -269,11 +271,12 @@ namespace DeploymentToolkit.Deployment
             if (EnvironmentVariables.Configuration.InstallSettings == null)
             {
                 _logger.Trace("No installation arguments specified in settings.xml. Looking for install.xml");
-                if (!File.Exists("install.xml"))
+                var installXmlPath = Path.Combine(DeploymentEnvironmentVariables.RootDirectory, "install.xml");
+                if (!File.Exists(installXmlPath))
                     ExitInstallation("install.xml is missing", ExitCode.InstallFileMissing);
 
                 _logger.Trace("Found install.xml. Reading...");
-                EnvironmentVariables.InstallSettings = ReadXml<InstallSettings>("install.xml");
+                EnvironmentVariables.InstallSettings = ReadXml<InstallSettings>(installXmlPath);
                 _logger.Trace("Successfully read install.xml");
             }
             else

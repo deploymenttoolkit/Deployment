@@ -2,7 +2,7 @@
 using System.Xml.Serialization;
 using static DeploymentToolkit.Actions.RegistryActions;
 
-namespace DeploymentToolkit.Actions.Modals
+namespace DeploymentToolkit.Actions.Modals.Actions
 {
     [XmlRoot(ElementName = "RegistrySetValue")]
     public class RegistrySetValue : IExecutableAction

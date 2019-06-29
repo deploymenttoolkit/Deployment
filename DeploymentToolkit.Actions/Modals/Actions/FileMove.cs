@@ -1,6 +1,6 @@
 ﻿using System.Xml.Serialization;
 
-namespace DeploymentToolkit.Actions.Modals
+namespace DeploymentToolkit.Actions.Modals.Actions
 {
     [XmlRoot(ElementName = "FileMove")]
     public class FileMove : IExecutableAction
