@@ -295,7 +295,7 @@ namespace DeploymentToolkit.Deployment
                     if (EnvironmentVariables.ActiveSequence.CustomActions?.Actions?.Count > 0)
                     {
                         _logger.Trace("Running BeforeDeployment actions ...");
-                        var actions = EnvironmentVariables.ActiveSequence.CustomActions.Actions.Where((a) => a.ExectionOrder == ExectionOrder.BeforeDeployment && a.ConditionResults).ToList();
+                        var actions = EnvironmentVariables.ActiveSequence.CustomActions.Actions.Where((a) => a.ExectionOrder == ExectionOrder.BeforeDeployment).ToList();
                         if (actions.Count > 0)
                         {
                             _logger.Trace("Evaluating BeforeDeploymentActions ...");
@@ -564,7 +564,9 @@ namespace DeploymentToolkit.Deployment
                     _logger.Trace($"Preprocessed: {preprocessed}");
                     action.ConditionResults = Evaluation.Evaluate(preprocessed);
                     _logger.Trace($"Result: {action.ConditionResults}");
-                    compiledActions.Add(action);
+
+                    if (action.ConditionResults)
+                        compiledActions.Add(action);
                 }
                 catch (ScriptingException ex)
                 {

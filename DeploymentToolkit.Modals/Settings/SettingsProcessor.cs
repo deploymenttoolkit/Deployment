@@ -30,6 +30,8 @@ namespace DeploymentToolkit.Modals.Settings
 
         public static T ReadSettings<T>(string path)
         {
+            _logger.Trace($"Reading from {path}");
+
             var xmlReader = new XmlSerializer(typeof(T));
             xmlReader.UnknownElement += OnUnknownElement;
             var text = File.ReadAllText(path);
@@ -104,7 +106,6 @@ namespace DeploymentToolkit.Modals.Settings
                 {
                     var properties = action.GetProperties().Where((e) => e.CanWrite).ToDictionary((e) => e.Name);
                     _customActions.Add(action.Name, new ActionInfo(action, properties));
-                    // _logger.Trace($"Added {action.Name} -> {properties.Aggregate((i, j) => i + ", " + j)}");
                 }
 
             }
