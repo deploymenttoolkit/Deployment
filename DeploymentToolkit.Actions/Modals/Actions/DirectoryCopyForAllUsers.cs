@@ -1,17 +1,10 @@
-﻿using System.Xml.Serialization;
-
-namespace DeploymentToolkit.Actions.Modals.Actions
+﻿namespace DeploymentToolkit.Actions.Modals.Actions
 {
-    [XmlRoot(ElementName = "DirectoryCopy")]
     public class DirectoryCopy : IExecutableAction
     {
-        [XmlAttribute(AttributeName = "Source")]
         public string Source { get; set; }
-        [XmlAttribute(AttributeName = "Target")]
         public string Target { get; set; }
-        [XmlAttribute(AttributeName = "Overwrite")]
         public bool Overwrite { get; set; }
-        [XmlAttribute(AttributeName = "Recursive")]
         public bool Recursive { get; set; }
 
         public bool Execute()
