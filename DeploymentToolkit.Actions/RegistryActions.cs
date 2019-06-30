@@ -1,7 +1,9 @@
-﻿using DeploymentToolkit.RegistryWrapper;
+﻿using DeploymentToolkit.Actions.Utils;
+using DeploymentToolkit.RegistryWrapper;
 using Microsoft.Win32;
 using NLog;
 using System;
+using System.IO;
 
 namespace DeploymentToolkit.Actions
 {
@@ -71,6 +73,27 @@ namespace DeploymentToolkit.Actions
             }
         }
 
+        public static bool CreateKeyForAllUsers(Architecture architecture, string path, string keyName, bool includeDefaultProfile, bool includeSpecialProfiles)
+        {
+            _logger.Trace($"CreateKeyForAllUsers({architecture}, {path}, {keyName}, {includeDefaultProfile}, {includeSpecialProfiles})");
+
+            foreach (var user in User.GetUserRegistry(includeDefaultProfile, includeSpecialProfiles))
+            {
+                try
+                {
+                    var userPath = Path.Combine(user, path);
+                    CreateKey(architecture, userPath, keyName);
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, $"Failed to process '{user}'");
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         public static bool DeleteKey(Architecture architecture, string path, string keyName)
         {
             _logger.Trace($"DeleteKey({architecture}, {path}, {keyName})");
@@ -89,6 +112,27 @@ namespace DeploymentToolkit.Actions
                 _logger.Error(ex, $"Failed to delete key {keyName} in {path}");
                 return false;
             }
+        }
+
+        public static bool DeleteKeyForAllUsers(Architecture architecture, string path, string keyName, bool includeDefaultProfile, bool includeSpecialProfiles)
+        {
+            _logger.Trace($"DeleteKeyForAllUsers({architecture}, {path}, {keyName}, {includeDefaultProfile}, {includeSpecialProfiles})");
+
+            foreach (var user in User.GetUserRegistry(includeDefaultProfile, includeSpecialProfiles))
+            {
+                try
+                {
+                    var userPath = Path.Combine(user, path);
+                    DeleteKey(architecture, userPath, keyName);
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, $"Failed to process '{user}'");
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         public static bool ValueExists(Architecture architecture, string path, string valueName)
@@ -151,6 +195,27 @@ namespace DeploymentToolkit.Actions
             }
         }
 
+        public static bool SetValueForAllUsers(Architecture architecture, string path, string valueName, string value, RegistryValueKind valueType, bool includeDefaultProfile, bool includeSpecialProfiles)
+        {
+
+            _logger.Trace($"SetValueForAllUsers({architecture}, {path}, {valueName}, {value}, {valueType}, {includeDefaultProfile}, {includeSpecialProfiles})");
+            foreach (var user in User.GetUserRegistry(includeDefaultProfile, includeSpecialProfiles))
+            {
+                try
+                {
+                    var userPath = Path.Combine(user, path);
+                    SetValue(architecture, userPath, valueName, value, valueType);
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, $"Failed to process '{user}'");
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         public static bool DeleteValue(Architecture architecture, string path, string valueName)
         {
             _logger.Trace($"DeleteValue({architecture}, {path}, {valueName})");
@@ -169,6 +234,26 @@ namespace DeploymentToolkit.Actions
                 _logger.Error(ex, $"Failed to delete {valueName} in {path}");
                 return false;
             }
+        }
+
+        public static bool DeleteValueForAllusers(Architecture architecture, string path, string valueName, bool includeDefaultProfile, bool includeSpecialProfiles)
+        {
+            _logger.Trace($"DeleteValueForAllusers({architecture}, {path}, {valueName}, {includeDefaultProfile}, {includeSpecialProfiles})");
+            foreach (var user in User.GetUserRegistry(includeDefaultProfile, includeSpecialProfiles))
+            {
+                try
+                {
+                    var userPath = Path.Combine(user, path);
+                    DeleteValue(architecture, userPath, valueName);
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, $"Failed to process '{user}'");
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }
