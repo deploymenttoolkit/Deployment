@@ -56,11 +56,15 @@
     <Compile Include="Modals\Actions\DirectoryDeleteForAllUsers.cs" />
     <Compile Include="Modals\Actions\FileCopyForAllUsers.cs" />
     <Compile Include="Modals\Actions\FileDeleteForAllUsers.cs" />
+    <Compile Include="Modals\Actions\RegistryCreateKeyForAllUsers.cs" />
     <Compile Include="Modals\Actions\RegistryCreateKey.cs" />
     <Compile Include="Modals\Actions\DirectoryCopy.cs" />
     <Compile Include="Modals\Actions\DirectoryCreate.cs" />
     <Compile Include="Modals\Actions\DirectoryDelete.cs" />
     <Compile Include="Modals\Actions\DirectoryMove.cs" />
+    <Compile Include="Modals\Actions\RegistryDeleteKeyForAllUsers.cs" />
+    <Compile Include="Modals\Actions\RegistryDeleteValueForAllUsers.cs" />
+    <Compile Include="Modals\Actions\RegistrySetValueForAllUsers.cs" />
     <Compile Include="Modals\ExecutionOrder.cs" />
     <Compile Include="Modals\Actions\FileCopy.cs" />
     <Compile Include="Modals\Actions\FileDelete.cs" />
