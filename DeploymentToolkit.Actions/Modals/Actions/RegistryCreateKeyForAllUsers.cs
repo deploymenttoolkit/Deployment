@@ -9,11 +9,11 @@ namespace DeploymentToolkit.Actions.Modals.Actions
         public string KeyName { get; set; }
 
         public bool IncludeDefaultProfile { get; set; }
-        public bool IncludePublicProfile { get; set; }
+        public bool IncludeSpecialProfiles { get; set; }
 
         public bool Execute()
         {
-            return CreateKeyForAllUsers(Architecture, Path, KeyName, IncludeDefaultProfile, IncludePublicProfile);
+            return CreateKeyForAllUsers(Architecture, Path, KeyName, IncludeDefaultProfile, IncludeSpecialProfiles);
         }
     }
 }

@@ -12,11 +12,11 @@ namespace DeploymentToolkit.Actions.Modals.Actions
         public RegistryValueKind Type { get; set; }
 
         public bool IncludeDefaultProfile { get; set; }
-        public bool IncludePublicProfile { get; set; }
+        public bool IncludeSpecialProfiles { get; set; }
 
         public bool Execute()
         {
-            return SetValueForAllUsers(Architecture, Path, ValueName, Value, Type, IncludeDefaultProfile, IncludePublicProfile);
+            return SetValueForAllUsers(Architecture, Path, ValueName, Value, Type, IncludeDefaultProfile, IncludeSpecialProfiles);
         }
     }
 }

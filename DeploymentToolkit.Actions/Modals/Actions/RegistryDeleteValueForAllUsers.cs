@@ -9,11 +9,11 @@ namespace DeploymentToolkit.Actions.Modals.Actions
         public string ValueName { get; set; }
 
         public bool IncludeDefaultProfile { get; set; }
-        public bool IncludePublicProfile { get; set; }
+        public bool IncludeSpecialProfiles { get; set; }
 
         public bool Execute()
         {
-            return DeleteValueForAllUsers(Architecture, Path, ValueName, IncludeDefaultProfile, IncludePublicProfile);
+            return DeleteValueForAllUsers(Architecture, Path, ValueName, IncludeDefaultProfile, IncludeSpecialProfiles);
         }
     }
 }
