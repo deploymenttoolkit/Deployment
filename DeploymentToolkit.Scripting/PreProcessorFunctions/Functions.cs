@@ -78,8 +78,16 @@ namespace DeploymentToolkit.Scripting
                 RegistryFunctions.CreateKey
             },
             {
+                "RegCreateKeyForAllUsers",
+                RegistryFunctions.CreateKeyForAllUsers
+            },
+            {
                 "RegDeleteKey",
                 RegistryFunctions.DeleteKey
+            },
+            {
+                "RegDeleteKeyForAllUsers",
+                RegistryFunctions.DeleteKeyForAllUsers
             },
             {
                 "RegHasValue",
@@ -94,8 +102,16 @@ namespace DeploymentToolkit.Scripting
                 RegistryFunctions.SetValue
             },
             {
+                "RegSetValueForAllUsers",
+                RegistryFunctions.SetValueForAllUsers
+            },
+            {
                 "RegDeleteValue",
                 RegistryFunctions.DeleteValue
+            },
+            {
+                "RegDeleteValueForAllUsers",
+                RegistryFunctions.DeleteValueForAllUsers
             }
             #endregion
         };

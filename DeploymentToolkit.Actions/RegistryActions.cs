@@ -236,9 +236,9 @@ namespace DeploymentToolkit.Actions
             }
         }
 
-        public static bool DeleteValueForAllusers(Architecture architecture, string path, string valueName, bool includeDefaultProfile, bool includeSpecialProfiles)
+        public static bool DeleteValueForAllUsers(Architecture architecture, string path, string valueName, bool includeDefaultProfile, bool includeSpecialProfiles)
         {
-            _logger.Trace($"DeleteValueForAllusers({architecture}, {path}, {valueName}, {includeDefaultProfile}, {includeSpecialProfiles})");
+            _logger.Trace($"DeleteValueForAllUsers({architecture}, {path}, {valueName}, {includeDefaultProfile}, {includeSpecialProfiles})");
             foreach (var user in User.GetUserRegistry(includeDefaultProfile, includeSpecialProfiles))
             {
                 try
