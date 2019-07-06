@@ -79,14 +79,6 @@ namespace DeploymentToolkit.Scripting
             },
 
             {
-                "WinDir",
-                delegate()
-                {
-                    return Environment.GetEnvironmentVariable("windir");
-                }
-            },
-
-            {
                 "LogonUser",
                 delegate()
                 {
