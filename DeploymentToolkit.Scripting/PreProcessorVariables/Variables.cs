@@ -84,12 +84,78 @@ namespace DeploymentToolkit.Scripting
                 {
                     return Environment.GetEnvironmentVariable("windir");
                 }
+            },
+
+            {
+                "LogonUser",
+                delegate()
+                {
+                    return Environment.UserName;
+                }
+            },
+            {
+                "LogonDomain",
+                delegate()
+                {
+                    return Environment.UserDomainName;
+                }
+            },
+            {
+                "WindowsBuild",
+                delegate()
+                {
+                    return Environment.OSVersion.Version.Build.ToString();
+                }
+            },
+            {
+                "ComputerName",
+                delegate()
+                {
+                    return Environment.MachineName;
+                }
+            },
+            {
+                "Date",
+                delegate()
+                {
+                    return DateTime.Now.ToShortDateString();
+                }
+            },
+            {
+                "Time",
+                delegate()
+                {
+                    return DateTime.Now.ToShortTimeString();
+                }
             }
         };
 
         private static void InitializeEnvironment()
         {
+            AddMsiVariables();
             AddEnvironmentVariables();
+        }
+
+        private static void AddMsiVariables()
+        {
+            _logger.Trace($"Adding MsiVariables ...");
+
+            try
+            {
+                {
+                    var culture = NativeFunctions.GetUserDefaultLangID();
+                    _variables.Add("UserLanguageID", () => culture.ToString());
+                }
+
+                {
+                    var culture = NativeFunctions.GetSystemDefaultLangID();
+                    _variables.Add("SystemLanguageID", () => culture.ToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Failed to add UserVariables");
+            }
         }
 
         private static void AddEnvironmentVariables()
