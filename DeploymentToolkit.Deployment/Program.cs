@@ -95,8 +95,9 @@ namespace DeploymentToolkit.Deployment
             var isUninstallation = arguments.Any(argument => argument.ToLower() == "--uninstall" || argument.ToLower() == "-u");
 
             DeploymentEnvironmentVariables.RootDirectory = Path.GetDirectoryName(settingsPath);
-            EnvironmentVariables.Configuration = ReadXml<Configuration>(settingsPath);
+            _logger.Info($"DeploymentRootDirectory: {DeploymentEnvironmentVariables.RootDirectory}");
 
+            EnvironmentVariables.Configuration = ReadXml<Configuration>(settingsPath);
             _logger.Trace("Successfully read settings");
 
             _logger.Info("Verifying install dependencies ...");
