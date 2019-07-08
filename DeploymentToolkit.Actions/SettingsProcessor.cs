@@ -128,9 +128,9 @@ namespace DeploymentToolkit.Actions
 
             try
             {
-                var globalExtensionsFiles = Directory.GetFiles(ToolkitEnvironment.EnvironmentVariables.DeploymentToolkitExtensionsPath, "*.dll");
+                var globalExtensionsFiles = Directory.GetFiles(ToolkitEnvironment.EnvironmentVariables.DeploymentToolkitExtensionsPath, "*.dll", SearchOption.AllDirectories);
                 var deploymentExtensionsFiles = Directory.Exists(DeploymentEnvironment.DeploymentEnvironmentVariables.ExtensionsEnvironment)
-                    ? Directory.GetFiles(DeploymentEnvironment.DeploymentEnvironmentVariables.ExtensionsEnvironment, "*.dll")
+                    ? Directory.GetFiles(DeploymentEnvironment.DeploymentEnvironmentVariables.ExtensionsEnvironment, "*.dll", SearchOption.AllDirectories)
                     : new string[0];
 
                 var combinedExtensionFiles = globalExtensionsFiles.Concat(deploymentExtensionsFiles).ToArray();
