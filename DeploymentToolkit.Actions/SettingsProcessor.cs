@@ -72,7 +72,13 @@ namespace DeploymentToolkit.Actions
                 }
 
                 var propertyInfo = actionInfo.Properties[attribute.Name];
-                var value = Convert.ChangeType(attribute.Value, propertyInfo.PropertyType);
+
+                var value = default(object);
+                if (propertyInfo.PropertyType.IsEnum)
+                    value = Enum.Parse(propertyInfo.PropertyType, attribute.Value);
+                else
+                    value = Convert.ChangeType(attribute.Value, propertyInfo.PropertyType);
+
                 propertyInfo.SetValue(instance, value);
             }
 
