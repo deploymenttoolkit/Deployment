@@ -91,12 +91,13 @@ namespace DeploymentToolkit.Modals.Settings
 
             try
             {
+                var actionInterface = typeof(IExecutableAction);
                 var assembly = Assembly.GetAssembly(typeof(Actions.Modals.Action));
                 var actions = assembly
                     .GetTypes()
                     .Where((t) =>
                         t.IsClass &&
-                        t.Namespace == "DeploymentToolkit.Actions.Modals.Actions"
+                        actionInterface.IsAssignableFrom(t)
                     )
                     .ToList();
 
