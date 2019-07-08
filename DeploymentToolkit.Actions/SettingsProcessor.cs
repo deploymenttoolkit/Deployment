@@ -16,6 +16,8 @@ namespace DeploymentToolkit.Actions
         private static bool _customActionsInitialized = false;
         private static Dictionary<string, ActionInfo> _customActions = new Dictionary<string, ActionInfo>();
 
+        private static List<string> _extensionAssemblyPaths = new List<string>();
+
         private class ActionInfo
         {
             internal Type Type { get; set; }
@@ -156,6 +158,10 @@ namespace DeploymentToolkit.Actions
 
                         _logger.Trace($"Loaded extension {extensionName}");
 
+                        var extensionDirectory = Path.GetDirectoryName(extension);
+                        if (!_extensionAssemblyPaths.Contains(extensionDirectory))
+                            _extensionAssemblyPaths.Add(extensionDirectory);
+
                         var actions = assembly
                             .GetTypes()
                             .Where((t) =>
@@ -182,11 +188,36 @@ namespace DeploymentToolkit.Actions
                         _logger.Error(ex, $"Failed to process extension '{extension}'");
                     }
                 }
+
+                if (_extensionAssemblyPaths.Count > 0)
+                {
+                    AppDomain.CurrentDomain.AssemblyResolve += AssemblyResolve;
+                }
             }
             catch (Exception ex)
             {
                 _logger.Error(ex, "Failed to load extensions");
             }
+        }
+
+        private static Assembly AssemblyResolve(object sender, ResolveEventArgs args)
+        {
+            var assemblyName = new AssemblyName(args.Name);
+            var fileName = $"{assemblyName.Name}.dll";
+            _logger.Trace($"Searching for '{assemblyName.Name}' ...");
+
+            foreach (var path in _extensionAssemblyPaths)
+            {
+                var fullPath = Path.Combine(path, fileName);
+
+                if (File.Exists(fullPath))
+                {
+                    _logger.Trace($"Loading {fullPath} ...");
+                    return Assembly.LoadFrom(fullPath);
+                }
+            }
+
+            return null;
         }
     }
 }
