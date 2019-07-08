@@ -1,9 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DeploymentToolkit.Scripting.Tests
 {
@@ -17,7 +13,7 @@ namespace DeploymentToolkit.Scripting.Tests
             {
                 new ExpectedConditon()
                 {
-                    Condition = @"('$DirectoryExists($WinDir$)$' == '1')",
+                    Condition = @"('$DirectoryExists($windir$)$' == '1')",
                     ExpectedResult = true
                 },
                 new ExpectedConditon()
@@ -36,7 +32,8 @@ namespace DeploymentToolkit.Scripting.Tests
             foreach (var condition in conditions)
             {
                 var preProcessed = PreProcessor.Process(condition.Condition);
-                Assert.AreEqual(condition.ExpectedResult, Evaluation.Evaluate(preProcessed));
+                var evaluated = Evaluation.Evaluate(preProcessed);
+                Assert.AreEqual(condition.ExpectedResult, evaluated, $"Expected '{condition.ExpectedResult}' but got '{evaluated}' ({condition.Condition} -> {preProcessed})");
             }
         }
 
@@ -61,7 +58,8 @@ namespace DeploymentToolkit.Scripting.Tests
             foreach (var condition in conditions)
             {
                 var preProcessed = PreProcessor.Process(condition.Condition);
-                Assert.AreEqual(condition.ExpectedResult, Evaluation.Evaluate(preProcessed));
+                var evaluated = Evaluation.Evaluate(preProcessed);
+                Assert.AreEqual(condition.ExpectedResult, evaluated, $"Expected '{condition.ExpectedResult}' but got '{evaluated}' ({condition.Condition} -> {preProcessed})");
             }
         }
 
@@ -101,7 +99,8 @@ namespace DeploymentToolkit.Scripting.Tests
             foreach (var condition in conditions)
             {
                 var preProcessed = PreProcessor.Process(condition.Condition);
-                Assert.AreEqual(condition.ExpectedResult, Evaluation.Evaluate(preProcessed));
+                var evaluated = Evaluation.Evaluate(preProcessed);
+                Assert.AreEqual(condition.ExpectedResult, evaluated, $"Expected '{condition.ExpectedResult}' but got '{evaluated}' ({condition.Condition} -> {preProcessed})");
             }
         }
 
@@ -141,7 +140,8 @@ namespace DeploymentToolkit.Scripting.Tests
             foreach (var condition in conditions)
             {
                 var preProcessed = PreProcessor.Process(condition.Condition);
-                Assert.AreEqual(condition.ExpectedResult, Evaluation.Evaluate(preProcessed));
+                var evaluated = Evaluation.Evaluate(preProcessed);
+                Assert.AreEqual(condition.ExpectedResult, evaluated, $"Expected '{condition.ExpectedResult}' but got '{evaluated}' ({condition.Condition} -> {preProcessed})");
             }
         }
 
@@ -171,7 +171,8 @@ namespace DeploymentToolkit.Scripting.Tests
             foreach (var condition in conditions)
             {
                 var preProcessed = PreProcessor.Process(condition.Condition);
-                Assert.AreEqual(condition.ExpectedResult, Evaluation.Evaluate(preProcessed));
+                var evaluated = Evaluation.Evaluate(preProcessed);
+                Assert.AreEqual(condition.ExpectedResult, evaluated, $"Expected '{condition.ExpectedResult}' but got '{evaluated}' ({condition.Condition} -> {preProcessed})");
             }
         }
     }
