@@ -1,8 +1,8 @@
-﻿using DeploymentToolkit.Actions.Modals;
-using DeploymentToolkit.Messaging;
+﻿using DeploymentToolkit.Messaging;
 using DeploymentToolkit.Messaging.Events;
 using DeploymentToolkit.Messaging.Messages;
 using DeploymentToolkit.Modals;
+using DeploymentToolkit.Modals.Actions;
 using DeploymentToolkit.Scripting;
 using DeploymentToolkit.Scripting.Exceptions;
 using DeploymentToolkit.ToolkitEnvironment;
@@ -545,7 +545,7 @@ namespace DeploymentToolkit.Deployment
             }
         }
 
-        private List<Actions.Modals.Action> EvaluateCustomActions(List<Actions.Modals.Action> actions)
+        private List<Actions.Modals.Action> EvaluateCustomActions(List<ActionBase> actions)
         {
             var compiledActions = new List<Actions.Modals.Action>();
             foreach (var action in actions)
@@ -553,7 +553,7 @@ namespace DeploymentToolkit.Deployment
                 if (string.IsNullOrEmpty(action.Condition))
                 {
                     action.ConditionResults = true;
-                    compiledActions.Add(action);
+                    compiledActions.Add(new Actions.Modals.Action(action));
                     continue;
                 }
 
@@ -566,7 +566,7 @@ namespace DeploymentToolkit.Deployment
                     _logger.Trace($"Result: {action.ConditionResults}");
 
                     if (action.ConditionResults)
-                        compiledActions.Add(action);
+                        compiledActions.Add(new Actions.Modals.Action(action));
                 }
                 catch (ScriptingException ex)
                 {

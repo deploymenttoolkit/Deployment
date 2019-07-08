@@ -48,6 +48,10 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Actions\ActionBase.cs" />
+    <Compile Include="Actions\ExecutionOrder.cs" />
+    <Compile Include="Actions\IExecutableAction.cs" />
+    <Compile Include="Actions\IOrderedAction.cs" />
     <Compile Include="App.cs" />
     <Compile Include="Settings\BlockerSettings.cs" />
     <Compile Include="CustomActions.cs" />
@@ -60,7 +64,6 @@
     <Compile Include="Settings\DeploymentSettings.cs" />
     <Compile Include="Settings\Install\UninstallItem.cs" />
     <Compile Include="Settings\TrayAppSettings.cs" />
-    <Compile Include="Settings\SettingsProcessor.cs" />
     <Compile Include="UninstallInfo.cs" />
     <Compile Include="SequenceCompletedEventArgs.cs" />
     <Compile Include="ISequence.cs" />
@@ -77,12 +80,6 @@
     <Compile Include="Settings\Install\RestartSettings.cs" />
     <Compile Include="Settings\Install\UninstallSettings.cs" />
     <Compile Include="Settings\Uninstall\UninstallSettings.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\DeploymentToolkit.Actions\DeploymentToolkit.Actions.csproj">
-      <Project>{0059F67C-809E-4811-995D-4647BB520C99}</Project>
-      <Name>DeploymentToolkit.Actions</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

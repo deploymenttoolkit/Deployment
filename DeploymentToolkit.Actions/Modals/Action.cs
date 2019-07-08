@@ -1,27 +1,25 @@
-﻿using NLog;
+﻿using DeploymentToolkit.Modals.Actions;
+using NLog;
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Xml.Serialization;
 
 namespace DeploymentToolkit.Actions.Modals
 {
     [XmlRoot(ElementName = "Action")]
-    public class Action : IOrderedAction
+    public class Action : ActionBase
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private readonly Guid Id = Guid.NewGuid();
+        public Action(ActionBase actionBase)
+        {
+            Actions = actionBase.Actions.ToList();
 
-        [XmlIgnore]
-        public List<IExecutableAction> Actions { get; set; } = new List<IExecutableAction>();
+            Condition = actionBase.Condition;
+            ExectionOrder = actionBase.ExectionOrder;
 
-        [XmlAttribute(AttributeName = "Conditon")]
-        public string Condition { get; set; }
-        [XmlAttribute(AttributeName = "ExectionOrder")]
-        public ExectionOrder ExectionOrder { get; set; }
-
-        [XmlIgnore()]
-        public bool ConditionResults { get; set; }
+            ConditionResults = actionBase.ConditionResults;
+        }
 
         public void ExecuteActions()
         {
@@ -41,17 +39,6 @@ namespace DeploymentToolkit.Actions.Modals
             }
 
             _logger.Trace($"Execution successfully finished");
-        }
-
-        public override bool Equals(object obj)
-        {
-            var action = obj as Action;
-            return action != null && Id.Equals(action.Id);
-        }
-
-        public override int GetHashCode()
-        {
-            return 2108858624 + EqualityComparer<Guid>.Default.GetHashCode(Id);
         }
     }
 }

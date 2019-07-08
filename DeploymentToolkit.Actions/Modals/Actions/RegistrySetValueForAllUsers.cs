@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using DeploymentToolkit.Modals.Actions;
+using Microsoft.Win32;
 using static DeploymentToolkit.Actions.RegistryActions;
 
 namespace DeploymentToolkit.Actions.Modals.Actions

@@ -1,4 +1,4 @@
-﻿namespace DeploymentToolkit.Actions.Modals
+﻿namespace DeploymentToolkit.Modals.Actions
 {
     public enum ExectionOrder
     {

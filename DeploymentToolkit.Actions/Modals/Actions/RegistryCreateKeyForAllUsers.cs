@@ -1,4 +1,5 @@
-﻿using static DeploymentToolkit.Actions.RegistryActions;
+﻿using DeploymentToolkit.Modals.Actions;
+using static DeploymentToolkit.Actions.RegistryActions;
 
 namespace DeploymentToolkit.Actions.Modals.Actions
 {

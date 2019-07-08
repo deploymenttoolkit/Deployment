@@ -1,4 +1,4 @@
-﻿using DeploymentToolkit.Actions.Modals;
+﻿using DeploymentToolkit.Modals.Actions;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace DeploymentToolkit.Modals.Settings
+namespace DeploymentToolkit.Actions
 {
     public static class SettingsProcessor
     {
@@ -74,7 +74,7 @@ namespace DeploymentToolkit.Modals.Settings
                 propertyInfo.SetValue(instance, value);
             }
 
-            var parent = (Actions.Modals.Action)e.ObjectBeingDeserialized;
+            var parent = (ActionBase)e.ObjectBeingDeserialized;
             if (parent == null)
             {
                 _logger.Error("Invalid parent!");
@@ -92,7 +92,7 @@ namespace DeploymentToolkit.Modals.Settings
             try
             {
                 var actionInterface = typeof(IExecutableAction);
-                var assembly = Assembly.GetAssembly(typeof(Actions.Modals.Action));
+                var assembly = Assembly.GetAssembly(typeof(Modals.Action));
                 var actions = assembly
                     .GetTypes()
                     .Where((t) =>

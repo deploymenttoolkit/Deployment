@@ -1,4 +1,6 @@
-﻿namespace DeploymentToolkit.Actions.Modals.Actions
+﻿using DeploymentToolkit.Modals.Actions;
+
+namespace DeploymentToolkit.Actions.Modals.Actions
 {
     public class FileMove : IExecutableAction
     {

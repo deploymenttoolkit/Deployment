@@ -1,4 +1,4 @@
-﻿using DeploymentToolkit.Actions.Modals;
+﻿using DeploymentToolkit.Modals.Actions;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 
@@ -8,6 +8,6 @@ namespace DeploymentToolkit.Modals
     public class CustomActions
     {
         [XmlElement(ElementName = "Action")]
-        public List<Action> Actions { get; set; }
+        public List<ActionBase> Actions { get; set; }
     }
 }

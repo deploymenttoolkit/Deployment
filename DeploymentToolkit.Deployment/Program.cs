@@ -1,4 +1,5 @@
-﻿using DeploymentToolkit.DeploymentEnvironment;
+﻿using DeploymentToolkit.Actions;
+using DeploymentToolkit.DeploymentEnvironment;
 using DeploymentToolkit.Installer.Executable;
 using DeploymentToolkit.Installer.MSI;
 using DeploymentToolkit.Modals;
