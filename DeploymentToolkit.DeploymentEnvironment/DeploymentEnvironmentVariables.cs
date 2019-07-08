@@ -30,5 +30,16 @@ namespace DeploymentToolkit.DeploymentEnvironment
                 return _filesDirectory;
             }
         }
+
+        private static string _extensionsEnvironment;
+        public static string ExtensionsEnvironment
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_extensionsEnvironment))
+                    _extensionsEnvironment = Path.Combine(RootDirectory, "Extensions");
+                return _extensionsEnvironment;
+            }
+        }
     }
 }

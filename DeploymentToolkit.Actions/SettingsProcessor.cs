@@ -87,8 +87,13 @@ namespace DeploymentToolkit.Actions
 
         private static void InitializeCustomActions()
         {
-            _logger.Trace("Reading Actions ...");
+            AddBuiltInActions();
+            AddActionsFromExtensions();
+        }
 
+        private static void AddBuiltInActions()
+        {
+            _logger.Trace("Reading built-in Actions ...");
             try
             {
                 var actionInterface = typeof(IExecutableAction);
@@ -101,18 +106,86 @@ namespace DeploymentToolkit.Actions
                     )
                     .ToList();
 
-                _logger.Trace($"Found {actions.Count} actions. Processing ...");
+                _logger.Debug($"Found {actions.Count} actions. Processing ...");
 
                 foreach (var action in actions)
                 {
                     var properties = action.GetProperties().Where((e) => e.CanWrite).ToDictionary((e) => e.Name);
                     _customActions.Add(action.Name, new ActionInfo(action, properties));
+                    _logger.Trace($"Added '{action.Name}' with {properties.Count} arguments");
                 }
 
             }
             catch (Exception ex)
             {
                 _logger.Error(ex, "Failed to read Actions");
+            }
+        }
+
+        private static void AddActionsFromExtensions()
+        {
+            _logger.Trace($"Reading Actions from extensions ...");
+
+            try
+            {
+                var globalExtensionsFiles = Directory.GetFiles(ToolkitEnvironment.EnvironmentVariables.DeploymentToolkitExtensionsPath, "*.dll");
+                var deploymentExtensionsFiles = Directory.Exists(DeploymentEnvironment.DeploymentEnvironmentVariables.ExtensionsEnvironment)
+                    ? Directory.GetFiles(DeploymentEnvironment.DeploymentEnvironmentVariables.ExtensionsEnvironment, "*.dll")
+                    : new string[0];
+
+                var combinedExtensionFiles = globalExtensionsFiles.Concat(deploymentExtensionsFiles).ToArray();
+
+                _logger.Trace($"Found {combinedExtensionFiles.Length} files. Processing files ...");
+                var appDomain = AppDomain.CreateDomain("LoaderDomain");
+                var tunnelType = typeof(AppDomainTunnel);
+                var tunnel = (AppDomainTunnel)appDomain.CreateInstanceAndUnwrap(tunnelType.Assembly.FullName, tunnelType.FullName);
+
+                var validExtensionFiles = tunnel.GetValidFiles(combinedExtensionFiles);
+
+                AppDomain.Unload(appDomain);
+
+                _logger.Trace($"Found {validExtensionFiles.Length} extensions. Loading ...");
+
+                var actionInterface = typeof(IExecutableAction);
+                foreach (var extension in validExtensionFiles)
+                {
+                    try
+                    {
+                        var assembly = Assembly.LoadFile(extension);
+                        var extensionName = assembly.GetName().Name;
+
+                        _logger.Trace($"Loaded extension {extensionName}");
+
+                        var actions = assembly
+                            .GetTypes()
+                            .Where((t) =>
+                                t.IsClass &&
+                                actionInterface.IsAssignableFrom(t)
+                            )
+                            .ToList();
+
+                        foreach (var action in actions)
+                        {
+                            if (_customActions.ContainsKey(action.Name))
+                            {
+                                _logger.Warn($"There is already an action named '{action.Name}'. Action not added.");
+                                continue;
+                            }
+
+                            var properties = action.GetProperties().Where((e) => e.CanWrite).ToDictionary((e) => e.Name);
+                            _customActions.Add(action.Name, new ActionInfo(action, properties));
+                            _logger.Trace($"[{extensionName}] Added '{action.Name}' with {properties.Count} arguments");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.Error(ex, $"Failed to process extension '{extension}'");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Failed to load extensions");
             }
         }
     }
