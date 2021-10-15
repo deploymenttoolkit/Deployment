@@ -53,6 +53,10 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DeploymentToolkit.Actions\DeploymentToolkit.Actions.csproj">
+      <Project>{0059f67c-809e-4811-995d-4647bb520c99}</Project>
+      <Name>DeploymentToolkit.Actions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DeploymentToolkit.Scripting\DeploymentToolkit.Scripting.csproj">
       <Project>{AD620098-DF03-45B9-9B91-7E1DD13BC86C}</Project>
       <Name>DeploymentToolkit.Scripting</Name>

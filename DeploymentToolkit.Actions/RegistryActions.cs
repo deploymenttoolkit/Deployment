@@ -175,7 +175,7 @@ namespace DeploymentToolkit.Actions
             }
         }
 
-        public static bool SetValue(Architecture architecture, string path, string valueName, string value, RegistryValueKind valueType)
+        public static bool SetValue(Architecture architecture, string path, string valueName, object value, RegistryValueKind valueType)
         {
             _logger.Trace($"SetValue({architecture}, {path}, {valueName}, {value}, {valueType})");
             if (string.IsNullOrEmpty(path))

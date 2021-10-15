@@ -6,6 +6,13 @@ namespace DeploymentToolkit.Scripting.Tests
     [TestClass()]
     public class RegistryTests
     {
+        [TestInitialize()]
+        public void PrepareEnvironment()
+        {
+            Actions.RegistryActions.SetValue(Actions.RegistryActions.Architecture.Win64, @"HKEY_CURRENT_USER\SOFTWARE\", "DT_TEST", "TEST", Microsoft.Win32.RegistryValueKind.String);
+            Actions.RegistryActions.SetValue(Actions.RegistryActions.Architecture.Win64, @"HKEY_CURRENT_USER\SOFTWARE\", "DT_TEST_DWORD", 1337, Microsoft.Win32.RegistryValueKind.DWord);
+        }
+
         [TestMethod()]
         public void TestArchitecture()
         {
@@ -57,7 +64,8 @@ namespace DeploymentToolkit.Scripting.Tests
             foreach (var condition in conditions)
             {
                 var preProcessed = PreProcessor.Process(condition.Condition);
-                Assert.AreEqual(condition.ExpectedResult, Evaluation.Evaluate(preProcessed));
+                var result = Evaluation.Evaluate(preProcessed);
+                Assert.AreEqual(condition.ExpectedResult, result, $"Ran '{condition.Condition}' and expected '{condition.ExpectedResult}' but got '{result}'. PreProcessed: '{preProcessed}'");
             }
         }
 
@@ -97,7 +105,8 @@ namespace DeploymentToolkit.Scripting.Tests
             foreach(var condition in conditions)
             {
                 var preProcessed = PreProcessor.Process(condition.Condition);
-                Assert.AreEqual(condition.ExpectedResult, Evaluation.Evaluate(preProcessed));
+                var result = Evaluation.Evaluate(preProcessed);
+                Assert.AreEqual(condition.ExpectedResult, result, $"Ran '{condition.Condition}' and expected '{condition.ExpectedResult}' but got '{result}'. PreProcessed: '{preProcessed}'");
             }
         }
 
@@ -108,13 +117,13 @@ namespace DeploymentToolkit.Scripting.Tests
             {
                 new ExpectedConditon()
                 {
-                    Condition = @"('$RegCreateKey(0, HKEY_LOCAL_MACHINE\SOFTWARE, DT_TEST)$' == '1')",
+                    Condition = @"('$RegCreateKey(0, HKEY_CURRENT_USER\SOFTWARE, DT_TEST)$' == '1')",
                     ExpectedResult = true
                 },
 
                 new ExpectedConditon()
                 {
-                    Condition = @"('$RegCreateKey(0, HKEY_LOCAL_MACHINE\SOFTWARE)$' == '1')",
+                    Condition = @"('$RegCreateKey(0, HKEY_CURRENT_USER\SOFTWARE)$' == '1')",
                     ExpectedResult = false
                 },
                 new ExpectedConditon()
@@ -124,7 +133,7 @@ namespace DeploymentToolkit.Scripting.Tests
                 },
                 new ExpectedConditon()
                 {
-                    Condition = @"('$RegCreateKey(0, HKEY_LOCAL_MACHINE\SOFTWARE, )$' == '1')",
+                    Condition = @"('$RegCreateKey(0, HKEY_CURRENT_USER\SOFTWARE, )$' == '1')",
                     ExpectedResult = false
                 },
                 new ExpectedConditon()
@@ -137,7 +146,8 @@ namespace DeploymentToolkit.Scripting.Tests
             foreach (var condition in conditions)
             {
                 var preProcessed = PreProcessor.Process(condition.Condition);
-                Assert.AreEqual(condition.ExpectedResult, Evaluation.Evaluate(preProcessed));
+                var result = Evaluation.Evaluate(preProcessed);
+                Assert.AreEqual(condition.ExpectedResult, result, $"Ran '{condition.Condition}' and expected '{condition.ExpectedResult}' but got '{result}'. PreProcessed: '{preProcessed}'");
             }
         }
 
@@ -148,13 +158,13 @@ namespace DeploymentToolkit.Scripting.Tests
             {
                 new ExpectedConditon()
                 {
-                    Condition = @"('$RegHasValue(0, HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion, ProgramFilesDir)$' == '1')",
+                    Condition = @"('$RegHasValue(0, HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer, UserSignedIn)$' == '1')",
                     ExpectedResult = true
                 },
 
                 new ExpectedConditon()
                 {
-                    Condition = @"('$RegHasValue(0, HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion)$' == '1')",
+                    Condition = @"('$RegHasValue(0, HKEY_CURRENT_USER\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion)$' == '1')",
                     ExpectedResult = false
                 },
                 new ExpectedConditon()
@@ -164,7 +174,7 @@ namespace DeploymentToolkit.Scripting.Tests
                 },
                 new ExpectedConditon()
                 {
-                    Condition = @"('$RegHasValue(0, HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion, )$' == '1')",
+                    Condition = @"('$RegHasValue(0, HKEY_CURRENT_USER\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion, )$' == '1')",
                     ExpectedResult = false
                 },
                 new ExpectedConditon()
@@ -177,7 +187,8 @@ namespace DeploymentToolkit.Scripting.Tests
             foreach (var condition in conditions)
             {
                 var preProcessed = PreProcessor.Process(condition.Condition);
-                Assert.AreEqual(condition.ExpectedResult, Evaluation.Evaluate(preProcessed));
+                var result = Evaluation.Evaluate(preProcessed);
+                Assert.AreEqual(condition.ExpectedResult, result, $"Ran '{condition.Condition}' and expected '{condition.ExpectedResult}' but got '{result}'. PreProcessed: '{preProcessed}'");
             }
         }
 
@@ -188,33 +199,33 @@ namespace DeploymentToolkit.Scripting.Tests
             {
                 new ExpectedConditon()
                 {
-                    Condition = @"('$RegSetValue(0, HKEY_LOCAL_MACHINE\SOFTWARE, DT_TEST, TEST, 1)$' == '1')",
+                    Condition = @"('$RegSetValue(0, HKEY_CURRENT_USER\SOFTWARE, DT_TEST, TEST, 1)$' == '1')",
                     ExpectedResult = true,
                 },
                 new ExpectedConditon()
                 {
-                    Condition = @"('$RegSetValue(0, HKEY_LOCAL_MACHINE\SOFTWARE, DT_TEST_EMPTY, , 1)$' == '1')",
+                    Condition = @"('$RegSetValue(0, HKEY_CURRENT_USER\SOFTWARE, DT_TEST_EMPTY, , 1)$' == '1')",
                     ExpectedResult = true,
                 },
                 new ExpectedConditon()
                 {
-                    Condition = @"('$RegSetValue(0, HKEY_LOCAL_MACHINE\SOFTWARE, DT_TEST_DWORD, 1337, 4)$' == '1')",
+                    Condition = @"('$RegSetValue(0, HKEY_CURRENT_USER\SOFTWARE, DT_TEST_DWORD, 1337, 4)$' == '1')",
                     ExpectedResult = true,
                 },
 
                 new ExpectedConditon()
                 {
-                    Condition = @"('$RegSetValue(0, HKEY_LOCAL_MACHINE\SOFTWARE, DT_TEST, TEST)$' == '1')",
+                    Condition = @"('$RegSetValue(0, HKEY_CURRENT_USER\SOFTWARE, DT_TEST, TEST)$' == '1')",
                     ExpectedResult = false,
                 },
                 new ExpectedConditon()
                 {
-                    Condition = @"('$RegSetValue(0, HKEY_LOCAL_MACHINE\SOFTWARE, DT_TEST, TEST, )$' == '1')",
+                    Condition = @"('$RegSetValue(0, HKEY_CURRENT_USER\SOFTWARE, DT_TEST, TEST, )$' == '1')",
                     ExpectedResult = false,
                 },
                 new ExpectedConditon()
                 {
-                    Condition = @"('$RegSetValue(0, HKEY_LOCAL_MACHINE\SOFTWARE, , TEST, 1)$' == '1')",
+                    Condition = @"('$RegSetValue(0, HKEY_CURRENT_USER\SOFTWARE, , TEST, 1)$' == '1')",
                     ExpectedResult = false,
                 },
                 new ExpectedConditon()
@@ -224,7 +235,7 @@ namespace DeploymentToolkit.Scripting.Tests
                 },
                 new ExpectedConditon()
                 {
-                    Condition = @"('$RegSetValue(, HKEY_LOCAL_MACHINE\SOFTWARE, DT_TEST, TEST, 1)$' == '1')",
+                    Condition = @"('$RegSetValue(, HKEY_CURRENT_USER\SOFTWARE, DT_TEST, TEST, 1)$' == '1')",
                     ExpectedResult = false,
                 },
                 new ExpectedConditon()
@@ -235,7 +246,7 @@ namespace DeploymentToolkit.Scripting.Tests
 
                 new ExpectedConditon()
                 {
-                    Condition = @"('$RegSetValue(0, HKEY_LOCAL_MACHINE\SOFTWARE, DT_TEST, TEST, 4)$' == '1')",
+                    Condition = @"('$RegSetValue(0, HKEY_CURRENT_USER\SOFTWARE, DT_TEST, TEST, 4)$' == '1')",
                     ExpectedResult = false,
                 },
             };
@@ -243,7 +254,8 @@ namespace DeploymentToolkit.Scripting.Tests
             foreach (var condition in conditions)
             {
                 var preProcessed = PreProcessor.Process(condition.Condition);
-                Assert.AreEqual(condition.ExpectedResult, Evaluation.Evaluate(preProcessed));
+                var result = Evaluation.Evaluate(preProcessed);
+                Assert.AreEqual(condition.ExpectedResult, result, $"Ran '{condition.Condition}' and expected '{condition.ExpectedResult}' but got '{result}'. PreProcessed: '{preProcessed}'");
             }
         }
 
@@ -254,28 +266,28 @@ namespace DeploymentToolkit.Scripting.Tests
             {
                 new ExpectedConditon()
                 {
-                    Condition = @"('$RegGetValue(0, HKEY_LOCAL_MACHINE\SOFTWARE, DT_TEST)$' == 'TEST')",
+                    Condition = @"('$RegGetValue(0, HKEY_CURRENT_USER\SOFTWARE, DT_TEST)$' == 'TEST')",
                     ExpectedResult = true
                 },
                 new ExpectedConditon()
                 {
-                    Condition = @"('$RegGetValue(0, HKEY_LOCAL_MACHINE\SOFTWARE, DT_TEST_EMPTY)$' == '')",
+                    Condition = @"('$RegGetValue(0, HKEY_CURRENT_USER\SOFTWARE, DT_TEST_EMPTY)$' == '')",
                     ExpectedResult = true
                 },
                 new ExpectedConditon()
                 {
-                    Condition = @"('$RegGetValue(0, HKEY_LOCAL_MACHINE\SOFTWARE, DT_TEST_DWORD)$' == '1337')",
+                    Condition = @"('$RegGetValue(0, HKEY_CURRENT_USER\SOFTWARE, DT_TEST_DWORD)$' == '1337')",
                     ExpectedResult = true
                 },
 
                 new ExpectedConditon()
                 {
-                    Condition = @"('$RegGetValue(0, HKEY_LOCAL_MACHINE\SOFTWARE)$' == 'TEST')",
+                    Condition = @"('$RegGetValue(0, HKEY_CURRENT_USER\SOFTWARE)$' == 'TEST')",
                     ExpectedResult = false
                 },
                 new ExpectedConditon()
                 {
-                    Condition = @"('$RegGetValue(0, HKEY_LOCAL_MACHINE\SOFTWARE, )$' == 'TEST')",
+                    Condition = @"('$RegGetValue(0, HKEY_CURRENT_USER\SOFTWARE, )$' == 'TEST')",
                     ExpectedResult = false
                 },
                 new ExpectedConditon()
@@ -293,7 +305,8 @@ namespace DeploymentToolkit.Scripting.Tests
             foreach (var condition in conditions)
             {
                 var preProcessed = PreProcessor.Process(condition.Condition);
-                Assert.AreEqual(condition.ExpectedResult, Evaluation.Evaluate(preProcessed));
+                var result = Evaluation.Evaluate(preProcessed);
+                Assert.AreEqual(condition.ExpectedResult, result, $"Ran '{condition.Condition}' and expected '{condition.ExpectedResult}' but got '{result}'. PreProcessed: '{preProcessed}'");
             }
         }
 
@@ -304,28 +317,28 @@ namespace DeploymentToolkit.Scripting.Tests
             {
                 new ExpectedConditon()
                 {
-                    Condition = @"('$RegDeleteValue(0, HKEY_LOCAL_MACHINE\SOFTWARE, DT_TEST)$' == '1')",
+                    Condition = @"('$RegDeleteValue(0, HKEY_CURRENT_USER\SOFTWARE, DT_TEST)$' == '1')",
                     ExpectedResult = true
                 },
                 new ExpectedConditon()
                 {
-                    Condition = @"('$RegDeleteValue(0, HKEY_LOCAL_MACHINE\SOFTWARE, DT_TEST_EMPTY)$' == '1')",
+                    Condition = @"('$RegDeleteValue(0, HKEY_CURRENT_USER\SOFTWARE, DT_TEST_EMPTY)$' == '1')",
                     ExpectedResult = true
                 },
                 new ExpectedConditon()
                 {
-                    Condition = @"('$RegDeleteValue(0, HKEY_LOCAL_MACHINE\SOFTWARE, DT_TEST_DWORD)$' == '1')",
+                    Condition = @"('$RegDeleteValue(0, HKEY_CURRENT_USER\SOFTWARE, DT_TEST_DWORD)$' == '1')",
                     ExpectedResult = true
                 },
 
                 new ExpectedConditon()
                 {
-                    Condition = @"('$RegDeleteValue(0, HKEY_LOCAL_MACHINE\SOFTWARE)$' == '1')",
+                    Condition = @"('$RegDeleteValue(0, HKEY_CURRENT_USER\SOFTWARE)$' == '1')",
                     ExpectedResult = false
                 },
                 new ExpectedConditon()
                 {
-                    Condition = @"('$RegDeleteValue(0, HKEY_LOCAL_MACHINE\SOFTWARE, )$' == '1')",
+                    Condition = @"('$RegDeleteValue(0, HKEY_CURRENT_USER\SOFTWARE, )$' == '1')",
                     ExpectedResult = false
                 },
                 new ExpectedConditon()
@@ -343,7 +356,8 @@ namespace DeploymentToolkit.Scripting.Tests
             foreach (var condition in conditions)
             {
                 var preProcessed = PreProcessor.Process(condition.Condition);
-                Assert.AreEqual(condition.ExpectedResult, Evaluation.Evaluate(preProcessed));
+                var result = Evaluation.Evaluate(preProcessed);
+                Assert.AreEqual(condition.ExpectedResult, result, $"Ran '{condition.Condition}' and expected '{condition.ExpectedResult}' but got '{result}'. PreProcessed: '{preProcessed}'");
             }
         }
 
@@ -354,13 +368,13 @@ namespace DeploymentToolkit.Scripting.Tests
             {
                 new ExpectedConditon()
                 {
-                    Condition = @"('$RegDeleteKey(0, HKEY_LOCAL_MACHINE\SOFTWARE, DT_TEST)$' == '1')",
+                    Condition = @"('$RegDeleteKey(0, HKEY_CURRENT_USER\SOFTWARE, DT_TEST)$' == '1')",
                     ExpectedResult = true
                 },
 
                 new ExpectedConditon()
                 {
-                    Condition = @"('$RegDeleteKey(0, HKEY_LOCAL_MACHINE\SOFTWARE)$' == '1')",
+                    Condition = @"('$RegDeleteKey(0, HKEY_CURRENT_USER\SOFTWARE)$' == '1')",
                     ExpectedResult = false
                 },
                 new ExpectedConditon()
@@ -370,7 +384,7 @@ namespace DeploymentToolkit.Scripting.Tests
                 },
                 new ExpectedConditon()
                 {
-                    Condition = @"('$RegDeleteKey(0, HKEY_LOCAL_MACHINE\SOFTWARE, )$' == '1')",
+                    Condition = @"('$RegDeleteKey(0, HKEY_CURRENT_USER\SOFTWARE, )$' == '1')",
                     ExpectedResult = false
                 },
                 new ExpectedConditon()
@@ -383,7 +397,8 @@ namespace DeploymentToolkit.Scripting.Tests
             foreach (var condition in conditions)
             {
                 var preProcessed = PreProcessor.Process(condition.Condition);
-                Assert.AreEqual(condition.ExpectedResult, Evaluation.Evaluate(preProcessed));
+                var result = Evaluation.Evaluate(preProcessed);
+                Assert.AreEqual(condition.ExpectedResult, result, $"Ran '{condition.Condition}' and expected '{condition.ExpectedResult}' but got '{result}'. PreProcessed: '{preProcessed}'");
             }
         }
     }
