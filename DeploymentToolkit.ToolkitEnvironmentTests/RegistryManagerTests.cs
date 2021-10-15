@@ -46,7 +46,7 @@ namespace DeploymentToolkit.ToolkitEnvironment.Tests
         [TestMethod()]
         public void GetInstalledProgramByNameExactTest()
         {
-            var programName = "Microsoft .NET Framework 4.7.2 SDK";
+            var programName = "Microsoft .NET Framework 4.8 SDK";
             var programs = RegistryManager.GetInstalledMSIProgramsByName(programName, true);
 
             Assert.IsNotNull(programs, $"Exception getting {programName}");
