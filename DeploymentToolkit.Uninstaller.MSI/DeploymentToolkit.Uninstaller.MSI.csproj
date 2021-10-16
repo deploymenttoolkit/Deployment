@@ -1,73 +1,29 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{364666E5-EE07-4266-AB69-70A701C57E9E}</ProjectGuid>
+    <TargetFramework>net6.0-windows</TargetFramework>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DeploymentToolkit.Uninstaller.MSI</RootNamespace>
-    <AssemblyName>DeploymentToolkit.Uninstaller.MSI</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
     <Deterministic>false</Deterministic>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="NLog">
       <HintPath>..\..\DeploymentToolkit.Logging\bin\Debug\NLog.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="MSIUninstaller.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\DeploymentToolkit.Logging\DeploymentToolkit.Logging.csproj">
-      <Project>{8bce8c64-7c10-498f-beb2-8804b191aea7}</Project>
-      <Name>DeploymentToolkit.Logging</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\DeploymentToolkit.Environment\DeploymentToolkit.ToolkitEnvironment.csproj">
-      <Project>{94c074c7-cae2-423e-84b7-80d5b74602bb}</Project>
-      <Name>DeploymentToolkit.ToolkitEnvironment</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\DeploymentToolkit.Modals\DeploymentToolkit.Modals.csproj">
-      <Project>{EC3FEDB7-4FC0-4DCF-A08F-F1DE2DC49E00}</Project>
-      <Name>DeploymentToolkit.Modals</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\DeploymentToolkit.Uninstaller\DeploymentToolkit.Uninstaller.csproj">
-      <Project>{1f774a30-e6f9-4bfd-b535-d7509d4c0a0f}</Project>
-      <Name>DeploymentToolkit.Uninstaller</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\..\DeploymentToolkit.Logging\DeploymentToolkit.Logging.csproj" />
+    <ProjectReference Include="..\DeploymentToolkit.Environment\DeploymentToolkit.ToolkitEnvironment.csproj" />
+    <ProjectReference Include="..\DeploymentToolkit.Modals\DeploymentToolkit.Modals.csproj" />
+    <ProjectReference Include="..\DeploymentToolkit.Uninstaller\DeploymentToolkit.Uninstaller.csproj" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.3.246501">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
 </Project>
