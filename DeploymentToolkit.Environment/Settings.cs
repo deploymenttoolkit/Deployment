@@ -1,4 +1,5 @@
 ﻿using DeploymentToolkit.Modals.Settings;
+using DeploymentToolkit.Modals.Settings.Tray;
 using System;
 using System.IO;
 using System.Xml.Serialization;

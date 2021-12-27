@@ -1,73 +1,81 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.136
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.31911.260
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.Deployment", "DeploymentToolkit.Deployment\DeploymentToolkit.Deployment.csproj", "{0585AEA5-A376-469C-8B39-921D9CC087F9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeploymentToolkit.Deployment", "DeploymentToolkit.Deployment\DeploymentToolkit.Deployment.csproj", "{0585AEA5-A376-469C-8B39-921D9CC087F9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.Installer", "DeploymentToolkit.Installer\DeploymentToolkit.Installer.csproj", "{D823DFAD-3522-434B-B1A8-91232A1169E6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeploymentToolkit.Installer", "DeploymentToolkit.Installer\DeploymentToolkit.Installer.csproj", "{D823DFAD-3522-434B-B1A8-91232A1169E6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.Installer.MSI", "DeploymentToolkit.Installer.MSI\DeploymentToolkit.Installer.MSI.csproj", "{6F6770F5-A209-4A26-A6FB-9CB5122F4108}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeploymentToolkit.Installer.MSI", "DeploymentToolkit.Installer.MSI\DeploymentToolkit.Installer.MSI.csproj", "{6F6770F5-A209-4A26-A6FB-9CB5122F4108}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.TrayApp", "..\DeploymentToolkit.TrayApp\DeploymentToolkit.TrayApp.csproj", "{9586473D-9BB5-4AF1-B9E1-77B72D5874B8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeploymentToolkit.TrayApp", "..\DeploymentToolkit.TrayApp\DeploymentToolkit.TrayApp.csproj", "{9586473D-9BB5-4AF1-B9E1-77B72D5874B8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.Modals", "DeploymentToolkit.Modals\DeploymentToolkit.Modals.csproj", "{EC3FEDB7-4FC0-4DCF-A08F-F1DE2DC49E00}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeploymentToolkit.Modals", "DeploymentToolkit.Modals\DeploymentToolkit.Modals.csproj", "{EC3FEDB7-4FC0-4DCF-A08F-F1DE2DC49E00}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DeploymentToolkit", "DeploymentToolkit", "{672AD382-4F4E-442D-B0C8-F094751E2995}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{26E734FC-81B7-40B3-99E0-17A799AEEE77}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TrayApp", "TrayApp", "{F71CC262-D270-489F-9BA5-69ECA6B0B267}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Debugger - Blocker", "Debugger - Blocker", "{BDC9234B-D443-4880-96B2-E9897A2D6D52}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.Debugger", "..\DeploymentToolkit.Debugger\DeploymentToolkit.Debugger.csproj", "{EE27D0DC-F1B3-426F-86BD-C8146944F9C9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeploymentToolkit.Debugger", "..\DeploymentToolkit.Debugger\DeploymentToolkit.Debugger.csproj", "{EE27D0DC-F1B3-426F-86BD-C8146944F9C9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.Logging", "..\DeploymentToolkit.Logging\DeploymentToolkit.Logging.csproj", "{8BCE8C64-7C10-498F-BEB2-8804B191AEA7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeploymentToolkit.Logging", "..\DeploymentToolkit.Logging\DeploymentToolkit.Logging.csproj", "{8BCE8C64-7C10-498F-BEB2-8804B191AEA7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.Messaging", "DeploymentToolkit.Messaging\DeploymentToolkit.Messaging.csproj", "{65AC59C5-F17A-4F96-97B2-B0ECB4304C3B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeploymentToolkit.Messaging", "DeploymentToolkit.Messaging\DeploymentToolkit.Messaging.csproj", "{65AC59C5-F17A-4F96-97B2-B0ECB4304C3B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.ToolkitEnvironment", "DeploymentToolkit.Environment\DeploymentToolkit.ToolkitEnvironment.csproj", "{94C074C7-CAE2-423E-84B7-80D5B74602BB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeploymentToolkit.ToolkitEnvironment", "DeploymentToolkit.Environment\DeploymentToolkit.ToolkitEnvironment.csproj", "{94C074C7-CAE2-423E-84B7-80D5B74602BB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Installer", "Installer", "{8D8ED2C1-89A7-4A94-92F7-15E780D946B9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.Scripting", "DeploymentToolkit.Scripting\DeploymentToolkit.Scripting.csproj", "{AD620098-DF03-45B9-9B91-7E1DD13BC86C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeploymentToolkit.Scripting", "DeploymentToolkit.Scripting\DeploymentToolkit.Scripting.csproj", "{AD620098-DF03-45B9-9B91-7E1DD13BC86C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.Scripting.Tests", "DeploymentToolkit.Scripting.Tests\DeploymentToolkit.Scripting.Tests.csproj", "{1199E298-4D2F-4D19-8602-73B05C6B9E9D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeploymentToolkit.Scripting.Tests", "DeploymentToolkit.Scripting.Tests\DeploymentToolkit.Scripting.Tests.csproj", "{1199E298-4D2F-4D19-8602-73B05C6B9E9D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.Actions", "DeploymentToolkit.Actions\DeploymentToolkit.Actions.csproj", "{0059F67C-809E-4811-995D-4647BB520C99}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeploymentToolkit.Actions", "DeploymentToolkit.Actions\DeploymentToolkit.Actions.csproj", "{0059F67C-809E-4811-995D-4647BB520C99}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.DeploymentEnvironment", "DeploymentToolkit.DeploymentEnvironment\DeploymentToolkit.DeploymentEnvironment.csproj", "{4EA54C46-9DBE-4872-9820-E24D2A88FB39}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeploymentToolkit.DeploymentEnvironment", "DeploymentToolkit.DeploymentEnvironment\DeploymentToolkit.DeploymentEnvironment.csproj", "{4EA54C46-9DBE-4872-9820-E24D2A88FB39}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.Installer.Executable", "DeploymentToolkit.Installer.Executable\DeploymentToolkit.Installer.Executable.csproj", "{3B6F788E-675B-4C3C-BAF7-D3B232811A62}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeploymentToolkit.Installer.Executable", "DeploymentToolkit.Installer.Executable\DeploymentToolkit.Installer.Executable.csproj", "{3B6F788E-675B-4C3C-BAF7-D3B232811A62}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Uninstaller", "Uninstaller", "{4BD3FEBC-9E55-4A00-B646-F6C9DEC79E3F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.Uninstaller", "DeploymentToolkit.Uninstaller\DeploymentToolkit.Uninstaller.csproj", "{1F774A30-E6F9-4BFD-B535-D7509D4C0A0F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeploymentToolkit.Uninstaller", "DeploymentToolkit.Uninstaller\DeploymentToolkit.Uninstaller.csproj", "{1F774A30-E6F9-4BFD-B535-D7509D4C0A0F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.Uninstaller.Executable", "DeploymentToolkit.Uninstaller.Executable\DeploymentToolkit.Uninstaller.Executable.csproj", "{A0E7F558-00A9-41B6-9B8B-125A102BDB57}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeploymentToolkit.Uninstaller.Executable", "DeploymentToolkit.Uninstaller.Executable\DeploymentToolkit.Uninstaller.Executable.csproj", "{A0E7F558-00A9-41B6-9B8B-125A102BDB57}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.Uninstaller.MSI", "DeploymentToolkit.Uninstaller.MSI\DeploymentToolkit.Uninstaller.MSI.csproj", "{364666E5-EE07-4266-AB69-70A701C57E9E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeploymentToolkit.Uninstaller.MSI", "DeploymentToolkit.Uninstaller.MSI\DeploymentToolkit.Uninstaller.MSI.csproj", "{364666E5-EE07-4266-AB69-70A701C57E9E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.Registry", "DeploymentToolkit.Registry\DeploymentToolkit.Registry.csproj", "{0EE12FB6-92F6-497A-8429-32E0C31B648A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{C10C8EF8-ECD3-4572-9F68-C087EC075331}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.RegistryTests", "DeploymentToolkit.RegistryTests\DeploymentToolkit.RegistryTests.csproj", "{3879250E-0D6E-41C3-8B17-4BD84C95FFE3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeploymentToolkit.RegistryTests", "DeploymentToolkit.RegistryTests\DeploymentToolkit.RegistryTests.csproj", "{3879250E-0D6E-41C3-8B17-4BD84C95FFE3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.RegistryWrapper", "DeploymentToolkit.RegistryWrapper\DeploymentToolkit.RegistryWrapper.csproj", "{D98D219D-9FE8-44C0-AB9A-D5FFF3578FEE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeploymentToolkit.RegistryWrapper", "DeploymentToolkit.RegistryWrapper\DeploymentToolkit.RegistryWrapper.csproj", "{D98D219D-9FE8-44C0-AB9A-D5FFF3578FEE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.ToolkitEnvironmentTests", "DeploymentToolkit.ToolkitEnvironmentTests\DeploymentToolkit.ToolkitEnvironmentTests.csproj", "{9DC082AF-9B96-4530-8A31-B30EB1CBF403}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeploymentToolkit.ToolkitEnvironmentTests", "DeploymentToolkit.ToolkitEnvironmentTests\DeploymentToolkit.ToolkitEnvironmentTests.csproj", "{9DC082AF-9B96-4530-8A31-B30EB1CBF403}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.Util", "DeploymentToolkit.Util\DeploymentToolkit.Util.csproj", "{AEBBE655-C600-4B78-8617-FA3921F33AFA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeploymentToolkit.Util", "DeploymentToolkit.Util\DeploymentToolkit.Util.csproj", "{AEBBE655-C600-4B78-8617-FA3921F33AFA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.Restart", "DeploymentToolkit.Restart\DeploymentToolkit.Restart.csproj", "{574AE079-0011-44CE-8E47-55F18C0F8AD1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeploymentToolkit.Restart", "DeploymentToolkit.Restart\DeploymentToolkit.Restart.csproj", "{574AE079-0011-44CE-8E47-55F18C0F8AD1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.Unblocker", "DeploymentToolkit.Unblocker\DeploymentToolkit.Unblocker.csproj", "{2D115754-8B3B-4890-9472-2580C09C3A36}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeploymentToolkit.Unblocker", "DeploymentToolkit.Unblocker\DeploymentToolkit.Unblocker.csproj", "{2D115754-8B3B-4890-9472-2580C09C3A36}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.Blocker", "..\DeploymentToolkit.Blocker\DeploymentToolkit.Blocker.csproj", "{0FD003A3-0C57-4C77-96FA-140B6D83A1A2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeploymentToolkit.Blocker", "..\DeploymentToolkit.Blocker\DeploymentToolkit.Blocker.csproj", "{0FD003A3-0C57-4C77-96FA-140B6D83A1A2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeploymentToolkit.ActionsTests", "DeploymentToolkit.ActionsTests\DeploymentToolkit.ActionsTests.csproj", "{A9EF70EF-D85E-4278-A16E-4F183BD58D19}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeploymentToolkit.ActionsTests", "DeploymentToolkit.ActionsTests\DeploymentToolkit.ActionsTests.csproj", "{A9EF70EF-D85E-4278-A16E-4F183BD58D19}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{881CAACE-739B-47AA-931B-8A48BCE83E1C}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
