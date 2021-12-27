@@ -2,10 +2,22 @@
 
 namespace DeploymentToolkit.Modals
 {
-    [XmlRoot("Messages")]
+	[XmlRoot("Messages")]
     public class Language
     {
-        public string DiskSpace_Message { get; set; }
+		// Everything below here we add ourselfs
+		public string PathToUpgradeRtf { get; set; }
+
+		public string DTK_WindowTitle { get; set; }
+		public string DTK_BrandingTitle { get; set; }
+
+		public string UpgradePrompt_ButtonStartNow { get; set; }
+		public string UpgradePrompt_ButtonSchedule { get; set; }
+		public string UpgradePrompt_ButtonMinimize { get; set; }
+
+
+		// Everything below this comment is from PSADT
+		public string DiskSpace_Message { get; set; }
 
         public string ClosePrompt_ButtonContinue { get; set; }
         public string ClosePrompt_ButtonContinueTooltip { get; set; }
