@@ -11,9 +11,18 @@ namespace DeploymentToolkit.Modals
 		public string DTK_WindowTitle { get; set; }
 		public string DTK_BrandingTitle { get; set; }
 
+		// Upgrade Messages
 		public string UpgradePrompt_ButtonStartNow { get; set; }
 		public string UpgradePrompt_ButtonSchedule { get; set; }
 		public string UpgradePrompt_ButtonMinimize { get; set; }
+
+		// Upgrade Schedule Dialog
+		public string UpgradePrompt_ButtonConfirm { get; set; }
+		public string UpgradePrompt_ButtonCancel { get; set; }
+		public string UpgradePrompt_ScheduleTitle { get; set; }
+		public string UpgradePrompt_ScheduleOptionOne { get; set; }
+		public string UpgradePrompt_ScheduleOptionTwo { get; set; }
+		public string UpgradePrompt_ScheduleReminder { get; set; }
 
 
 		// Everything below this comment is from PSADT
