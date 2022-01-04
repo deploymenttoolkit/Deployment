@@ -129,7 +129,7 @@ csharp_indent_braces=false
 csharp_space_between_method_declaration_name_and_open_parenthesis=false
 
 [*.{cs,vb}]
-indent_style=tab
+indent_style=space
 dotnet_style_allow_multiple_blank_lines_experimental=true:error
 
 # Naming rules

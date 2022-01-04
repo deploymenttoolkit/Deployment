@@ -14,9 +14,9 @@ namespace DeploymentToolkit.Actions
         private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
         private static bool _customActionsInitialized = false;
-        private static Dictionary<string, ActionInfo> _customActions = new Dictionary<string, ActionInfo>();
+        private static readonly Dictionary<string, ActionInfo> _customActions = new Dictionary<string, ActionInfo>();
 
-        private static List<string> _extensionAssemblyPaths = new List<string>();
+        private static readonly List<string> _extensionAssemblyPaths = new List<string>();
 
         private class ActionInfo
         {
@@ -37,7 +37,7 @@ namespace DeploymentToolkit.Actions
             var xmlReader = new XmlSerializer(typeof(T));
             xmlReader.UnknownElement += OnUnknownElement;
             var text = File.ReadAllText(path);
-            using (var stringReader = new StringReader(text))
+            using(var stringReader = new StringReader(text))
             {
                 return (T)xmlReader.Deserialize(stringReader);
             }
@@ -45,7 +45,7 @@ namespace DeploymentToolkit.Actions
 
         private static void OnUnknownElement(object sender, XmlElementEventArgs e)
         {
-            if (!_customActionsInitialized)
+            if(!_customActionsInitialized)
             {
                 InitializeCustomActions();
                 _customActionsInitialized = true;
@@ -53,7 +53,7 @@ namespace DeploymentToolkit.Actions
 
             var element = e.Element;
 
-            if (!_customActions.ContainsKey(element.Name))
+            if(!_customActions.ContainsKey(element.Name))
             {
                 _logger.Warn($"Unknown element in Settings: {element.Name}");
                 return;
@@ -61,11 +61,10 @@ namespace DeploymentToolkit.Actions
 
             var actionInfo = _customActions[element.Name];
             var instance = Activator.CreateInstance(actionInfo.Type);
-            var type = instance.GetType();
 
-            foreach (XmlAttribute attribute in element.Attributes)
+            foreach(XmlAttribute attribute in element.Attributes)
             {
-                if (!actionInfo.Properties.ContainsKey(attribute.Name))
+                if(!actionInfo.Properties.ContainsKey(attribute.Name))
                 {
                     _logger.Warn($"{element.Name} does not contain {attribute.Name}. Check docs!");
                     return;
@@ -73,17 +72,21 @@ namespace DeploymentToolkit.Actions
 
                 var propertyInfo = actionInfo.Properties[attribute.Name];
 
-                var value = default(object);
-                if (propertyInfo.PropertyType.IsEnum)
+                object value;
+                if(propertyInfo.PropertyType.IsEnum)
+                {
                     value = Enum.Parse(propertyInfo.PropertyType, attribute.Value);
+                }
                 else
+                {
                     value = Convert.ChangeType(attribute.Value, propertyInfo.PropertyType);
+                }
 
                 propertyInfo.SetValue(instance, value);
             }
 
             var parent = (ActionBase)e.ObjectBeingDeserialized;
-            if (parent == null)
+            if(parent == null)
             {
                 _logger.Error("Invalid parent!");
                 return;
@@ -116,7 +119,7 @@ namespace DeploymentToolkit.Actions
 
                 _logger.Debug($"Found {actions.Count} actions. Processing ...");
 
-                foreach (var action in actions)
+                foreach(var action in actions)
                 {
                     var properties = action.GetProperties().Where((e) => e.CanWrite).ToDictionary((e) => e.Name);
                     _customActions.Add(action.Name, new ActionInfo(action, properties));
@@ -124,7 +127,7 @@ namespace DeploymentToolkit.Actions
                 }
 
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 _logger.Error(ex, "Failed to read Actions");
             }
@@ -139,46 +142,51 @@ namespace DeploymentToolkit.Actions
                 var globalExtensionsFiles = Directory.GetFiles(ToolkitEnvironment.EnvironmentVariables.DeploymentToolkitExtensionsPath, "*.dll", SearchOption.AllDirectories);
                 var deploymentExtensionsFiles = Directory.Exists(DeploymentEnvironment.DeploymentEnvironmentVariables.ExtensionsEnvironment)
                     ? Directory.GetFiles(DeploymentEnvironment.DeploymentEnvironmentVariables.ExtensionsEnvironment, "*.dll", SearchOption.AllDirectories)
-                    : new string[0];
+                    : Array.Empty<string>();
 
                 var combinedExtensionFiles = globalExtensionsFiles.Concat(deploymentExtensionsFiles).ToArray();
 
                 _logger.Trace($"Found {combinedExtensionFiles.Length} files. Processing files ...");
-                var appDomain = AppDomain.CreateDomain("LoaderDomain");
-                var tunnelType = typeof(AppDomainTunnel);
-                var tunnel = (AppDomainTunnel)appDomain.CreateInstanceAndUnwrap(tunnelType.Assembly.FullName, tunnelType.FullName);
 
-                var validExtensionFiles = tunnel.GetValidFiles(combinedExtensionFiles);
-
-                AppDomain.Unload(appDomain);
-
-                _logger.Trace($"Found {validExtensionFiles.Length} extensions. Loading ...");
-
-                var actionInterface = typeof(IExecutableAction);
-                foreach (var extension in validExtensionFiles)
+                var actionType = typeof(IExecutableAction);
+                foreach(var file in combinedExtensionFiles)
                 {
                     try
                     {
-                        var assembly = Assembly.LoadFile(extension);
-                        var extensionName = assembly.GetName().Name;
+                        var assembly = Assembly.LoadFile(file);
+                        var implementsInteface = assembly
+                            .GetTypes()
+                            .Any(x =>
+                                x.IsClass &&
+                                actionType.IsAssignableFrom(x)
+                            );
 
+                        if(!implementsInteface)
+                        {
+                            _logger.Warn($"DLL '{file}' was loaded but does not implement the required interface");
+                            continue;
+                        }
+
+                        var extensionName = assembly.GetName().Name;
                         _logger.Trace($"Loaded extension {extensionName}");
 
-                        var extensionDirectory = Path.GetDirectoryName(extension);
-                        if (!_extensionAssemblyPaths.Contains(extensionDirectory))
+                        var extensionDirectory = Path.GetDirectoryName(file);
+                        if(!_extensionAssemblyPaths.Contains(extensionDirectory))
+                        {
                             _extensionAssemblyPaths.Add(extensionDirectory);
+                        }
 
                         var actions = assembly
                             .GetTypes()
                             .Where((t) =>
                                 t.IsClass &&
-                                actionInterface.IsAssignableFrom(t)
+                                actionType.IsAssignableFrom(t)
                             )
                             .ToList();
 
-                        foreach (var action in actions)
+                        foreach(var action in actions)
                         {
-                            if (_customActions.ContainsKey(action.Name))
+                            if(_customActions.ContainsKey(action.Name))
                             {
                                 _logger.Warn($"There is already an action named '{action.Name}'. Action not added.");
                                 continue;
@@ -189,18 +197,18 @@ namespace DeploymentToolkit.Actions
                             _logger.Trace($"[{extensionName}] Added '{action.Name}' with {properties.Count} arguments");
                         }
                     }
-                    catch (Exception ex)
+                    catch(Exception ex)
                     {
-                        _logger.Error(ex, $"Failed to process extension '{extension}'");
+                        _logger.Warn(ex, $"Failed to load DLL '{file}'");
                     }
                 }
 
-                if (_extensionAssemblyPaths.Count > 0)
+                if(_extensionAssemblyPaths.Count > 0)
                 {
                     AppDomain.CurrentDomain.AssemblyResolve += AssemblyResolve;
                 }
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 _logger.Error(ex, "Failed to load extensions");
             }
@@ -212,11 +220,11 @@ namespace DeploymentToolkit.Actions
             var fileName = $"{assemblyName.Name}.dll";
             _logger.Trace($"Searching for '{assemblyName.Name}' ...");
 
-            foreach (var path in _extensionAssemblyPaths)
+            foreach(var path in _extensionAssemblyPaths)
             {
                 var fullPath = Path.Combine(path, fileName);
 
-                if (File.Exists(fullPath))
+                if(File.Exists(fullPath))
                 {
                     _logger.Trace($"Loading {fullPath} ...");
                     return Assembly.LoadFrom(fullPath);

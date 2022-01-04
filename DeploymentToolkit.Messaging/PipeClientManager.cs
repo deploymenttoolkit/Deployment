@@ -42,7 +42,7 @@ namespace DeploymentToolkit.Messaging
             }
         }
 
-        private const int _trayAppStartTimeOut = 5000;
+        private const int TrayAppStartTimeOut = 5000;
         private static int _trayAppRetrys = 3;
 
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
@@ -57,7 +57,7 @@ namespace DeploymentToolkit.Messaging
         /// Key: ProcessID
         /// Value: PipeClient(Manager)
         /// </summary>
-        private Dictionary<int, PipeClient> _clients = new Dictionary<int, PipeClient>();
+        private readonly Dictionary<int, PipeClient> _clients = new Dictionary<int, PipeClient>();
         private string _lastSentMessage = null;
 
         private readonly object _messageLock = new object();
@@ -102,7 +102,7 @@ namespace DeploymentToolkit.Messaging
 
             if (!startup)
             {
-                System.Threading.Thread.Sleep(_trayAppStartTimeOut);
+                System.Threading.Thread.Sleep(TrayAppStartTimeOut);
             }
 
             var processes = Process.GetProcessesByName(TrayAppExeNameWithoutExtension);
@@ -115,7 +115,7 @@ namespace DeploymentToolkit.Messaging
                 Util.ProcessUtil.StartTrayAppForAllLoggedOnUsers();
 
                 _logger.Trace("Waiting for start ...");
-                System.Threading.Thread.Sleep(_trayAppStartTimeOut);
+                System.Threading.Thread.Sleep(TrayAppStartTimeOut);
 
                 _logger.Trace("Scanning for tray apps ...");
                 processes = Process.GetProcessesByName(TrayAppExeNameWithoutExtension);

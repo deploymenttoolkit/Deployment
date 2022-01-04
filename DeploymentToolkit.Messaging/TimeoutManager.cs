@@ -9,17 +9,20 @@ namespace DeploymentToolkit.Messaging
 {
     internal class TimeoutManager : IDisposable
     {
-        private const int _simulationSleepTime = 1000;
-        private const int _threadSleepTime = 30000;
+        // Time in miliseconds
+        private const int SimulationSleepTime = 1000;
+        // Time in seconds
+        private const int ThreadSleepTime = 30;
 
         private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+        private static readonly CancellationTokenSource _cancellationToken = new();
 
         private volatile bool _isSimulating = false;
         private int _trayAppRetrys = 3;
 
-        private PipeClientManager _pipeClientManager;
+        private readonly PipeClientManager _pipeClientManager;
 
-        private Thread _timeoutThread;
+        private readonly Thread _timeoutThread;
 
         private DateTime _timeoutDeadline = default(DateTime);
 
@@ -46,11 +49,17 @@ namespace DeploymentToolkit.Messaging
 
                 var lastExpectedResponse = _pipeClientManager.CurrentStep;
 
-                while (true)
+                while(!_cancellationToken.IsCancellationRequested)
                 {
-                    Thread.Sleep(_threadSleepTime);
+                    var sleepTime = 0;
+                    while(sleepTime++ != ThreadSleepTime)
+                    {
+                        Thread.Sleep(1000);
+                        _cancellationToken.Token.ThrowIfCancellationRequested();
+                    }
 
-                    if (_isSimulating)
+
+                    if(_isSimulating)
                     {
                         _logger.Trace("Responses are simulated. Timeout thread stopping ...");
                         return;
@@ -59,14 +68,14 @@ namespace DeploymentToolkit.Messaging
                     var expectedResponse = _pipeClientManager.CurrentStep;
                     _logger.Trace($"Checking for timeouts for dialog {expectedResponse}...");
 
-                    if (_timeoutDeadline == default(DateTime) || lastExpectedResponse != expectedResponse)
+                    if(_timeoutDeadline == default(DateTime) || lastExpectedResponse != expectedResponse)
                     {
                         _logger.Trace("Updating deadline ...");
                         UpdateTimeout();
                         lastExpectedResponse = expectedResponse;
                     }
 
-                    if (_timeoutDeadline > DateTime.Now)
+                    if(_timeoutDeadline > DateTime.Now)
                     {
                         _logger.Trace("Deadline not yet reached ...");
                         continue;
@@ -84,7 +93,7 @@ namespace DeploymentToolkit.Messaging
                     });
                 }
             }
-            catch (ThreadAbortException) { }
+            catch(OperationCanceledException) { }
         }
 
         private void UpdateTimeout()
@@ -92,38 +101,38 @@ namespace DeploymentToolkit.Messaging
             var timeout = 0;
             var activeSequence = EnvironmentVariables.ActiveSequence;
             var expectedResponse = _pipeClientManager.CurrentStep;
-            switch (expectedResponse)
+            switch(expectedResponse)
             {
                 case DeploymentStep.CloseApplications:
-                    {
-                        timeout = activeSequence.CloseProgramsSettings.TimeUntilForcedClose;
+                {
+                    timeout = activeSequence.CloseProgramsSettings.TimeUntilForcedClose;
 
-                        if (timeout <= 0)
-                        {
-                            timeout = EnvironmentVariables.DeploymentToolkitStepTimout;
-                            _logger.Trace($"No close timeout specified. Using global threshold of {timeout} seconds");
-                        }
-                    }
-                    break;
-
-                case DeploymentStep.Restart:
-                    {
-                        timeout = activeSequence.RestartSettings.TimeUntilForcedRestart;
-
-                        if (timeout <= 0)
-                        {
-                            timeout = EnvironmentVariables.DeploymentToolkitStepTimout;
-                            _logger.Trace($"No restart timeout specified. Using global threshold of {timeout} seconds");
-                        }
-                    }
-                    break;
-
-                default:
+                    if(timeout <= 0)
                     {
                         timeout = EnvironmentVariables.DeploymentToolkitStepTimout;
                         _logger.Trace($"No close timeout specified. Using global threshold of {timeout} seconds");
                     }
-                    break;
+                }
+                break;
+
+                case DeploymentStep.Restart:
+                {
+                    timeout = activeSequence.RestartSettings.TimeUntilForcedRestart;
+
+                    if(timeout <= 0)
+                    {
+                        timeout = EnvironmentVariables.DeploymentToolkitStepTimout;
+                        _logger.Trace($"No restart timeout specified. Using global threshold of {timeout} seconds");
+                    }
+                }
+                break;
+
+                default:
+                {
+                    timeout = EnvironmentVariables.DeploymentToolkitStepTimout;
+                    _logger.Trace($"No close timeout specified. Using global threshold of {timeout} seconds");
+                }
+                break;
             }
 
             _timeoutDeadline = DateTime.Now.AddSeconds(timeout + EnvironmentVariables.DeploymentToolkitStepExtraTime);
@@ -133,7 +142,7 @@ namespace DeploymentToolkit.Messaging
 
         private void OnProcessStarted(object sender, EventArgs e)
         {
-            if (_pipeClientManager.ConnectedClients > 0)
+            if(_pipeClientManager.ConnectedClients > 0)
             {
                 _logger.Debug($"{_pipeClientManager.ConnectedClients} clients connected. Expecting responses ...");
             }
@@ -141,7 +150,7 @@ namespace DeploymentToolkit.Messaging
 
         private void OnProcessStopped(object sender, EventArgs e)
         {
-            if (_pipeClientManager.ConnectedClients > 0)
+            if(_pipeClientManager.ConnectedClients > 0)
             {
                 _logger.Debug($"Tray app disconnected. {_pipeClientManager.ConnectedClients} remaining clients");
                 return;
@@ -149,7 +158,7 @@ namespace DeploymentToolkit.Messaging
 
             _logger.Warn($"No more tray apps running !");
 
-            if (_trayAppRetrys == 0)
+            if(_trayAppRetrys == 0)
             {
                 _logger.Warn("No more retries left. Forcing deployment ...");
                 SimulateUserResponses();
@@ -168,13 +177,13 @@ namespace DeploymentToolkit.Messaging
 
             var lastExpectedResponse = DeploymentStep.Start;
 
-            while (_pipeClientManager.CurrentStep != DeploymentStep.End)
+            while(_pipeClientManager.CurrentStep != DeploymentStep.End)
             {
                 var expectedResponse = _pipeClientManager.CurrentStep;
                 _logger.Trace($"Current expected answer: {expectedResponse}");
 
 
-                if (lastExpectedResponse != expectedResponse)
+                if(lastExpectedResponse != expectedResponse)
                 {
                     _logger.Info($"Sending fake response for {expectedResponse}");
 
@@ -187,7 +196,7 @@ namespace DeploymentToolkit.Messaging
                         }
                     });
 
-                    if (expectedResponse == DeploymentStep.Restart)
+                    if(expectedResponse == DeploymentStep.Restart)
                     {
                         // Quit when a Restart is detected
                         break;
@@ -197,7 +206,7 @@ namespace DeploymentToolkit.Messaging
                 }
 
                 // Wait so deployment toolkit can send next response
-                Thread.Sleep(_simulationSleepTime);
+                Thread.Sleep(SimulationSleepTime);
             }
 
             _logger.Trace("Deployment ended");
@@ -205,9 +214,12 @@ namespace DeploymentToolkit.Messaging
 
         public void Dispose()
         {
-            _timeoutThread?.Abort();
+            if(!_cancellationToken.IsCancellationRequested)
+            {
+                _cancellationToken.Cancel();
+            }
 
-            if (_isSimulating)
+            if(_isSimulating)
             {
                 _logger.Debug("Aborting Simulation ...");
                 _pipeClientManager.CurrentStep = DeploymentStep.End;

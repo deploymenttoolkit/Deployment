@@ -19,7 +19,7 @@ namespace DeploymentToolkit.Messaging
         internal string Username;
         internal string Domain;
 
-        private Logger _logger = LogManager.GetCurrentClassLogger();
+        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         private readonly NamedPipeClientStream _receiverPipe;
         private readonly NamedPipeClientStream _senderPipe;
@@ -27,8 +27,8 @@ namespace DeploymentToolkit.Messaging
         private readonly StreamReader _reader;
         private readonly StreamWriter _writer;
 
+        private readonly CancellationTokenSource cancellationToken = new();
         private readonly Thread _backgroundWorker;
-
 
         internal PipeClient(int processId)
         {
@@ -76,9 +76,9 @@ namespace DeploymentToolkit.Messaging
             }
             else
             {
-                this.SessionId = connectMessage.SessionId;
-                this.Username = connectMessage.Username;
-                this.Domain = connectMessage.Domain;
+                SessionId = connectMessage.SessionId;
+                Username = connectMessage.Username;
+                Domain = connectMessage.Domain;
 
                 _logger.Info($"Connected to {Username}@{Domain} on session {SessionId}");
 
@@ -120,9 +120,14 @@ namespace DeploymentToolkit.Messaging
                 do
                 {
                     _logger.Trace("Waiting for new messages ...");
-                    var data = await _reader.ReadLineAsync();
-                    if (string.IsNullOrEmpty(data))
+                    var data = await _reader.ReadLineAsync().WaitAsync(cancellationToken.Token).ConfigureAwait(false);
+
+                    cancellationToken.Token.ThrowIfCancellationRequested();
+
+                    if(string.IsNullOrEmpty(data))
+                    {
                         continue;
+                    }
                     _logger.Trace($"Received message from tray app ({data})");
 
                     try
@@ -190,10 +195,12 @@ namespace DeploymentToolkit.Messaging
                     {
                         _logger.Error(ex, "Failed to parse message");
                     }
+
+                    cancellationToken.Token.ThrowIfCancellationRequested();
                 }
-                while (_receiverPipe.IsConnected);
+                while (_receiverPipe.IsConnected && !cancellationToken.IsCancellationRequested);
             }
-            catch (ThreadAbortException) { }
+            catch (OperationCanceledException) { }
             catch (Exception ex)
             {
                 _logger.Error(ex, "Error while receiving messages");
@@ -205,7 +212,10 @@ namespace DeploymentToolkit.Messaging
             IsConnected = false;
             _receiverPipe?.Dispose();
             _senderPipe?.Dispose();
-            _backgroundWorker?.Abort();
+            if(!cancellationToken.IsCancellationRequested)
+            {
+                cancellationToken.Cancel();
+            }
         }
     }
 }
