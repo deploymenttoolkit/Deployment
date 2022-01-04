@@ -12,8 +12,8 @@ namespace DeploymentToolkit.ToolkitEnvironment
     public static partial class EnvironmentVariables
     {
         public static SequenceType ActiveSequenceType;
-        private static IInstallUninstallSequence _activeSequence;
-        public static IInstallUninstallSequence ActiveSequence
+        private static ISequence _activeSequence;
+        public static ISequence ActiveSequence
         {
             get => _activeSequence;
             set

@@ -2,7 +2,10 @@
 {
     public enum SequenceType
     {
+        Unknown,
         Installation,
-        Uninstallation
+        Uninstallation,
+        Repair,
+        Upgrade
     }
 }

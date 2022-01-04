@@ -226,7 +226,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
             }
         }
 
-        internal static void SetActiveSequence(IInstallUninstallSequence sequence)
+        internal static void SetActiveSequence(ISequence sequence)
         {
             _logger.Trace($"Updating ActiveSequence in registry ...");
 

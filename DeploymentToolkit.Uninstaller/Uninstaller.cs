@@ -9,7 +9,7 @@ using System;
 
 namespace DeploymentToolkit.Uninstaller
 {
-    public abstract class Uninstaller : IInstallUninstallSequence
+    public abstract class Uninstaller : ISequence
     {
         public abstract UninstallerType UninstallerType { get; }
 
@@ -35,7 +35,7 @@ namespace DeploymentToolkit.Uninstaller
 
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        public IInstallUninstallSequence SubSequence
+        public ISequence SubSequence
         {
             get => throw new NotSupportedException();
         }

@@ -13,7 +13,7 @@ using System.Threading;
 
 namespace DeploymentToolkit.Installer
 {
-    public abstract class Installer : IInstallUninstallSequence
+    public abstract class Installer : ISequence
     {
         public abstract InstallerType InstallerType { get; }
         public abstract event EventHandler<SequenceCompletedEventArgs> OnSequenceCompleted;
@@ -41,7 +41,7 @@ namespace DeploymentToolkit.Installer
         private volatile bool _uninstallCompleted = false;
         private volatile bool _uninstallSuccess = false;
 
-        public IInstallUninstallSequence SubSequence
+        public ISequence SubSequence
         {
             get => throw new NotSupportedException();
         }

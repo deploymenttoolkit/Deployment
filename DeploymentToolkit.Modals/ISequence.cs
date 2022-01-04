@@ -1,13 +1,19 @@
-﻿using System;
+﻿using DeploymentToolkit.Modals.Settings;
+using DeploymentToolkit.Modals.Settings.Install;
 
 namespace DeploymentToolkit.Modals
 {
-    public interface ISequence
+    public interface ISequence : IMainSequence
     {
-        event EventHandler<SequenceCompletedEventArgs> OnSequenceCompleted;
+        string UniqueName { get; }
 
-        IInstallUninstallSequence SubSequence { get; }
-        void SequenceBegin();
-        void SequenceEnd();
+        CloseProgramsSettings CloseProgramsSettings { get; }
+        DeferSettings DeferSettings { get; }
+        RestartSettings RestartSettings { get; }
+        LogoffSettings LogoffSettings { get; }
+        CustomActions CustomActions { get; }
+
+        void BeforeSequenceBegin();
+        void BeforeSequenceComplete(bool success);
     }
 }

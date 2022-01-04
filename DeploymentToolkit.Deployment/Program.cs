@@ -22,7 +22,7 @@ using System.Threading;
 
 namespace DeploymentToolkit.Deployment
 {
-    class Program
+    internal class Program
     {
         public static int GlobalExitCode = (int)ExitCode.ExitOK;
 
@@ -33,8 +33,11 @@ namespace DeploymentToolkit.Deployment
         {
             get
             {
-                if (string.IsNullOrEmpty(_namespace))
+                if(string.IsNullOrEmpty(_namespace))
+                {
                     _namespace = typeof(Program).Namespace;
+                }
+
                 return _namespace;
             }
         }
@@ -44,8 +47,11 @@ namespace DeploymentToolkit.Deployment
         {
             get
             {
-                if (_version == null)
+                if(_version == null)
+                {
                     _version = Assembly.GetExecutingAssembly().GetName().Version;
+                }
+
                 return _version;
             }
         }
@@ -55,13 +61,13 @@ namespace DeploymentToolkit.Deployment
         private static MainSequence _mainSequence;
         private static bool _sequenceCompleted = false;
 
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             try
             {
                 Logging.LogManager.Initialize("Deployment");
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 Console.WriteLine($"Failed to initialize logger: {ex}");
 #if DEBUG
@@ -78,22 +84,44 @@ namespace DeploymentToolkit.Deployment
 
             _logger.Trace("Trying to read settings...");
 
-            if (args.Length != 2)
+            if(args.Length != 2)
             {
-                ExitInstallation("Invalid command line arguments. Use: -i [XML] or -u [XML]", ExitCode.MissingRequiredParameter);
+                ExitInstallation("Invalid command line arguments. Use: -i [XML] or -x [XML]", ExitCode.MissingRequiredParameter);
             }
 
             var settingsPath = Path.GetFullPath(args[1]);
             _logger.Trace($"Searching for settings file in {settingsPath}");
 
-            if (!File.Exists(settingsPath))
+            if(!File.Exists(settingsPath))
             {
                 ExitInstallation("settings.xml is missing!", ExitCode.SettingsFileMissing);
             }
 
             var arguments = args.ToList();
             var isInstallation = arguments.Any(argument => argument.ToLower() == "--install" || argument.ToLower() == "-i");
-            var isUninstallation = arguments.Any(argument => argument.ToLower() == "--uninstall" || argument.ToLower() == "-u");
+            var isUninstallation = arguments.Any(argument => argument.ToLower() == "--uninstall" || argument.ToLower() == "-x");
+            var isRepair = arguments.Any(argument => argument.ToLower() == "--repair" || argument.ToLower() == "-r");
+            var isUpgrade = arguments.Any(argument => argument.ToLower() == "--upgrade" || argument.ToLower() == "-u");
+            var sequenceType = SequenceType.Unknown;
+
+            if(isInstallation)
+            {
+                sequenceType = SequenceType.Installation;
+            }
+            else if(isUninstallation)
+            {
+                sequenceType = SequenceType.Uninstallation;
+            }
+            else if(isRepair)
+            {
+                sequenceType = SequenceType.Repair;
+            }
+            else if(isUpgrade)
+            {
+                sequenceType = SequenceType.Upgrade;
+            }
+
+            _logger.Info($"SequenceType: {sequenceType}");
 
             DeploymentEnvironmentVariables.RootDirectory = Path.GetDirectoryName(settingsPath);
             _logger.Info($"DeploymentRootDirectory: {DeploymentEnvironmentVariables.RootDirectory}");
@@ -104,7 +132,7 @@ namespace DeploymentToolkit.Deployment
             _logger.Info("Verifying install dependencies ...");
             _logger.Info($"IsAdministrator: {EnvironmentVariables.IsAdministrator}");
             _logger.Info($"IsElevated: {EnvironmentVariables.IsElevated}");
-            if (!EnvironmentVariables.IsElevated)
+            if(!EnvironmentVariables.IsElevated)
             {
                 ExitInstallation("Program has to be run as Administrator to function properly!", ExitCode.NotElevated);
             }
@@ -113,7 +141,7 @@ namespace DeploymentToolkit.Deployment
             {
                 _logger.Info($"DT-Installation Path: {EnvironmentVariables.DeploymentToolkitInstallPath}");
             }
-            catch (DeploymentToolkitInstallPathNotFoundException)
+            catch(DeploymentToolkitInstallPathNotFoundException)
             {
                 ExitInstallation($"Could not get installation path of the deployment toolkit", ExitCode.DeploymentToolkitInstallPathNotFound);
             }
@@ -121,23 +149,32 @@ namespace DeploymentToolkit.Deployment
             _logger.Trace("Reading deployment settings ...");
             ApplyGlobalSettings();
 
-            _logger.Trace("Parsing command line arguments...");
+            _logger.Trace("Parsing sequence ...");
 
-            if (isInstallation)
+            var sequence = sequenceType switch
             {
-                Install();
-            }
-            else
+                SequenceType.Installation => GetInstallationSequence(),
+                SequenceType.Uninstallation => GetUninstallationSequence(),
+                _ => null
+            };
+
+            if(sequence == null)
             {
-                if (isUninstallation)
-                {
-                    Uninstall();
-                }
-                else
-                {
-                    ExitInstallation("Failed to install or uninstall. Neither install nor uninstall command line has been specified", ExitCode.MissingRequiredParameter);
-                }
+                ExitInstallation("Failed to install or uninstall. Neither install nor uninstall command line has been specified", ExitCode.MissingRequiredParameter);
             }
+
+            _logger.Trace($"Starting sequence {sequence.GetType().Name}");
+            _mainSequence = new MainSequence(sequence);
+            _mainSequence.OnSequenceCompleted += OnSequenceCompleted;
+            _mainSequence.SequenceBegin();
+
+            do
+            {
+                Thread.Sleep(1000);
+            }
+            while(!_sequenceCompleted);
+
+            _logger.Info($"Sequence {sequence.GetType().Name} completed");
 
             _logger.Info($"Ended {Namespace} v{Version}");
 #if DEBUG
@@ -150,20 +187,34 @@ namespace DeploymentToolkit.Deployment
         {
             Settings = ToolkitEnvironment.Settings.GetDeploymentSettings();
 
-            if (Settings.MSI != null)
+            if(Settings.MSI != null)
             {
                 var msiSettings = Settings.MSI;
 
-                if (!string.IsNullOrEmpty(msiSettings.ActiveSetupParameters))
+                if(!string.IsNullOrEmpty(msiSettings.ActiveSetupParameters))
+                {
                     MSI.ActiveSetupParameters = msiSettings.ActiveSetupParameters;
-                if (!string.IsNullOrEmpty(msiSettings.DefaultInstallParameters))
+                }
+
+                if(!string.IsNullOrEmpty(msiSettings.DefaultInstallParameters))
+                {
                     MSI.DefaultInstallParameters = msiSettings.DefaultInstallParameters;
-                if (!string.IsNullOrEmpty(msiSettings.DefaultLoggingParameters))
+                }
+
+                if(!string.IsNullOrEmpty(msiSettings.DefaultLoggingParameters))
+                {
                     MSI.DefaultLoggingParameters = msiSettings.DefaultLoggingParameters;
-                if (!string.IsNullOrEmpty(msiSettings.DefaultSilentParameters))
+                }
+
+                if(!string.IsNullOrEmpty(msiSettings.DefaultSilentParameters))
+                {
                     MSI.DefaultSilentParameters = msiSettings.DefaultSilentParameters;
-                if (!string.IsNullOrEmpty(msiSettings.DefaultUninstallParameters))
+                }
+
+                if(!string.IsNullOrEmpty(msiSettings.DefaultUninstallParameters))
+                {
                     MSI.DefaultUninstallParameters = msiSettings.DefaultUninstallParameters;
+                }
             }
         }
 
@@ -174,19 +225,19 @@ namespace DeploymentToolkit.Deployment
             {
                 return SettingsProcessor.ReadSettings<T>(path);
             }
-            catch (UnauthorizedAccessException ex)
+            catch(UnauthorizedAccessException ex)
             {
                 ExitInstallation(ex, $"Failed to read {path}. Access to the file denied", ExitCode.FailedToReadSettings);
             }
-            catch (InvalidOperationException ex)
+            catch(InvalidOperationException ex)
             {
                 ExitInstallation(ex, $"Failed to deserialized {path}. Verify that {path} is a valid xml file", ExitCode.FailedToReadSettings);
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 ExitInstallation(ex, $"Failed to read {path}", ExitCode.FailedToReadSettings);
             }
-            return default(T);
+            return default;
         }
 
         private static void ExitInstallation(string message, ExitCode exitCode)
@@ -207,15 +258,75 @@ namespace DeploymentToolkit.Deployment
             Environment.Exit((int)exitCode);
         }
 
-        public static void Uninstall()
+        private static ISequence GetInstallationSequence()
+        {
+            _logger.Info("Detected install command line. Selected 'Install' as deployment");
+            if(EnvironmentVariables.Configuration.InstallSettings == null)
+            {
+                _logger.Trace("No installation arguments specified in settings.xml. Looking for install.xml");
+                var installXmlPath = Path.Combine(DeploymentEnvironmentVariables.RootDirectory, "install.xml");
+                if(!File.Exists(installXmlPath))
+                {
+                    ExitInstallation("install.xml is missing", ExitCode.InstallFileMissing);
+                }
+
+                _logger.Trace("Found install.xml. Reading...");
+                EnvironmentVariables.InstallSettings = ReadXml<InstallSettings>(installXmlPath);
+                _logger.Trace("Successfully read install.xml");
+            }
+            else
+            {
+                _logger.Trace("Install options specified inside settings.xml");
+                EnvironmentVariables.InstallSettings = EnvironmentVariables.Configuration.InstallSettings;
+            }
+
+            _logger.Info("Read install settings. Starting installation...");
+            _logger.Trace("Checking CommandLine Path...");
+
+            EnvironmentVariables.InstallSettings.CommandLine = VerifyCommandLine(EnvironmentVariables.InstallSettings.CommandLine);
+
+            _logger.Trace("Verifiying that file specified in CommandLine exists...");
+            // CommandLine should either specify an exe file or an msi file. Either way the file has to exist
+            if(!File.Exists(EnvironmentVariables.InstallSettings.CommandLine))
+            {
+                ExitInstallation($"File specified in CommandLine does not exists ({EnvironmentVariables.InstallSettings.CommandLine}). Aborting installation", ExitCode.InvalidCommandLineSpecified);
+            }
+
+            // Detecting installation type
+            try
+            {
+                ISequence sequence;
+                if(EnvironmentVariables.InstallSettings.CommandLine.ToLower().EndsWith(".msi"))
+                {
+                    // Microsoft Installer
+                    sequence = new MSIInstaller(EnvironmentVariables.InstallSettings);
+                }
+                else
+                {
+                    // Unknown / EXE installer
+                    sequence = new ExeInstaller(EnvironmentVariables.InstallSettings);
+                }
+
+                return sequence;
+            }
+            catch(Exception ex)
+            {
+                ExitInstallation(ex, "Error during setup", ExitCode.ErrorDuringInstallation);
+            }
+            return null;
+        }
+
+        public static ISequence GetUninstallationSequence()
         {
             _logger.Info("Detected uninstall command line. Selected 'Uninstall' as deployment");
-            if (EnvironmentVariables.Configuration.UninstallSettings == null)
+            if(EnvironmentVariables.Configuration.UninstallSettings == null)
             {
                 _logger.Trace("No uninstall arguments specified in settings.xml. Looking for uninstall.xml");
                 var uninstallXmlPath = Path.Combine(DeploymentEnvironmentVariables.RootDirectory, "uninstall.xml");
-                if (!File.Exists(uninstallXmlPath))
+                if(!File.Exists(uninstallXmlPath))
+                {
                     ExitInstallation("uninstall.xml is missing", ExitCode.UninstallFileMissing);
+                }
 
                 _logger.Trace("Found uninstall.xml. Reading...");
                 EnvironmentVariables.UninstallSettings = ReadXml<UninstallSettings>(uninstallXmlPath);
@@ -237,99 +348,25 @@ namespace DeploymentToolkit.Deployment
             // Detecting installation type
             try
             {
-                var sequence = default(IInstallUninstallSequence);
-                if (EnvironmentVariables.UninstallSettings.CommandLine.ToLower().EndsWith(".msi"))
+                ISequence sequence;
+                if(EnvironmentVariables.UninstallSettings.CommandLine.ToLower().EndsWith(".msi"))
                 {
                     // Microsoft Installer
                     sequence = new MSIUninstaller(EnvironmentVariables.UninstallSettings);
                 }
                 else
                 {
-                    // Unknwon / EXE installer
+                    // Unknown / EXE installer
                     sequence = new ExeUninstaller(EnvironmentVariables.UninstallSettings);
                 }
 
-                _mainSequence = new MainSequence(sequence);
-                _mainSequence.OnSequenceCompleted += OnSequenceCompleted;
-                _mainSequence.SequenceBegin();
-
-                do
-                {
-                    Thread.Sleep(1000);
-                }
-                while (!_sequenceCompleted);
+                return sequence;
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
-                ExitInstallation(ex, "Error during uninstallation", ExitCode.ErrorDuringUninstallation);
+                ExitInstallation(ex, "Error during setup", ExitCode.ErrorDuringUninstallation);
             }
-
-            _logger.Info("Uninstall sequence completed");
-        }
-
-        public static void Install()
-        {
-            _logger.Info("Detected install command line. Selected 'Install' as deployment");
-            if (EnvironmentVariables.Configuration.InstallSettings == null)
-            {
-                _logger.Trace("No installation arguments specified in settings.xml. Looking for install.xml");
-                var installXmlPath = Path.Combine(DeploymentEnvironmentVariables.RootDirectory, "install.xml");
-                if (!File.Exists(installXmlPath))
-                    ExitInstallation("install.xml is missing", ExitCode.InstallFileMissing);
-
-                _logger.Trace("Found install.xml. Reading...");
-                EnvironmentVariables.InstallSettings = ReadXml<InstallSettings>(installXmlPath);
-                _logger.Trace("Successfully read install.xml");
-            }
-            else
-            {
-                _logger.Trace("Install options specified inside settings.xml");
-                EnvironmentVariables.InstallSettings = EnvironmentVariables.Configuration.InstallSettings;
-            }
-
-            _logger.Info("Read install settings. Starting installation...");
-            _logger.Trace("Checking CommandLine Path...");
-
-            EnvironmentVariables.InstallSettings.CommandLine = VerifyCommandLine(EnvironmentVariables.InstallSettings.CommandLine);
-
-            _logger.Trace("Verifiying that file specified in CommandLine exists...");
-            // CommandLine should either specify an exe file or an msi file. Either way the file has to exist
-            if (!File.Exists(EnvironmentVariables.InstallSettings.CommandLine))
-            {
-                ExitInstallation($"File specified in CommandLine does not exists ({EnvironmentVariables.InstallSettings.CommandLine}). Aborting installation", ExitCode.InvalidCommandLineSpecified);
-            }
-
-            // Detecting installation type
-            try
-            {
-                var sequence = default(IInstallUninstallSequence);
-                if (EnvironmentVariables.InstallSettings.CommandLine.ToLower().EndsWith(".msi"))
-                {
-                    // Microsoft Installer
-                    sequence = new MSIInstaller(EnvironmentVariables.InstallSettings);
-                }
-                else
-                {
-                    // Unknwon / EXE installer
-                    sequence = new ExeInstaller(EnvironmentVariables.InstallSettings);
-                }
-
-                _mainSequence = new MainSequence(sequence);
-                _mainSequence.OnSequenceCompleted += OnSequenceCompleted;
-                _mainSequence.SequenceBegin();
-
-                do
-                {
-                    Thread.Sleep(1000);
-                }
-                while (!_sequenceCompleted);
-            }
-            catch (Exception ex)
-            {
-                ExitInstallation(ex, "Error during installation", ExitCode.ErrorDuringInstallation);
-            }
-
-            _logger.Info("Install sequence completed");
+            return null;
         }
 
         private static void OnSequenceCompleted(object sender, SequenceCompletedEventArgs e)
@@ -344,7 +381,7 @@ namespace DeploymentToolkit.Deployment
 
                 _logger.Info("Sequence completed.");
 
-                if (
+                if(
                     e.ForceRestart || // Restart requested by GUI
                     (EnvironmentVariables.ActiveSequence.RestartSettings.ForceRestart && !EnvironmentVariables.IsGUIEnabled && !EnvironmentVariables.IsRunningInTaskSequence) // Restart enforced by config and no GUI available
                 )
@@ -364,7 +401,7 @@ namespace DeploymentToolkit.Deployment
                     _logger.Info($"Spawned restart process with id {process.Id} in session {process.SessionId}");
                 }
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 _logger.Error(ex, "Error during validation of sequence completion");
             }
@@ -378,7 +415,7 @@ namespace DeploymentToolkit.Deployment
         {
             // If you specify a full path, then the length should stay the same
             var fullPath = Path.GetFullPath(commandLine);
-            if (commandLine.Length != fullPath.Length)
+            if(commandLine.Length != fullPath.Length)
             {
                 _logger.Trace("Not a absolute path specified. Searching for file in 'Files' folder");
                 var path = Path.Combine(DeploymentEnvironmentVariables.FilesDirectory, commandLine);
@@ -394,12 +431,12 @@ namespace DeploymentToolkit.Deployment
 
             _logger.Trace("Verifiying that file specified in CommandLine exists...");
             // CommandLine should either specify an exe file or an msi file. Either way the file has to exist
-            if (!File.Exists(commandLine))
+            if(!File.Exists(commandLine))
             {
                 // With MSI uninstallation its also possible to uninstall via GUID
                 var regex = new Regex(@"(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}");
                 var match = regex.Match(commandLine);
-                if (match.Success)
+                if(match.Success)
                 {
                     _logger.Trace("Detected MSI GUID. Not verifying existence of MSI file");
                     return true;
