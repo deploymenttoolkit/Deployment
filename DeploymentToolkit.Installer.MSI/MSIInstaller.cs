@@ -181,11 +181,9 @@ namespace DeploymentToolkit.Installer.MSI
 
             BeforeSequenceComplete(installCompletedEventArgs.SequenceSuccessful);
 
-            OnSequenceCompleted?.BeginInvoke(
+            OnSequenceCompleted.Invoke(
                 this,
-                installCompletedEventArgs,
-                OnSequenceCompleted.EndInvoke,
-                null
+                installCompletedEventArgs
             );
         }
     }
