@@ -63,6 +63,13 @@ namespace DeploymentToolkit.Deployment
 
         private static void Main(string[] args)
         {
+#if DEBUG
+            while(!System.Diagnostics.Debugger.IsAttached)
+            {
+                Thread.Sleep(1000);
+                Console.WriteLine("Waiting for debugger ...");
+            }
+#endif
             try
             {
                 Logging.LogManager.Initialize("Deployment");
