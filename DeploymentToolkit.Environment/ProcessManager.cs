@@ -20,8 +20,8 @@ namespace DeploymentToolkit.ToolkitEnvironment
 
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private const string _blockExecutionKey = @"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options";
-        private const string _runOnceKey = @"HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\RunOnce";
+        private const string BlockExecutionKey = @"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options";
+        private const string RunOnceKey = @"HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\RunOnce";
 
         public static bool CheckPrograms(string[] applications, out List<string> openProcesses)
         {
@@ -127,9 +127,9 @@ namespace DeploymentToolkit.ToolkitEnvironment
                         }
 
                         _logger.Trace($"Blocking execution of {executableName}");
-                        Win96Registry.CreateSubKey(RegistryHive.LocalMachine, _blockExecutionKey, executableName);
-                        Win96Registry.SetValue(RegistryHive.LocalMachine, _blockExecutionKey, executableName, "Debugger", EnvironmentVariables.DeploymentToolkitBlockerExePath);
-                        Win96Registry.SetValue(RegistryHive.LocalMachine, _blockExecutionKey, executableName, "DT_BLOCK", 0x01);
+                        Win96Registry.CreateSubKey(RegistryHive.LocalMachine, BlockExecutionKey, executableName);
+                        Win96Registry.SetValue(RegistryHive.LocalMachine, BlockExecutionKey, executableName, "Debugger", EnvironmentVariables.DeploymentToolkitBlockerExePath);
+                        Win96Registry.SetValue(RegistryHive.LocalMachine, BlockExecutionKey, executableName, "DT_BLOCK", 0x01);
 
                         startBlocked = true;
                     }
@@ -142,7 +142,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
                 if(startBlocked)
                 {
                     var registry = new Win64Registry();
-                    var subKey = registry.OpenSubKey(_runOnceKey);
+                    var subKey = registry.OpenSubKey(RunOnceKey);
 
                     subKey.SetValue("Deployment Toolkit Unblocker", EnvironmentVariables.DeploymentToolkitUnblockerExePath, RegistryValueKind.String);
 
@@ -180,7 +180,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
                         }
 
                         _logger.Trace($"Unblocking execution of {executableName}");
-                        Win96Registry.DeleteSubKey(RegistryHive.LocalMachine, _blockExecutionKey, executableName);
+                        Win96Registry.DeleteSubKey(RegistryHive.LocalMachine, BlockExecutionKey, executableName);
                     }
                     catch(Exception ex)
                     {
@@ -224,7 +224,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
             var result = new List<string>();
             try
             {
-                var fullPath = Path.Combine("HKEY_LOCAL_MACHINE", _blockExecutionKey);
+                var fullPath = Path.Combine("HKEY_LOCAL_MACHINE", BlockExecutionKey);
                 var win32Registry = new Win32Registry();
                 var subKeys = win32Registry.GetSubKeys(fullPath);
 

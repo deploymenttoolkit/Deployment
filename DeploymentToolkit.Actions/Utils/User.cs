@@ -7,11 +7,11 @@ namespace DeploymentToolkit.Actions.Utils
 {
     public static class User
     {
-        private const string _defaultUserProfile = @"C:\Users\Default";
-        private const string _publicUserProfile = @"C:\Users\Public";
+        private const string DefaultUserProfile = @"C:\Users\Default";
+        private const string PublicUserProfile = @"C:\Users\Public";
 
-        private const string _compatibilityAllUserProfile = @"C:\Users\All Users";
-        private const string _compatibilityDefaultUserProfile = @"C:\Users\Default User";
+        private const string CompatibilityAllUserProfile = @"C:\Users\All Users";
+        private const string CompatibilityDefaultUserProfile = @"C:\Users\Default User";
 
         private static List<string> _userFolders;
         public static List<string> GetUserFolders(bool includeDefaultProfile, bool includePublicProfile)
@@ -20,24 +20,24 @@ namespace DeploymentToolkit.Actions.Utils
             {
                 var userDirectories = Directory.GetDirectories(@"C:\Users").ToList();
 
-                if(userDirectories.Contains(_defaultUserProfile))
+                if(userDirectories.Contains(DefaultUserProfile))
                 {
-                    userDirectories.Remove(_defaultUserProfile);
+                    userDirectories.Remove(DefaultUserProfile);
                 }
 
-                if(userDirectories.Contains(_publicUserProfile))
+                if(userDirectories.Contains(PublicUserProfile))
                 {
-                    userDirectories.Remove(_publicUserProfile);
+                    userDirectories.Remove(PublicUserProfile);
                 }
 
-                if(userDirectories.Contains(_compatibilityAllUserProfile))
+                if(userDirectories.Contains(CompatibilityAllUserProfile))
                 {
-                    userDirectories.Remove(_compatibilityAllUserProfile);
+                    userDirectories.Remove(CompatibilityAllUserProfile);
                 }
 
-                if(userDirectories.Contains(_compatibilityDefaultUserProfile))
+                if(userDirectories.Contains(CompatibilityDefaultUserProfile))
                 {
-                    userDirectories.Remove(_compatibilityDefaultUserProfile);
+                    userDirectories.Remove(CompatibilityDefaultUserProfile);
                 }
 
                 _userFolders = userDirectories;
@@ -51,12 +51,12 @@ namespace DeploymentToolkit.Actions.Utils
             var copy = _userFolders.ToList();
             if(includeDefaultProfile)
             {
-                copy.Add(_defaultUserProfile);
+                copy.Add(DefaultUserProfile);
             }
 
             if(includePublicProfile)
             {
-                copy.Add(_publicUserProfile);
+                copy.Add(PublicUserProfile);
             }
 
             return copy;

@@ -12,12 +12,12 @@ namespace DeploymentToolkit.ToolkitEnvironment
 {
     public static class RegistryManager
     {
-        private const string _deploymentToolkitRegistryPath = @"HKEY_LOCAL_MACHINE\SOFTWARE\DeploymentToolkit";
-        private const string _deploymentToolkitActiveSequence = "ActiveSequence";
-        private const string _deploymentToolkitHistory = "History";
-        private const string _deploymentToolkitDeployments = "Deployments";
+        private const string DeploymentToolkitRegistryPath = @"HKEY_LOCAL_MACHINE\SOFTWARE\DeploymentToolkit";
+        private const string DeploymentToolkitActiveSequence = "ActiveSequence";
+        private const string DeploymentToolkitHistory = "History";
+        private const string DeploymentToolkitDeployments = "Deployments";
 
-        private const string _applicationUninstallPath = @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
+        private const string ApplicationUninstallPath = @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
 
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
@@ -30,7 +30,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
             _logger.Trace("Verifying registry ...");
 
             var registry = new Win64Registry();
-            if(!registry.CreateSubKey(Path.GetDirectoryName(_deploymentToolkitRegistryPath), Path.GetFileName(_deploymentToolkitRegistryPath)))
+            if(!registry.CreateSubKey(Path.GetDirectoryName(DeploymentToolkitRegistryPath), Path.GetFileName(DeploymentToolkitRegistryPath)))
             {
                 _logger.Fatal("Failed to validate registry");
                 throw new Exception("Registry corrupt?");
@@ -41,7 +41,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
 
         private static bool GetDeploymentRegistryKey(string deploymentName, out RegistryKey deploymentRegistryKey)
         {
-            _lastDeploymentRegistryKeyPath = Path.Combine(_deploymentToolkitRegistryPath, _deploymentToolkitDeployments, deploymentName);
+            _lastDeploymentRegistryKeyPath = Path.Combine(DeploymentToolkitRegistryPath, DeploymentToolkitDeployments, deploymentName);
             deploymentRegistryKey = _registry.OpenSubKey(_lastDeploymentRegistryKeyPath);
 
             if(deploymentRegistryKey == null)
@@ -56,7 +56,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
         {
             var result = new List<DeferedDeployment>();
 
-            var path = Path.Combine(_deploymentToolkitRegistryPath, _deploymentToolkitDeployments);
+            var path = Path.Combine(DeploymentToolkitRegistryPath, DeploymentToolkitDeployments);
             var subKeys = _registry.GetSubKeys(path);
 
             if(subKeys == null || subKeys.Length == 0)
@@ -241,11 +241,11 @@ namespace DeploymentToolkit.ToolkitEnvironment
             _logger.Trace($"Updating ActiveSequence in registry ...");
 
             var registry = new Win64Registry();
-            var path = Path.Combine(_deploymentToolkitRegistryPath, _deploymentToolkitActiveSequence);
+            var path = Path.Combine(DeploymentToolkitRegistryPath, DeploymentToolkitActiveSequence);
 
-            if(!registry.CreateSubKey(_deploymentToolkitRegistryPath, _deploymentToolkitActiveSequence))
+            if(!registry.CreateSubKey(DeploymentToolkitRegistryPath, DeploymentToolkitActiveSequence))
             {
-                _logger.Error($"Failed to create '{_deploymentToolkitActiveSequence}' key in '{_deploymentToolkitRegistryPath}'");
+                _logger.Error($"Failed to create '{DeploymentToolkitActiveSequence}' key in '{DeploymentToolkitRegistryPath}'");
                 return;
             }
 
@@ -276,16 +276,16 @@ namespace DeploymentToolkit.ToolkitEnvironment
 
             var registry = new Win64Registry();
 
-            var startTime = registry.GetValue(Path.Combine(_deploymentToolkitRegistryPath, _deploymentToolkitActiveSequence), "StartTime");
+            var startTime = registry.GetValue(Path.Combine(DeploymentToolkitRegistryPath, DeploymentToolkitActiveSequence), "StartTime");
             if(startTime == null)
             {
                 _logger.Warn("Failed to get startTime from ActiveSequence");
                 startTime = string.Empty;
             }
 
-            if(!registry.DeleteSubKey(_deploymentToolkitRegistryPath, _deploymentToolkitActiveSequence))
+            if(!registry.DeleteSubKey(DeploymentToolkitRegistryPath, DeploymentToolkitActiveSequence))
             {
-                _logger.Error($"Failed to delete '{_deploymentToolkitActiveSequence}' from '{_deploymentToolkitRegistryPath}'");
+                _logger.Error($"Failed to delete '{DeploymentToolkitActiveSequence}' from '{DeploymentToolkitRegistryPath}'");
                 return;
             }
 
@@ -293,20 +293,20 @@ namespace DeploymentToolkit.ToolkitEnvironment
 
             var subKeyName = DateTime.Now.ToFileTime().ToString();
 
-            if(!registry.CreateSubKey(_deploymentToolkitRegistryPath, _deploymentToolkitHistory))
+            if(!registry.CreateSubKey(DeploymentToolkitRegistryPath, DeploymentToolkitHistory))
             {
-                _logger.Error($"Failed to create '{_deploymentToolkitHistory}' in '{_deploymentToolkitRegistryPath}'");
+                _logger.Error($"Failed to create '{DeploymentToolkitHistory}' in '{DeploymentToolkitRegistryPath}'");
                 return;
             }
 
-            var historyPath = Path.Combine(_deploymentToolkitRegistryPath, _deploymentToolkitHistory);
+            var historyPath = Path.Combine(DeploymentToolkitRegistryPath, DeploymentToolkitHistory);
             if(!registry.CreateSubKey(historyPath, subKeyName))
             {
                 _logger.Error($"Failed to create '{subKeyName}' in '{historyPath}'");
                 return;
             }
 
-            var path = Path.Combine(_deploymentToolkitRegistryPath, _deploymentToolkitHistory, subKeyName);
+            var path = Path.Combine(DeploymentToolkitRegistryPath, DeploymentToolkitHistory, subKeyName);
 
             var activeSequence = EnvironmentVariables.ActiveSequence;
             if(!registry.SetValue(path, "Name", activeSequence.UniqueName, RegistryValueKind.String))
@@ -430,13 +430,13 @@ namespace DeploymentToolkit.ToolkitEnvironment
         public static List<UninstallInfo> GetInstalledMSIPrograms()
         {
             var win32Registry = new Win32Registry();
-            var keys = win32Registry.GetSubKeys(_applicationUninstallPath);
+            var keys = win32Registry.GetSubKeys(ApplicationUninstallPath);
             var msiPrograms = GetInstallMSIProgramsInHive(win32Registry, keys);
 
             if(Environment.Is64BitOperatingSystem)
             {
                 var win64Registry = new Win64Registry();
-                var win64Keys = win64Registry.GetSubKeys(_applicationUninstallPath);
+                var win64Keys = win64Registry.GetSubKeys(ApplicationUninstallPath);
                 msiPrograms = msiPrograms.Union(GetInstallMSIProgramsInHive(win64Registry, win64Keys)).ToList();
             }
 
@@ -457,7 +457,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
                     continue;
                 }
 
-                var keyPath = Path.Combine(_applicationUninstallPath, key);
+                var keyPath = Path.Combine(ApplicationUninstallPath, key);
                 var program = new UninstallInfo()
                 {
                     DisplayName = registry.GetValue(keyPath, "DisplayName")?.ToString() ?? string.Empty,

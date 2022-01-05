@@ -36,21 +36,20 @@ namespace DeploymentToolkit.ToolkitEnvironment
         public const int DeploymentToolkitStepTimout = 600;
         public const int DeploymentToolkitStepExtraTime = 30;
 
-        private const string _deploymentToolkitRestartExeName = "DeploymentToolkit.Restart.exe";
-        private const string _deploymentToolkitDeploymentExeName = "DeploymentToolkit.Deployment.exe";
-        private const string _deploymentToolkitBlockerExeName = "DeploymentToolkit.Blocker.exe";
-        private const string _deploymentToolkitUnblockerExeName = "DeploymentToolkit.Unblocker.exe";
-        private const string _deploymentToolkitTrayExeName = "DeploymentToolkit.TrayApp.exe";
-
-        public static string DeploymentToolkitTrayExeName => _deploymentToolkitTrayExeName;
+        private const string DeploymentToolkitRestartExeName = "DeploymentToolkit.Restart.exe";
+        private const string DeploymentToolkitDeploymentExeName = "DeploymentToolkit.Deployment.exe";
+        private const string DeploymentToolkitBlockerExeName = "DeploymentToolkit.Blocker.exe";
+        private const string DeploymentToolkitUnblockerExeName = "DeploymentToolkit.Unblocker.exe";
+        
+        public const string DeploymentToolkitTrayExeName = "DeploymentToolkit.TrayApp.exe";
 
         private static readonly string[] _requiredToolkitFiles = new string[]
         {
-            _deploymentToolkitRestartExeName,
-            _deploymentToolkitDeploymentExeName,
-            _deploymentToolkitBlockerExeName,
-            _deploymentToolkitUnblockerExeName,
-            _deploymentToolkitTrayExeName
+            DeploymentToolkitRestartExeName,
+            DeploymentToolkitDeploymentExeName,
+            DeploymentToolkitBlockerExeName,
+            DeploymentToolkitUnblockerExeName,
+            DeploymentToolkitTrayExeName
         };
 
         private static string _deploymentToolkitInstallPath = null;
@@ -129,7 +128,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
             {
                 if(_deploymentToolkitRestartExePath == null)
                 {
-                    _deploymentToolkitRestartExePath = Path.Combine(DeploymentToolkitInstallPath, _deploymentToolkitRestartExeName);
+                    _deploymentToolkitRestartExePath = Path.Combine(DeploymentToolkitInstallPath, DeploymentToolkitRestartExeName);
                 }
 
                 return _deploymentToolkitRestartExePath;
@@ -142,7 +141,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
             {
                 if(_deploymentToolkitBlockerExePath == null)
                 {
-                    _deploymentToolkitBlockerExePath = Path.Combine(DeploymentToolkitInstallPath, _deploymentToolkitBlockerExeName);
+                    _deploymentToolkitBlockerExePath = Path.Combine(DeploymentToolkitInstallPath, DeploymentToolkitBlockerExeName);
                 }
 
                 return _deploymentToolkitBlockerExePath;
@@ -155,7 +154,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
             {
                 if(_deploymentToolkitUnblockerExePath == null)
                 {
-                    _deploymentToolkitUnblockerExePath = Path.Combine(DeploymentToolkitInstallPath, _deploymentToolkitUnblockerExeName);
+                    _deploymentToolkitUnblockerExePath = Path.Combine(DeploymentToolkitInstallPath, DeploymentToolkitUnblockerExeName);
                 }
 
                 return _deploymentToolkitUnblockerExePath;
@@ -168,7 +167,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
             {
                 if(_deploymentToolkitTrayExePath == null)
                 {
-                    _deploymentToolkitTrayExePath = Path.Combine(DeploymentToolkitInstallPath, _deploymentToolkitTrayExeName);
+                    _deploymentToolkitTrayExePath = Path.Combine(DeploymentToolkitInstallPath, DeploymentToolkitTrayExeName);
                 }
 
                 return _deploymentToolkitTrayExePath;
