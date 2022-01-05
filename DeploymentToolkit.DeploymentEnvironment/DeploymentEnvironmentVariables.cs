@@ -10,8 +10,11 @@ namespace DeploymentToolkit.DeploymentEnvironment
         {
             get
             {
-                if (string.IsNullOrEmpty(_rootDirectory))
+                if(string.IsNullOrEmpty(_rootDirectory))
+                {
                     _rootDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                }
+
                 return _rootDirectory;
             }
             set
@@ -25,8 +28,11 @@ namespace DeploymentToolkit.DeploymentEnvironment
         {
             get
             {
-                if (string.IsNullOrEmpty(_filesDirectory))
+                if(string.IsNullOrEmpty(_filesDirectory))
+                {
                     _filesDirectory = Path.Combine(RootDirectory, "Files");
+                }
+
                 return _filesDirectory;
             }
         }
@@ -36,8 +42,11 @@ namespace DeploymentToolkit.DeploymentEnvironment
         {
             get
             {
-                if (string.IsNullOrEmpty(_extensionsEnvironment))
+                if(string.IsNullOrEmpty(_extensionsEnvironment))
+                {
                     _extensionsEnvironment = Path.Combine(RootDirectory, "Extensions");
+                }
+
                 return _extensionsEnvironment;
             }
         }
