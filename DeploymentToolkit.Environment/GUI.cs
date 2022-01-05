@@ -8,11 +8,15 @@
         {
             get
             {
-                if (ForceDisableGUI)
+                if(ForceDisableGUI)
+                {
                     return false;
+                }
 
-                if (IsRunningInTaskSequence)
+                if(IsRunningInTaskSequence)
+                {
                     return false;
+                }
 
                 return true;
             }

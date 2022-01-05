@@ -15,7 +15,11 @@ namespace DeploymentToolkit.ToolkitEnvironment
         private static ISequence _activeSequence;
         public static ISequence ActiveSequence
         {
-            get => _activeSequence;
+            get
+            {
+                return _activeSequence;
+            }
+
             set
             {
                 _activeSequence = value;
@@ -27,7 +31,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
         public static InstallSettings InstallSettings;
         public static UninstallSettings UninstallSettings;
 
-        private static Logger _logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         public const int DeploymentToolkitStepTimout = 600;
         public const int DeploymentToolkitStepExtraTime = 30;
@@ -38,7 +42,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
         private const string _deploymentToolkitUnblockerExeName = "DeploymentToolkit.Unblocker.exe";
         private const string _deploymentToolkitTrayExeName = "DeploymentToolkit.TrayApp.exe";
 
-        public static string DeploymentToolkitTrayExeName { get => _deploymentToolkitTrayExeName; }
+        public static string DeploymentToolkitTrayExeName => _deploymentToolkitTrayExeName;
 
         private static readonly string[] _requiredToolkitFiles = new string[]
         {
@@ -54,17 +58,19 @@ namespace DeploymentToolkit.ToolkitEnvironment
         {
             get
             {
-                if (_deploymentToolkitInstallPath != null)
+                if(_deploymentToolkitInstallPath != null)
+                {
                     return _deploymentToolkitInstallPath;
+                }
 
                 var installPath = Environment.GetEnvironmentVariable("DTInstallPath", EnvironmentVariableTarget.Machine);
-                if (installPath == null)
+                if(installPath == null)
                 {
                     var currentDirectory = Directory.GetCurrentDirectory();
-                    foreach (var file in _requiredToolkitFiles)
+                    foreach(var file in _requiredToolkitFiles)
                     {
                         var debuggerPath = Path.Combine(currentDirectory, file);
-                        if (!File.Exists(debuggerPath))
+                        if(!File.Exists(debuggerPath))
                         {
                             // Maybe add more options later??
                             // Like a registry entry with the install path other than an EnvironmentVariable
@@ -84,12 +90,14 @@ namespace DeploymentToolkit.ToolkitEnvironment
         {
             get
             {
-                if (_deploymentToolkitExtensionsPath == null)
+                if(_deploymentToolkitExtensionsPath == null)
                 {
                     _deploymentToolkitExtensionsPath = Path.Combine(DeploymentToolkitInstallPath, "Extensions");
 
-                    if (!Directory.Exists(_deploymentToolkitExtensionsPath))
+                    if(!Directory.Exists(_deploymentToolkitExtensionsPath))
+                    {
                         Directory.CreateDirectory(_deploymentToolkitExtensionsPath);
+                    }
                 }
                 return _deploymentToolkitExtensionsPath;
             }
@@ -100,12 +108,14 @@ namespace DeploymentToolkit.ToolkitEnvironment
         {
             get
             {
-                if (_deploymentToolkitSettingsPath == null)
+                if(_deploymentToolkitSettingsPath == null)
                 {
                     _deploymentToolkitSettingsPath = Path.Combine(DeploymentToolkitInstallPath, "Config");
 
-                    if (!Directory.Exists(_deploymentToolkitSettingsPath))
+                    if(!Directory.Exists(_deploymentToolkitSettingsPath))
+                    {
                         Directory.CreateDirectory(_deploymentToolkitSettingsPath);
+                    }
                 }
 
                 return _deploymentToolkitSettingsPath;
@@ -117,8 +127,11 @@ namespace DeploymentToolkit.ToolkitEnvironment
         {
             get
             {
-                if (_deploymentToolkitRestartExePath == null)
+                if(_deploymentToolkitRestartExePath == null)
+                {
                     _deploymentToolkitRestartExePath = Path.Combine(DeploymentToolkitInstallPath, _deploymentToolkitRestartExeName);
+                }
+
                 return _deploymentToolkitRestartExePath;
             }
         }
@@ -127,8 +140,11 @@ namespace DeploymentToolkit.ToolkitEnvironment
         {
             get
             {
-                if (_deploymentToolkitBlockerExePath == null)
+                if(_deploymentToolkitBlockerExePath == null)
+                {
                     _deploymentToolkitBlockerExePath = Path.Combine(DeploymentToolkitInstallPath, _deploymentToolkitBlockerExeName);
+                }
+
                 return _deploymentToolkitBlockerExePath;
             }
         }
@@ -137,8 +153,11 @@ namespace DeploymentToolkit.ToolkitEnvironment
         {
             get
             {
-                if (_deploymentToolkitUnblockerExePath == null)
+                if(_deploymentToolkitUnblockerExePath == null)
+                {
                     _deploymentToolkitUnblockerExePath = Path.Combine(DeploymentToolkitInstallPath, _deploymentToolkitUnblockerExeName);
+                }
+
                 return _deploymentToolkitUnblockerExePath;
             }
         }
@@ -147,8 +166,11 @@ namespace DeploymentToolkit.ToolkitEnvironment
         {
             get
             {
-                if (_deploymentToolkitTrayExePath == null)
+                if(_deploymentToolkitTrayExePath == null)
+                {
                     _deploymentToolkitTrayExePath = Path.Combine(DeploymentToolkitInstallPath, _deploymentToolkitTrayExeName);
+                }
+
                 return _deploymentToolkitTrayExePath;
             }
         }
@@ -164,7 +186,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
             _logger.Trace("Checking if running in TaskSequence...");
 
             var tsEnvironment = Type.GetTypeFromProgID("Microsoft.SMS.TSEnvironment");
-            if (tsEnvironment == null)
+            if(tsEnvironment == null)
             {
                 _logger.Info("Couldn't load 'Microsoft.SMS.TSEnvironment' therefore we are not in a task sequence");
                 return;

@@ -23,8 +23,11 @@ namespace DeploymentToolkit.ToolkitEnvironment
         {
             get
             {
-                if (string.IsNullOrEmpty(_productCode))
+                if(string.IsNullOrEmpty(_productCode))
+                {
                     ReadMSI();
+                }
+
                 return _productCode;
             }
             private set
@@ -39,8 +42,11 @@ namespace DeploymentToolkit.ToolkitEnvironment
         {
             get
             {
-                if (string.IsNullOrEmpty(_productVersion))
+                if(string.IsNullOrEmpty(_productVersion))
+                {
                     ReadMSI();
+                }
+
                 return _productVersion;
             }
             private set
@@ -50,11 +56,11 @@ namespace DeploymentToolkit.ToolkitEnvironment
             }
         }
 
-        private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+        private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
         private static void ReadMSI()
         {
-            if (EnvironmentVariables.ActiveSequenceType == SequenceType.Installation)
+            if(EnvironmentVariables.ActiveSequenceType == SequenceType.Installation)
             {
                 ReadMSI(EnvironmentVariables.InstallSettings.CommandLine);
             }
@@ -66,12 +72,14 @@ namespace DeploymentToolkit.ToolkitEnvironment
 
         public static void ReadMSI(string msiPath)
         {
-            if (!File.Exists(msiPath))
+            if(!File.Exists(msiPath))
+            {
                 throw new FileNotFoundException(nameof(msiPath));
+            }
 
             _logger.Trace($"Reading msi properties from {msiPath}");
 
-            using (var database = new Database(msiPath, DatabaseOpenMode.ReadOnly))
+            using(var database = new Database(msiPath, DatabaseOpenMode.ReadOnly))
             {
                 _logger.Debug($"[{database.SummaryInfo.RevisionNumber}]{database.SummaryInfo.Title} from {database.SummaryInfo.Author} successfully opened");
 

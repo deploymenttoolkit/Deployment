@@ -15,12 +15,14 @@ namespace DeploymentToolkit.ToolkitEnvironment
             path = Path.GetFullPath(path);
             _logger.Trace($"Saving settings to {path}");
 
-            if (File.Exists(path))
+            if(File.Exists(path))
+            {
                 File.Delete(path);
+            }
 
             var xmlWriter = new XmlSerializer(input.GetType());
 
-            using (var streamWriter = new StreamWriter(path))
+            using(var streamWriter = new StreamWriter(path))
             {
                 xmlWriter.Serialize(streamWriter, input);
             }
@@ -33,12 +35,12 @@ namespace DeploymentToolkit.ToolkitEnvironment
                 path = Path.GetFullPath(path);
                 var xmlReader = new XmlSerializer(typeof(T));
                 var text = File.ReadAllText(path);
-                using (var stringReader = new StringReader(text))
+                using(var stringReader = new StringReader(text))
                 {
                     return (T)xmlReader.Deserialize(stringReader);
                 }
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 _logger.Error(ex, $"Failed to deserialize {path}");
                 return default(T);
@@ -51,7 +53,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
             _logger.Trace($"Reading settings from {path}");
             try
             {
-                if (!File.Exists(path))
+                if(!File.Exists(path))
                 {
                     var instance = (T)Activator.CreateInstance(typeof(T));
                     SaveXml(path, instance);
@@ -60,7 +62,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
 
                 return ReadXml<T>(path);
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 _logger.Error(ex, $"Failed to serialize {path}");
                 return default(T);

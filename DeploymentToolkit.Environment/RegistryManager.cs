@@ -19,9 +19,9 @@ namespace DeploymentToolkit.ToolkitEnvironment
 
         private const string _applicationUninstallPath = @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
 
-        private static Logger _logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private static Win64Registry _registry = new Win64Registry();
+        private static readonly Win64Registry _registry = new Win64Registry();
 
         private static string _lastDeploymentRegistryKeyPath;
 
@@ -30,7 +30,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
             _logger.Trace("Verifying registry ...");
 
             var registry = new Win64Registry();
-            if (!registry.CreateSubKey(Path.GetDirectoryName(_deploymentToolkitRegistryPath), Path.GetFileName(_deploymentToolkitRegistryPath)))
+            if(!registry.CreateSubKey(Path.GetDirectoryName(_deploymentToolkitRegistryPath), Path.GetFileName(_deploymentToolkitRegistryPath)))
             {
                 _logger.Fatal("Failed to validate registry");
                 throw new Exception("Registry corrupt?");
@@ -44,8 +44,11 @@ namespace DeploymentToolkit.ToolkitEnvironment
             _lastDeploymentRegistryKeyPath = Path.Combine(_deploymentToolkitRegistryPath, _deploymentToolkitDeployments, deploymentName);
             deploymentRegistryKey = _registry.OpenSubKey(_lastDeploymentRegistryKeyPath);
 
-            if (deploymentRegistryKey == null)
+            if(deploymentRegistryKey == null)
+            {
                 return false;
+            }
+
             return true;
         }
 
@@ -56,13 +59,13 @@ namespace DeploymentToolkit.ToolkitEnvironment
             var path = Path.Combine(_deploymentToolkitRegistryPath, _deploymentToolkitDeployments);
             var subKeys = _registry.GetSubKeys(path);
 
-            if (subKeys == null || subKeys.Length == 0)
+            if(subKeys == null || subKeys.Length == 0)
             {
                 _logger.Trace("No defered deployments available");
                 return result;
             }
 
-            foreach (var key in subKeys)
+            foreach(var key in subKeys)
             {
                 try
                 {
@@ -76,19 +79,19 @@ namespace DeploymentToolkit.ToolkitEnvironment
                         Name = key
                     };
 
-                    if (!string.IsNullOrEmpty(deploymentEndDate) && DateTime.TryParse(deploymentEndDate, out var deploymentEndDay))
+                    if(!string.IsNullOrEmpty(deploymentEndDate) && DateTime.TryParse(deploymentEndDate, out var deploymentEndDay))
                     {
                         deferedDeployment.RemainingDays = (int)Math.Ceiling((deploymentEndDay - DateTime.Now).TotalDays);
                     }
 
-                    if (!string.IsNullOrEmpty(deploymentDeadlineString) && DateTime.TryParse(deploymentDeadlineString, out var deploymentDeadline))
+                    if(!string.IsNullOrEmpty(deploymentDeadlineString) && DateTime.TryParse(deploymentDeadlineString, out var deploymentDeadline))
                     {
                         deferedDeployment.Deadline = deploymentDeadline;
                     }
 
                     result.Add(deferedDeployment);
                 }
-                catch (Exception ex)
+                catch(Exception ex)
                 {
                     _logger.Error(ex, $"Failed to process '{key}'");
                 }
@@ -99,15 +102,17 @@ namespace DeploymentToolkit.ToolkitEnvironment
 
         public static int? GetDeploymentRemainingDays(string deploymentName)
         {
-            if (string.IsNullOrEmpty(deploymentName))
+            if(string.IsNullOrEmpty(deploymentName))
+            {
                 throw new ArgumentException("Empty string not allowed", nameof(deploymentName));
+            }
 
-            if (GetDeploymentRegistryKey(deploymentName, out var registryKey))
+            if(GetDeploymentRegistryKey(deploymentName, out var registryKey))
             {
                 // This isn't the first time we are working with this deployment
                 _logger.Trace($"Getting 'DeploymentEndDate' for {deploymentName}");
                 var deploymentEndDayString = (string)registryKey.GetValue("DeploymentEndDate", string.Empty);
-                if (string.IsNullOrEmpty(deploymentEndDayString) || !DateTime.TryParse(deploymentEndDayString, out var deploymentEndDay))
+                if(string.IsNullOrEmpty(deploymentEndDayString) || !DateTime.TryParse(deploymentEndDayString, out var deploymentEndDay))
                 {
                     _logger.Warn($"Invalid 'DeploymentEndDate' in registry or 'DeploymentEndDate' not found under {_lastDeploymentRegistryKeyPath}");
                 }
@@ -120,7 +125,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
             }
 
             // The current deployment is being run the first time
-            if (deploymentName == EnvironmentVariables.ActiveSequence.UniqueName)
+            if(deploymentName == EnvironmentVariables.ActiveSequence.UniqueName)
             {
                 _logger.Trace($"Getting remaining days of current deployment {EnvironmentVariables.ActiveSequence.DeferSettings.Days}");
 
@@ -133,14 +138,16 @@ namespace DeploymentToolkit.ToolkitEnvironment
 
         public static DateTime? GetDeploymentDeadline(string deploymentName)
         {
-            if (string.IsNullOrEmpty(deploymentName))
+            if(string.IsNullOrEmpty(deploymentName))
+            {
                 throw new ArgumentException("Empty string not allowed", nameof(deploymentName));
+            }
 
-            if (GetDeploymentRegistryKey(deploymentName, out var registryKey))
+            if(GetDeploymentRegistryKey(deploymentName, out var registryKey))
             {
                 // This isn't the first time we are working with this deployment
                 var deploymentDeadlineString = (string)registryKey.GetValue("DeploymentDeadline", string.Empty);
-                if (string.IsNullOrEmpty(deploymentDeadlineString) || !DateTime.TryParse(deploymentDeadlineString, out var deploymentDeadline))
+                if(string.IsNullOrEmpty(deploymentDeadlineString) || !DateTime.TryParse(deploymentDeadlineString, out var deploymentDeadline))
                 {
                     _logger.Warn($"Invalid 'DeploymentDeadline' in registry or 'DeploymentDeadline' not found under {_lastDeploymentRegistryKeyPath}");
                 }
@@ -151,12 +158,15 @@ namespace DeploymentToolkit.ToolkitEnvironment
             }
 
             // The current deployment is being run the first time
-            if (deploymentName == EnvironmentVariables.Configuration.Name)
+            if(deploymentName == EnvironmentVariables.Configuration.Name)
             {
                 _logger.Trace($"Getting deadline of current deployment {EnvironmentVariables.ActiveSequence.DeferSettings.Days}");
                 var deadline = EnvironmentVariables.ActiveSequence.DeferSettings.DeadlineAsDate;
-                if (deadline == DateTime.MinValue)
+                if(deadline == DateTime.MinValue)
+                {
                     return null;
+                }
+
                 return deadline;
             }
 
@@ -170,13 +180,13 @@ namespace DeploymentToolkit.ToolkitEnvironment
             var deploymentExists = GetDeploymentRegistryKey(uniqueName, out _);
             var deploymentRegistryPath = _lastDeploymentRegistryKeyPath;
 
-            if (deploymentExists)
+            if(deploymentExists)
             {
                 _logger.Trace($"{deploymentRegistryPath} already exists. Deleting...");
                 _registry.DeleteSubKey(deploymentRegistryPath);
             }
 
-            if (deferalSettings.DeadlineAsDate == DateTime.MinValue && deferalSettings.Days <= 0)
+            if(deferalSettings.DeadlineAsDate == DateTime.MinValue && deferalSettings.Days <= 0)
             {
                 _logger.Trace($"No need to save deferal settings for {uniqueName} as no settings are specified");
                 return;
@@ -185,14 +195,14 @@ namespace DeploymentToolkit.ToolkitEnvironment
             _logger.Trace($"Creating '{deploymentRegistryPath}' ...");
             var deploymentRegistryKey = _registry.CreateSubKey(deploymentRegistryPath);
 
-            if (deferalSettings.Days > 0)
+            if(deferalSettings.Days > 0)
             {
                 var endDate = DateTime.Now.AddDays(deferalSettings.Days).ToShortDateString();
                 _logger.Trace($"Deployment can be defered for {deferalSettings.Days} days. Enddate: {endDate}");
                 deploymentRegistryKey.SetValue("DeploymentEndDate", endDate);
             }
 
-            if (deferalSettings.DeadlineAsDate != DateTime.MinValue)
+            if(deferalSettings.DeadlineAsDate != DateTime.MinValue)
             {
                 var deadLine = deferalSettings.Deadline;
                 _logger.Trace($"Deployment can be defered until {deadLine}.");
@@ -208,14 +218,14 @@ namespace DeploymentToolkit.ToolkitEnvironment
             var deploymentExists = GetDeploymentRegistryKey(uniqueName, out _);
             var deploymentRegistryPath = _lastDeploymentRegistryKeyPath;
 
-            if (deploymentExists)
+            if(deploymentExists)
             {
                 _logger.Trace($"{deploymentRegistryPath} exists. Deleting...");
                 try
                 {
                     _registry.DeleteSubKey(deploymentRegistryPath);
                 }
-                catch (Exception ex)
+                catch(Exception ex)
                 {
                     _logger.Error(ex, $"Error while trying to delete deferal settings for {uniqueName} -> {deploymentRegistryPath}");
                 }
@@ -233,25 +243,25 @@ namespace DeploymentToolkit.ToolkitEnvironment
             var registry = new Win64Registry();
             var path = Path.Combine(_deploymentToolkitRegistryPath, _deploymentToolkitActiveSequence);
 
-            if (!registry.CreateSubKey(_deploymentToolkitRegistryPath, _deploymentToolkitActiveSequence))
+            if(!registry.CreateSubKey(_deploymentToolkitRegistryPath, _deploymentToolkitActiveSequence))
             {
                 _logger.Error($"Failed to create '{_deploymentToolkitActiveSequence}' key in '{_deploymentToolkitRegistryPath}'");
                 return;
             }
 
-            if (!registry.SetValue(path, "Name", sequence.UniqueName, RegistryValueKind.String))
+            if(!registry.SetValue(path, "Name", sequence.UniqueName, RegistryValueKind.String))
             {
                 _logger.Error($"Failed to set Name in '{path}'");
                 return;
             }
 
-            if (!registry.SetValue(path, "Type", EnvironmentVariables.ActiveSequenceType.ToString(), RegistryValueKind.String))
+            if(!registry.SetValue(path, "Type", EnvironmentVariables.ActiveSequenceType.ToString(), RegistryValueKind.String))
             {
                 _logger.Error($"Failed to set Type in '{path}'");
                 return;
             }
 
-            if (!registry.SetValue(path, "StartTime", DateTime.Now.ToFileTime().ToString(), RegistryValueKind.String))
+            if(!registry.SetValue(path, "StartTime", DateTime.Now.ToFileTime().ToString(), RegistryValueKind.String))
             {
                 _logger.Error($"Failed to set StartTime in '{path}'");
                 return;
@@ -267,13 +277,13 @@ namespace DeploymentToolkit.ToolkitEnvironment
             var registry = new Win64Registry();
 
             var startTime = registry.GetValue(Path.Combine(_deploymentToolkitRegistryPath, _deploymentToolkitActiveSequence), "StartTime");
-            if (startTime == null)
+            if(startTime == null)
             {
                 _logger.Warn("Failed to get startTime from ActiveSequence");
                 startTime = string.Empty;
             }
 
-            if (!registry.DeleteSubKey(_deploymentToolkitRegistryPath, _deploymentToolkitActiveSequence))
+            if(!registry.DeleteSubKey(_deploymentToolkitRegistryPath, _deploymentToolkitActiveSequence))
             {
                 _logger.Error($"Failed to delete '{_deploymentToolkitActiveSequence}' from '{_deploymentToolkitRegistryPath}'");
                 return;
@@ -283,14 +293,14 @@ namespace DeploymentToolkit.ToolkitEnvironment
 
             var subKeyName = DateTime.Now.ToFileTime().ToString();
 
-            if (!registry.CreateSubKey(_deploymentToolkitRegistryPath, _deploymentToolkitHistory))
+            if(!registry.CreateSubKey(_deploymentToolkitRegistryPath, _deploymentToolkitHistory))
             {
                 _logger.Error($"Failed to create '{_deploymentToolkitHistory}' in '{_deploymentToolkitRegistryPath}'");
                 return;
             }
 
             var historyPath = Path.Combine(_deploymentToolkitRegistryPath, _deploymentToolkitHistory);
-            if (!registry.CreateSubKey(historyPath, subKeyName))
+            if(!registry.CreateSubKey(historyPath, subKeyName))
             {
                 _logger.Error($"Failed to create '{subKeyName}' in '{historyPath}'");
                 return;
@@ -299,54 +309,54 @@ namespace DeploymentToolkit.ToolkitEnvironment
             var path = Path.Combine(_deploymentToolkitRegistryPath, _deploymentToolkitHistory, subKeyName);
 
             var activeSequence = EnvironmentVariables.ActiveSequence;
-            if (!registry.SetValue(path, "Name", activeSequence.UniqueName, RegistryValueKind.String))
+            if(!registry.SetValue(path, "Name", activeSequence.UniqueName, RegistryValueKind.String))
             {
                 _logger.Error($"Failed to set Name in '{path}'");
                 return;
             }
 
-            if (!registry.SetValue(path, "Type", EnvironmentVariables.ActiveSequenceType.ToString(), RegistryValueKind.String))
+            if(!registry.SetValue(path, "Type", EnvironmentVariables.ActiveSequenceType.ToString(), RegistryValueKind.String))
             {
                 _logger.Error($"Failed to set Type in '{path}'");
                 return;
             }
 
-            if (!registry.SetValue(path, "StartTime", startTime.ToString(), RegistryValueKind.String))
+            if(!registry.SetValue(path, "StartTime", startTime.ToString(), RegistryValueKind.String))
             {
                 _logger.Error($"Failed to set StartTime in '{path}'");
                 return;
             }
 
-            if (!registry.SetValue(path, "EndTime", DateTime.Now.ToFileTime().ToString(), RegistryValueKind.String))
+            if(!registry.SetValue(path, "EndTime", DateTime.Now.ToFileTime().ToString(), RegistryValueKind.String))
             {
                 _logger.Error($"Failed to set EndTime in '{path}'");
                 return;
             }
 
-            if (!registry.SetValue(path, "ExitCode", sequenceCompletedEventArgs.ReturnCode, RegistryValueKind.DWord))
+            if(!registry.SetValue(path, "ExitCode", sequenceCompletedEventArgs.ReturnCode, RegistryValueKind.DWord))
             {
                 _logger.Error($"Failed to set ExitCode in '{path}");
                 return;
             }
 
-            if (!registry.SetValue(path, "Successful", sequenceCompletedEventArgs.SequenceSuccessful, RegistryValueKind.DWord))
+            if(!registry.SetValue(path, "Successful", sequenceCompletedEventArgs.SequenceSuccessful, RegistryValueKind.DWord))
             {
                 _logger.Error($"Failed to set Successful in '{path}");
                 return;
             }
 
-            if (sequenceCompletedEventArgs.CountErrors > 0)
+            if(sequenceCompletedEventArgs.CountErrors > 0)
             {
-                if (!registry.CreateSubKey(path, "Errors"))
+                if(!registry.CreateSubKey(path, "Errors"))
                 {
                     _logger.Error($"Failed to create Errors in '{path}");
                     return;
                 }
 
                 var errorPath = Path.Combine(path, "Errors");
-                for (var i = 0; i < sequenceCompletedEventArgs.CountErrors; i++)
+                for(var i = 0; i < sequenceCompletedEventArgs.CountErrors; i++)
                 {
-                    if (!registry.CreateSubKey(errorPath, i.ToString()))
+                    if(!registry.CreateSubKey(errorPath, i.ToString()))
                     {
                         _logger.Error($"Failed to create in '{errorPath}'");
                         continue;
@@ -355,7 +365,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
                     var currentError = sequenceCompletedEventArgs.SequenceErrors[i];
                     var currentErrorPath = Path.Combine(errorPath, i.ToString());
 
-                    if (!registry.SetValue(currentErrorPath, "Message", currentError.Message, RegistryValueKind.String))
+                    if(!registry.SetValue(currentErrorPath, "Message", currentError.Message, RegistryValueKind.String))
                     {
                         _logger.Error($"Failed to set Message in '{currentErrorPath}");
                         return;
@@ -363,18 +373,18 @@ namespace DeploymentToolkit.ToolkitEnvironment
                 }
             }
 
-            if (sequenceCompletedEventArgs.CountWarnings > 0)
+            if(sequenceCompletedEventArgs.CountWarnings > 0)
             {
-                if (!registry.CreateSubKey(path, "Warnings"))
+                if(!registry.CreateSubKey(path, "Warnings"))
                 {
                     _logger.Error($"Failed to create Warnings in '{path}");
                     return;
                 }
 
                 var warningPath = Path.Combine(path, "Warnings");
-                for (var i = 0; i < sequenceCompletedEventArgs.CountWarnings; i++)
+                for(var i = 0; i < sequenceCompletedEventArgs.CountWarnings; i++)
                 {
-                    if (!registry.CreateSubKey(warningPath, i.ToString()))
+                    if(!registry.CreateSubKey(warningPath, i.ToString()))
                     {
                         _logger.Error($"Failed to create in '{warningPath}'");
                         continue;
@@ -383,7 +393,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
                     var currentWarning = sequenceCompletedEventArgs.SequenceWarnings[i];
                     var currentWarningPath = Path.Combine(warningPath, i.ToString());
 
-                    if (!registry.SetValue(currentWarningPath, "Message", currentWarning.Message, RegistryValueKind.String))
+                    if(!registry.SetValue(currentWarningPath, "Message", currentWarning.Message, RegistryValueKind.String))
                     {
                         _logger.Error($"Failed to set Message in '{currentWarningPath}");
                         return;
@@ -396,13 +406,13 @@ namespace DeploymentToolkit.ToolkitEnvironment
         {
             var installedPrograms = GetInstalledMSIPrograms();
 
-            if (!exact)
+            if(!exact)
             {
                 var result = new List<UninstallInfo>();
                 var regex = new Regex(name);
-                foreach (var program in installedPrograms)
+                foreach(var program in installedPrograms)
                 {
-                    if (regex.Match(program.DisplayName).Success)
+                    if(regex.Match(program.DisplayName).Success)
                     {
                         _logger.Trace($"Found match: {program.DisplayName}");
                         result.Add(program);
@@ -423,7 +433,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
             var keys = win32Registry.GetSubKeys(_applicationUninstallPath);
             var msiPrograms = GetInstallMSIProgramsInHive(win32Registry, keys);
 
-            if (Environment.Is64BitOperatingSystem)
+            if(Environment.Is64BitOperatingSystem)
             {
                 var win64Registry = new Win64Registry();
                 var win64Keys = win64Registry.GetSubKeys(_applicationUninstallPath);
@@ -437,11 +447,11 @@ namespace DeploymentToolkit.ToolkitEnvironment
         {
             var result = new List<UninstallInfo>();
 
-            foreach (var key in keys)
+            foreach(var key in keys)
             {
                 _logger.Trace($"Processing {key}");
 
-                if (!Guid.TryParse(key, out var productId))
+                if(!Guid.TryParse(key, out var productId))
                 {
                     _logger.Debug($"{key} could not be parsed as guid. Assuming non MSI installation. Skipping");
                     continue;
@@ -457,7 +467,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
                     ProductId = $@"{{{productId.ToString()}}}"
                 };
 
-                if (!program.UninstallString.ToLower().Contains("msiexec"))
+                if(!program.UninstallString.ToLower().Contains("msiexec"))
                 {
                     _logger.Debug($"{key} does not contain 'msiexec' in UninstallString. Skipping");
                     continue;

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
@@ -11,30 +10,30 @@ namespace DeploymentToolkit.ToolkitEnvironment
         #region DLLImports
         [DllImport("advapi32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        static extern bool OpenProcessToken(IntPtr ProcessHandle, UInt32 DesiredAccess, out IntPtr TokenHandle);
+        private static extern bool OpenProcessToken(IntPtr ProcessHandle, uint DesiredAccess, out IntPtr TokenHandle);
 
         [DllImport("kernel32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        static extern bool CloseHandle(IntPtr hObject);
+        private static extern bool CloseHandle(IntPtr hObject);
 
         [DllImport("advapi32.dll", SetLastError = true)]
         public static extern bool GetTokenInformation(IntPtr TokenHandle, TOKEN_INFORMATION_CLASS TokenInformationClass, IntPtr TokenInformation, uint TokenInformationLength, out uint ReturnLength);
         #endregion
 
         #region Native-Variables
-        public const UInt32 STANDARD_RIGHTS_REQUIRED = 0x000F0000;
-        public const UInt32 STANDARD_RIGHTS_READ = 0x00020000;
-        public const UInt32 TOKEN_ASSIGN_PRIMARY = 0x0001;
-        public const UInt32 TOKEN_DUPLICATE = 0x0002;
-        public const UInt32 TOKEN_IMPERSONATE = 0x0004;
-        public const UInt32 TOKEN_QUERY = 0x0008;
-        public const UInt32 TOKEN_QUERY_SOURCE = 0x0010;
-        public const UInt32 TOKEN_ADJUST_PRIVILEGES = 0x0020;
-        public const UInt32 TOKEN_ADJUST_GROUPS = 0x0040;
-        public const UInt32 TOKEN_ADJUST_DEFAULT = 0x0080;
-        public const UInt32 TOKEN_ADJUST_SESSIONID = 0x0100;
-        public const UInt32 TOKEN_READ = (STANDARD_RIGHTS_READ | TOKEN_QUERY);
-        public const UInt32 TOKEN_ALL_ACCESS = (STANDARD_RIGHTS_REQUIRED | TOKEN_ASSIGN_PRIMARY |
+        public const uint STANDARD_RIGHTS_REQUIRED = 0x000F0000;
+        public const uint STANDARD_RIGHTS_READ = 0x00020000;
+        public const uint TOKEN_ASSIGN_PRIMARY = 0x0001;
+        public const uint TOKEN_DUPLICATE = 0x0002;
+        public const uint TOKEN_IMPERSONATE = 0x0004;
+        public const uint TOKEN_QUERY = 0x0008;
+        public const uint TOKEN_QUERY_SOURCE = 0x0010;
+        public const uint TOKEN_ADJUST_PRIVILEGES = 0x0020;
+        public const uint TOKEN_ADJUST_GROUPS = 0x0040;
+        public const uint TOKEN_ADJUST_DEFAULT = 0x0080;
+        public const uint TOKEN_ADJUST_SESSIONID = 0x0100;
+        public const uint TOKEN_READ = (STANDARD_RIGHTS_READ | TOKEN_QUERY);
+        public const uint TOKEN_ALL_ACCESS = (STANDARD_RIGHTS_REQUIRED | TOKEN_ASSIGN_PRIMARY |
             TOKEN_DUPLICATE | TOKEN_IMPERSONATE | TOKEN_QUERY | TOKEN_QUERY_SOURCE |
             TOKEN_ADJUST_PRIVILEGES | TOKEN_ADJUST_GROUPS | TOKEN_ADJUST_DEFAULT |
             TOKEN_ADJUST_SESSIONID);
@@ -85,8 +84,10 @@ namespace DeploymentToolkit.ToolkitEnvironment
         {
             get
             {
-                if (_isAdministrator.HasValue)
+                if(_isAdministrator.HasValue)
+                {
                     return _isAdministrator.Value;
+                }
 
                 var identity = WindowsIdentity.GetCurrent();
                 var principal = new WindowsPrincipal(identity);
@@ -100,13 +101,15 @@ namespace DeploymentToolkit.ToolkitEnvironment
         {
             get
             {
-                if (_isElevated.HasValue)
+                if(_isElevated.HasValue)
+                {
                     return _isElevated.Value;
+                }
 
                 var tokenHandle = IntPtr.Zero;
                 try
                 {
-                    if (!OpenProcessToken(Process.GetCurrentProcess().Handle, TOKEN_ALL_ACCESS, out tokenHandle))
+                    if(!OpenProcessToken(Process.GetCurrentProcess().Handle, TOKEN_ALL_ACCESS, out tokenHandle))
                     {
                         _logger.Error($"Failed to get process token. Win32 error: {Marshal.GetLastWin32Error()}");
                         _isElevated = false;
@@ -120,8 +123,10 @@ namespace DeploymentToolkit.ToolkitEnvironment
 
                         _isElevated = principal.IsInRole(WindowsBuiltInRole.Administrator) || principal.IsInRole(0x200);
 
-                        if (_isElevated.Value)
+                        if(_isElevated.Value)
+                        {
                             return true;
+                        }
                     }
                     catch(Exception ex)
                     {
@@ -139,7 +144,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
                         try
                         {
                             var success = GetTokenInformation(tokenHandle, TOKEN_INFORMATION_CLASS.TokenElevationType, elevationPointer, (uint)resultSize, out returnedSize);
-                            if (success)
+                            if(success)
                             {
                                 elevationResult = (TOKEN_ELEVATION_TYPE)Marshal.ReadInt32(elevationPointer);
                                 _isElevated = elevationResult == TOKEN_ELEVATION_TYPE.TokenElevationTypeFull;
@@ -150,17 +155,19 @@ namespace DeploymentToolkit.ToolkitEnvironment
                                 _logger.Error($"Failed to get token information Win32 error: {Marshal.GetLastWin32Error()}");
                             }
                         }
-                        catch (Exception ex)
+                        catch(Exception ex)
                         {
                             _logger.Error(ex, $"Failed to process token. Win32 error: {Marshal.GetLastWin32Error()}");
                         }
                         finally
                         {
-                            if (elevationPointer != IntPtr.Zero)
+                            if(elevationPointer != IntPtr.Zero)
+                            {
                                 Marshal.FreeHGlobal(elevationPointer);
+                            }
                         }
                     }
-                    catch (Exception ex)
+                    catch(Exception ex)
                     {
                         _logger.Error(ex);
                     }
@@ -168,15 +175,17 @@ namespace DeploymentToolkit.ToolkitEnvironment
                     _isElevated = false;
                     return false;
                 }
-                catch (Exception ex)
+                catch(Exception ex)
                 {
                     _logger.Error(ex, "Failed to process IsElevated");
                     return false;
                 }
                 finally
                 {
-                    if (tokenHandle != IntPtr.Zero)
+                    if(tokenHandle != IntPtr.Zero)
+                    {
                         CloseHandle(tokenHandle);
+                    }
                 }
             }
         }

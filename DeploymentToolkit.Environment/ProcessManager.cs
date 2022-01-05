@@ -15,10 +15,10 @@ namespace DeploymentToolkit.ToolkitEnvironment
         #region Imports
         [DllImport("user32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        static extern bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+        private static extern bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
         #endregion
 
-        private static Logger _logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         private const string _blockExecutionKey = @"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options";
         private const string _runOnceKey = @"HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\RunOnce";
@@ -27,21 +27,23 @@ namespace DeploymentToolkit.ToolkitEnvironment
         {
             openProcesses = new List<string>();
 
-            if (applications.Length == 0)
+            if(applications.Length == 0)
             {
                 _logger.Trace("No executables specified to close");
                 return false;
             }
 
-            foreach (var executable in applications)
+            foreach(var executable in applications)
             {
                 var executableName = executable.ToLower();
-                if (executableName.EndsWith(".exe"))
+                if(executableName.EndsWith(".exe"))
+                {
                     executableName = executableName.Substring(0, executableName.Length - 4);
+                }
 
                 _logger.Trace($"Searching for a process named {executableName}");
                 var processes = Process.GetProcessesByName(executableName);
-                if (processes.Length > 0)
+                if(processes.Length > 0)
                 {
                     openProcesses.AddRange(
                         processes.Select(process => process.ProcessName)
@@ -49,38 +51,43 @@ namespace DeploymentToolkit.ToolkitEnvironment
                 }
             }
 
-            if (openProcesses.Count > 0)
+            if(openProcesses.Count > 0)
+            {
                 return true;
+            }
+
             return false;
         }
 
         public static bool ClosePrograms(string[] applications)
         {
-            if (applications.Length == 0)
+            if(applications.Length == 0)
             {
                 _logger.Trace("No executables specified to close");
                 return true;
             }
 
-            foreach (var executable in applications)
+            foreach(var executable in applications)
             {
                 try
                 {
                     var executableName = executable.ToLower();
-                    if (executableName.EndsWith(".exe"))
+                    if(executableName.EndsWith(".exe"))
+                    {
                         executableName = executableName.Substring(0, executableName.Length - 4);
+                    }
 
                     _logger.Trace($"Searching for a process named {executableName}");
                     var processes = Process.GetProcessesByName(executableName);
-                    if (processes.Length > 0)
+                    if(processes.Length > 0)
                     {
-                        foreach (var process in processes)
+                        foreach(var process in processes)
                         {
                             _logger.Trace($"Trying to close [{process.Id}]{process.ProcessName}");
                             // Send a WM_CLOSE and wait for a gracefull exit
                             PostMessage(process.Handle, 0x0010, IntPtr.Zero, IntPtr.Zero);
                             var exited = process.WaitForExit(5000);
-                            if (!exited)
+                            if(!exited)
                             {
                                 _logger.Trace($"Process did not close after close message. Killing...");
                                 process.Kill(); // If it does not exit gracefully then just kill it
@@ -88,7 +95,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
                         }
                     }
                 }
-                catch (Exception ex)
+                catch(Exception ex)
                 {
                     _logger.Error(ex, $"Failed to process {executable}");
                 }
@@ -99,7 +106,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
 
         public static bool BlockExecution(string[] applications)
         {
-            if (applications.Length == 0)
+            if(applications.Length == 0)
             {
                 _logger.Trace("No executables specified to block");
                 return true;
@@ -109,13 +116,15 @@ namespace DeploymentToolkit.ToolkitEnvironment
             {
                 var startBlocked = false;
                 var executableNames = applications.Distinct();
-                foreach (var executable in executableNames)
+                foreach(var executable in executableNames)
                 {
                     try
                     {
                         var executableName = executable.ToLower();
-                        if (!executableName.EndsWith(".exe"))
+                        if(!executableName.EndsWith(".exe"))
+                        {
                             executableName += ".exe";
+                        }
 
                         _logger.Trace($"Blocking execution of {executableName}");
                         Win96Registry.CreateSubKey(RegistryHive.LocalMachine, _blockExecutionKey, executableName);
@@ -124,13 +133,13 @@ namespace DeploymentToolkit.ToolkitEnvironment
 
                         startBlocked = true;
                     }
-                    catch (Exception ex)
+                    catch(Exception ex)
                     {
                         _logger.Error(ex, $"Failed to process {executable}");
                     }
                 }
 
-                if (startBlocked)
+                if(startBlocked)
                 {
                     var registry = new Win64Registry();
                     var subKey = registry.OpenSubKey(_runOnceKey);
@@ -142,7 +151,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
 
                 return true;
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 _logger.Error(ex, "Failed to block execution of executables");
                 return false;
@@ -151,7 +160,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
 
         public static bool UnblockExecution(string[] applications)
         {
-            if (applications.Length == 0)
+            if(applications.Length == 0)
             {
                 _logger.Trace("No executables specified to block");
                 return true;
@@ -160,18 +169,20 @@ namespace DeploymentToolkit.ToolkitEnvironment
             try
             {
                 var executableNames = applications.Distinct();
-                foreach (var executable in executableNames)
+                foreach(var executable in executableNames)
                 {
                     try
                     {
                         var executableName = executable.ToLower();
-                        if (!executableName.EndsWith(".exe"))
+                        if(!executableName.EndsWith(".exe"))
+                        {
                             executableName += ".exe";
+                        }
 
                         _logger.Trace($"Unblocking execution of {executableName}");
                         Win96Registry.DeleteSubKey(RegistryHive.LocalMachine, _blockExecutionKey, executableName);
                     }
-                    catch (Exception ex)
+                    catch(Exception ex)
                     {
                         _logger.Error(ex, $"Failed to process {executable}");
                     }
@@ -179,7 +190,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
 
                 return true;
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 _logger.Error(ex, "Failed to unblock exection of executables");
                 return false;
@@ -189,7 +200,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
         public static void UnblockAllDTBlockedApps()
         {
             var apps = GetAllDTBlockedApps();
-            if (apps.Count == 0)
+            if(apps.Count == 0)
             {
                 _logger.Info("No apps to unblock");
                 return;
@@ -202,7 +213,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
 
                 _logger.Info("Successfully unblocked");
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 _logger.Error(ex, $"Failed to unblock execution of apps");
             }
@@ -217,30 +228,36 @@ namespace DeploymentToolkit.ToolkitEnvironment
                 var win32Registry = new Win32Registry();
                 var subKeys = win32Registry.GetSubKeys(fullPath);
 
-                foreach (var key in subKeys)
+                foreach(var key in subKeys)
                 {
-                    if (IsKeyBlockedByDT(win32Registry, fullPath, key))
+                    if(IsKeyBlockedByDT(win32Registry, fullPath, key))
+                    {
                         result.Add(key);
+                    }
                 }
 
-                if (Environment.Is64BitOperatingSystem)
+                if(Environment.Is64BitOperatingSystem)
                 {
                     var win64Registry = new Win64Registry();
                     var win64SubKeys = win64Registry.GetSubKeys(fullPath);
 
-                    foreach (var key in subKeys)
+                    foreach(var key in subKeys)
                     {
-                        if (!IsKeyBlockedByDT(win64Registry, fullPath, key))
+                        if(!IsKeyBlockedByDT(win64Registry, fullPath, key))
+                        {
                             continue;
+                        }
 
-                        if (result.Contains(key))
+                        if(result.Contains(key))
+                        {
                             continue;
+                        }
 
                         result.Add(key);
                     }
                 }
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 _logger.Error(ex, "Failed to get blocked apps");
             }
@@ -250,7 +267,7 @@ namespace DeploymentToolkit.ToolkitEnvironment
         private static bool IsKeyBlockedByDT(WinRegistryBase registry, string path, string subKeyName)
         {
             var subKey = registry.OpenSubKey(path, subKeyName);
-            if (subKey != null)
+            if(subKey != null)
             {
                 return subKey.GetValue("DT_BLOCK", null) != null;
             }
