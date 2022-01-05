@@ -25,26 +25,26 @@ namespace DeploymentToolkit.Installer
         {
             get
             {
-                if (string.IsNullOrEmpty(_unqiueName))
+                if(string.IsNullOrEmpty(_unqiueName))
+                {
                     _unqiueName = $"{EnvironmentVariables.Configuration.Name}_{EnvironmentVariables.Configuration.Version}_Install";
+                }
+
                 return _unqiueName;
             }
         }
-        public CloseProgramsSettings CloseProgramsSettings { get => InstallSettings.CloseProgramsSettings; }
-        public DeferSettings DeferSettings { get => InstallSettings.DeferSettings; }
-        public RestartSettings RestartSettings { get => InstallSettings.RestartSettings; }
-        public LogoffSettings LogoffSettings { get => InstallSettings.LogoffSettings; }
-        public CustomActions CustomActions { get => InstallSettings.CustomActions; }
+        public CloseProgramsSettings CloseProgramsSettings => InstallSettings.CloseProgramsSettings;
+        public DeferSettings DeferSettings => InstallSettings.DeferSettings;
+        public RestartSettings RestartSettings => InstallSettings.RestartSettings;
+        public LogoffSettings LogoffSettings => InstallSettings.LogoffSettings;
+        public CustomActions CustomActions => InstallSettings.CustomActions;
 
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         private volatile bool _uninstallCompleted = false;
         private volatile bool _uninstallSuccess = false;
 
-        public ISequence SubSequence
-        {
-            get => throw new NotSupportedException();
-        }
+        public ISequence SubSequence => throw new NotSupportedException();
 
         public Installer(InstallSettings installSettings)
         {
@@ -77,31 +77,39 @@ namespace DeploymentToolkit.Installer
 
             var activeSetupSettings = InstallSettings.ActiveSetupSettings;
 
-            if (string.IsNullOrEmpty(activeSetupSettings.Name))
+            if(string.IsNullOrEmpty(activeSetupSettings.Name))
             {
-                if (InstallerType == InstallerType.Executable)
+                if(InstallerType == InstallerType.Executable)
+                {
                     activeSetupSettings.Name = UniqueName;
+                }
                 else
-                    activeSetupSettings.Name = MSI.ProductCode;
+                {
+                    activeSetupSettings.Name = ToolkitEnvironment.MSI.ProductCode;
+                }
             }
 
-            if (string.IsNullOrEmpty(activeSetupSettings.CommandLine))
+            if(string.IsNullOrEmpty(activeSetupSettings.CommandLine))
             {
-                if (InstallerType == InstallerType.Executable)
+                if(InstallerType == InstallerType.Executable)
                 {
                     _logger.Warn("No ActiveSetup entry created. Commandline cannot be empty");
                     return;
                 }
 
-                activeSetupSettings.CommandLine = $"msiexec.exe {MSI.ActiveSetupParameters} {MSI.ProductCode} {MSI.DefaultSilentParameters}";
+                activeSetupSettings.CommandLine = $"msiexec.exe {ToolkitEnvironment.MSI.ActiveSetupParameters} {ToolkitEnvironment.MSI.ProductCode} {ToolkitEnvironment.MSI.DefaultSilentParameters}";
             }
 
-            if (string.IsNullOrEmpty(activeSetupSettings.Version))
+            if(string.IsNullOrEmpty(activeSetupSettings.Version))
             {
-                if (InstallerType == InstallerType.Executable)
+                if(InstallerType == InstallerType.Executable)
+                {
                     activeSetupSettings.Version = EnvironmentVariables.Configuration.Version;
+                }
                 else
-                    activeSetupSettings.Version = MSI.ProductVersion;
+                {
+                    activeSetupSettings.Version = ToolkitEnvironment.MSI.ProductVersion;
+                }
             }
 
             _logger.Info($"Creating ActiveSetup entry for [{activeSetupSettings.Version}]{activeSetupSettings.Name} and command line '{activeSetupSettings.CommandLine}'");
@@ -109,31 +117,31 @@ namespace DeploymentToolkit.Installer
             var registry = new Win64Registry();
             try
             {
-                if (!registry.CreateSubKey(MSI.ActiveSetupPath, activeSetupSettings.Name))
+                if(!registry.CreateSubKey(ToolkitEnvironment.MSI.ActiveSetupPath, activeSetupSettings.Name))
                 {
                     _logger.Error("Failed to create active setup entry");
                     return;
                 }
 
-                var activeSetupEntryPath = Path.Combine(MSI.ActiveSetupPath, activeSetupSettings.Name);
-                if (!registry.SetValue(activeSetupEntryPath, "StubPath", activeSetupSettings.CommandLine, RegistryValueKind.String))
+                var activeSetupEntryPath = Path.Combine(ToolkitEnvironment.MSI.ActiveSetupPath, activeSetupSettings.Name);
+                if(!registry.SetValue(activeSetupEntryPath, "StubPath", activeSetupSettings.CommandLine, RegistryValueKind.String))
                 {
                     _logger.Error("Failed to set StubPath");
-                    registry.DeleteSubKey(MSI.ActiveSetupPath, activeSetupSettings.Name);
+                    registry.DeleteSubKey(ToolkitEnvironment.MSI.ActiveSetupPath, activeSetupSettings.Name);
                 }
 
-                if (!registry.SetValue(activeSetupEntryPath, "Version", activeSetupSettings.Version.Replace('.', ','), RegistryValueKind.String))
+                if(!registry.SetValue(activeSetupEntryPath, "Version", activeSetupSettings.Version.Replace('.', ','), RegistryValueKind.String))
                 {
                     _logger.Error("Failed to set Version");
-                    registry.DeleteSubKey(MSI.ActiveSetupPath, activeSetupSettings.Name);
+                    registry.DeleteSubKey(ToolkitEnvironment.MSI.ActiveSetupPath, activeSetupSettings.Name);
                 }
             }
             catch(Exception ex)
             {
                 _logger.Error(ex, "Failed to create ActiveSetup entry");
-                
+
                 // Delete the key if it was created
-                registry.DeleteSubKey(MSI.ActiveSetupPath, activeSetupSettings.Name);
+                registry.DeleteSubKey(ToolkitEnvironment.MSI.ActiveSetupPath, activeSetupSettings.Name);
             }
 
             _logger.Info("ActiveSetup entry successfully created");
@@ -191,7 +199,7 @@ namespace DeploymentToolkit.Installer
                         {
                             Thread.Sleep(10);
                         }
-                        while (!_uninstallCompleted);
+                        while(!_uninstallCompleted);
 
                         _logger.Trace($"Finished uninstalling {match.ProductId}");
 
@@ -213,38 +221,46 @@ namespace DeploymentToolkit.Installer
                 _logger.Trace($"Finished uninstalling. Result: {e.SequenceSuccessful}");
                 _uninstallSuccess = e.SequenceSuccessful;
 
-                if (!e.SequenceSuccessful && InstallSettings.UninstallSettings.IgnoreUninstallErrors)
+                if(!e.SequenceSuccessful && InstallSettings.UninstallSettings.IgnoreUninstallErrors)
                 {
                     _logger.Info("Uninstallation reported errors but 'IgnoreUninstallErrors' flag is set. Ignoring errors");
                     _uninstallSuccess = true;
                 }
 
-                if (!e.SequenceSuccessful)
+                if(!e.SequenceSuccessful)
                 {
-                    if (e.CountErrors > 0)
+                    if(e.CountErrors > 0)
                     {
-                        foreach (var error in e.SequenceErrors)
+                        foreach(var error in e.SequenceErrors)
                         {
-                            if (InstallSettings.UninstallSettings.IgnoreUninstallErrors)
+                            if(InstallSettings.UninstallSettings.IgnoreUninstallErrors)
+                            {
                                 _logger.Info(error);
+                            }
                             else
+                            {
                                 _logger.Error(error);
+                            }
                         }
                     }
 
-                    if (e.CountWarnings > 0)
+                    if(e.CountWarnings > 0)
                     {
-                        foreach (var warning in e.SequenceWarnings)
+                        foreach(var warning in e.SequenceWarnings)
                         {
-                            if (InstallSettings.UninstallSettings.IgnoreUninstallErrors)
+                            if(InstallSettings.UninstallSettings.IgnoreUninstallErrors)
+                            {
                                 _logger.Info(warning);
+                            }
                             else
+                            {
                                 _logger.Warn(warning);
+                            }
                         }
                     }
                 }
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 _logger.Error(ex, "Error during OnUninstallComplete");
             }

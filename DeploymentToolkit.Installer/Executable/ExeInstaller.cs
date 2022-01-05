@@ -8,10 +8,7 @@ namespace DeploymentToolkit.Installer.Executable
 {
     public class ExeInstaller : Installer
     {
-        public override InstallerType InstallerType
-        {
-            get => InstallerType.Executable;
-        }
+        public override InstallerType InstallerType => InstallerType.Executable;
 
         public override event EventHandler<SequenceCompletedEventArgs> OnSequenceCompleted;
 
@@ -19,19 +16,25 @@ namespace DeploymentToolkit.Installer.Executable
 
         private Process _installerProcess;
 
-        private string _fileName;
-        private string _arguments;
+        private readonly string _fileName;
+        private readonly string _arguments;
 
         public ExeInstaller(InstallSettings installSettings) : base(installSettings)
         {
-            if (installSettings.CommandLine.ToLower().EndsWith(".msi"))
+            if(installSettings.CommandLine.ToLower().EndsWith(".msi"))
+            {
                 throw new Exception("ExeInstaller can only be used with non-MSI installations");
+            }
 
-            if (string.IsNullOrEmpty(installSettings.CommandLine))
+            if(string.IsNullOrEmpty(installSettings.CommandLine))
+            {
                 throw new Exception($"{nameof(installSettings.CommandLine)} can't be empty!");
+            }
 
-            if (string.IsNullOrEmpty(installSettings.Parameters))
+            if(string.IsNullOrEmpty(installSettings.Parameters))
+            {
                 _logger.Warn($"No parameters specified");
+            }
 
             _fileName = installSettings.CommandLine;
             _arguments = installSettings.Parameters;

@@ -53,16 +53,12 @@
     <ProjectReference Include="..\DeploymentToolkit.Actions\DeploymentToolkit.Actions.csproj" />
     <ProjectReference Include="..\DeploymentToolkit.DeploymentEnvironment\DeploymentToolkit.DeploymentEnvironment.csproj" />
     <ProjectReference Include="..\DeploymentToolkit.Environment\DeploymentToolkit.ToolkitEnvironment.csproj" />
-    <ProjectReference Include="..\DeploymentToolkit.Installer.Executable\DeploymentToolkit.Installer.Executable.csproj" />
-    <ProjectReference Include="..\DeploymentToolkit.Installer.MSI\DeploymentToolkit.Installer.MSI.csproj" />
     <ProjectReference Include="..\DeploymentToolkit.Installer\DeploymentToolkit.Installer.csproj" />
     <ProjectReference Include="..\DeploymentToolkit.Messaging\DeploymentToolkit.Messaging.csproj" />
     <ProjectReference Include="..\DeploymentToolkit.Modals\DeploymentToolkit.Modals.csproj" />
     <ProjectReference Include="..\DeploymentToolkit.Restart\DeploymentToolkit.Restart.csproj" />
     <ProjectReference Include="..\DeploymentToolkit.Scripting\DeploymentToolkit.Scripting.csproj" />
     <ProjectReference Include="..\DeploymentToolkit.Unblocker\DeploymentToolkit.Unblocker.csproj" />
-    <ProjectReference Include="..\DeploymentToolkit.Uninstaller.Executable\DeploymentToolkit.Uninstaller.Executable.csproj" />
-    <ProjectReference Include="..\DeploymentToolkit.Uninstaller.MSI\DeploymentToolkit.Uninstaller.MSI.csproj" />
     <ProjectReference Include="..\DeploymentToolkit.Uninstaller\DeploymentToolkit.Uninstaller.csproj" />
     <ProjectReference Include="..\DeploymentToolkit.Util\DeploymentToolkit.Util.csproj" />
   </ItemGroup>

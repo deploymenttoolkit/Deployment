@@ -20,7 +20,6 @@
     <ProjectReference Include="..\DeploymentToolkit.Environment\DeploymentToolkit.ToolkitEnvironment.csproj" />
     <ProjectReference Include="..\DeploymentToolkit.Modals\DeploymentToolkit.Modals.csproj" />
     <ProjectReference Include="..\DeploymentToolkit.RegistryWrapper\DeploymentToolkit.RegistryWrapper.csproj" />
-    <ProjectReference Include="..\DeploymentToolkit.Uninstaller.MSI\DeploymentToolkit.Uninstaller.MSI.csproj" />
     <ProjectReference Include="..\DeploymentToolkit.Uninstaller\DeploymentToolkit.Uninstaller.csproj" />
   </ItemGroup>
   <ItemGroup>

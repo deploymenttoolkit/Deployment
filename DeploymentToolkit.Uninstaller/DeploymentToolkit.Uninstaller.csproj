@@ -16,6 +16,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\DeploymentToolkit.Logging\DeploymentToolkit.Logging.csproj" />
     <ProjectReference Include="..\DeploymentToolkit.Environment\DeploymentToolkit.ToolkitEnvironment.csproj" />
     <ProjectReference Include="..\DeploymentToolkit.Modals\DeploymentToolkit.Modals.csproj" />
     <ProjectReference Include="..\DeploymentToolkit.RegistryWrapper\DeploymentToolkit.RegistryWrapper.csproj" />

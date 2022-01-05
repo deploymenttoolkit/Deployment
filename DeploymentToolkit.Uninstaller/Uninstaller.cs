@@ -22,23 +22,23 @@ namespace DeploymentToolkit.Uninstaller
         {
             get
             {
-                if (string.IsNullOrEmpty(_unqiueName))
+                if(string.IsNullOrEmpty(_unqiueName))
+                {
                     _unqiueName = $"{EnvironmentVariables.Configuration.Name}_{EnvironmentVariables.Configuration.Version}_Uninstall";
+                }
+
                 return _unqiueName;
             }
         }
-        public CloseProgramsSettings CloseProgramsSettings { get => UninstallSettings.CloseProgramsSettings; }
-        public DeferSettings DeferSettings { get => UninstallSettings.DeferSettings; }
-        public RestartSettings RestartSettings { get => UninstallSettings.RestartSettings; }
-        public LogoffSettings LogoffSettings { get => UninstallSettings.LogoffSettings; }
-        public CustomActions CustomActions { get => UninstallSettings.CustomActions; }
+        public CloseProgramsSettings CloseProgramsSettings => UninstallSettings.CloseProgramsSettings;
+        public DeferSettings DeferSettings => UninstallSettings.DeferSettings;
+        public RestartSettings RestartSettings => UninstallSettings.RestartSettings;
+        public LogoffSettings LogoffSettings => UninstallSettings.LogoffSettings;
+        public CustomActions CustomActions => UninstallSettings.CustomActions;
 
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        public ISequence SubSequence
-        {
-            get => throw new NotSupportedException();
-        }
+        public ISequence SubSequence => throw new NotSupportedException();
 
         public Uninstaller(UninstallSettings installSettings)
         {
@@ -58,7 +58,7 @@ namespace DeploymentToolkit.Uninstaller
         {
             _logger.Trace("Running BeforeSequenceComplete actions ...");
 
-            if (UninstallSettings.ActiveSetupSettings != null && UninstallSettings.ActiveSetupSettings.UseActiveSetup)
+            if(UninstallSettings.ActiveSetupSettings != null && UninstallSettings.ActiveSetupSettings.UseActiveSetup)
             {
                 ProcessActiveSetup();
             }
@@ -70,19 +70,23 @@ namespace DeploymentToolkit.Uninstaller
 
             var activeSetupSettings = UninstallSettings.ActiveSetupSettings;
 
-            if (string.IsNullOrEmpty(activeSetupSettings.Name))
+            if(string.IsNullOrEmpty(activeSetupSettings.Name))
             {
-                if (UninstallerType == UninstallerType.Executable)
+                if(UninstallerType == UninstallerType.Executable)
+                {
                     activeSetupSettings.Name = UniqueName;
+                }
                 else
-                    activeSetupSettings.Name = MSI.ProductCode;
+                {
+                    activeSetupSettings.Name = ToolkitEnvironment.MSI.ProductCode;
+                }
             }
 
             var registry = new Win64Registry();
             try
             {
                 _logger.Trace("Deleting Machine keys ...");
-                if (!registry.DeleteSubKey(MSI.ActiveSetupPath, activeSetupSettings.Name))
+                if(!registry.DeleteSubKey(ToolkitEnvironment.MSI.ActiveSetupPath, activeSetupSettings.Name))
                 {
                     _logger.Error("Failed to delete active setup entry");
                     return;
@@ -92,15 +96,19 @@ namespace DeploymentToolkit.Uninstaller
                 var users = registry.GetSubKeys("HKEY_USERS");
                 foreach(var sId in users)
                 {
-                    if (sId == ".DEFAULT")
+                    if(sId == ".DEFAULT")
+                    {
                         continue;
+                    }
 
-                    if (sId.EndsWith("_Classes"))
+                    if(sId.EndsWith("_Classes"))
+                    {
                         continue;
+                    }
 
                     _logger.Trace($"Processing {sId}");
 
-                    registry.DeleteSubKey(string.Format(MSI.ActiveSetupUserPath, sId), activeSetupSettings.Name);
+                    registry.DeleteSubKey(string.Format(ToolkitEnvironment.MSI.ActiveSetupUserPath, sId), activeSetupSettings.Name);
                 }
 
                 _logger.Info("Successfully deleted ActiveSetup keys");

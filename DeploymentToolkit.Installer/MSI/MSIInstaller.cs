@@ -9,22 +9,21 @@ namespace DeploymentToolkit.Installer.MSI
 {
     public class MSIInstaller : Installer
     {
-        public override InstallerType InstallerType
-        {
-            get => InstallerType.MicrosoftInstaller;
-        }
+        public override InstallerType InstallerType => InstallerType.MicrosoftInstaller;
 
         public override event EventHandler<SequenceCompletedEventArgs> OnSequenceCompleted;
 
-        private Logger _logger = LogManager.GetCurrentClassLogger();
+        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private string _commandLine = "";
+        private readonly string _commandLine = "";
         private Process _installerProcess;
 
         public MSIInstaller(InstallSettings installSettings) : base(installSettings)
         {
-            if (!installSettings.CommandLine.ToLower().EndsWith(".msi"))
+            if(!installSettings.CommandLine.ToLower().EndsWith(".msi"))
+            {
                 throw new Exception("MSIInstaller can only be used with MSI installations");
+            }
 
             if(!InstallSettings.MSISettings.UseDefaultMSIParameters && string.IsNullOrEmpty(InstallSettings.Parameters))
             {
@@ -32,13 +31,13 @@ namespace DeploymentToolkit.Installer.MSI
                 InstallSettings.Parameters = ToolkitEnvironment.MSI.DefaultInstallParameters;
             }
 
-            if (InstallSettings.MSISettings.UseDefaultMSIParameters)
+            if(InstallSettings.MSISettings.UseDefaultMSIParameters)
             {
                 _logger.Info($"MSISettings->UseDefaultMSIParameters specified. Switching Parameters from '{InstallSettings.Parameters}' to '{ToolkitEnvironment.MSI.DefaultInstallParameters}'");
                 InstallSettings.Parameters = ToolkitEnvironment.MSI.DefaultInstallParameters;
             }
 
-            if (InstallSettings.MSISettings.SupressMSIRestartReturnCode)
+            if(InstallSettings.MSISettings.SupressMSIRestartReturnCode)
             {
                 _logger.Info("MSISettings->SupressMSIRestartReturnCode specified. Suppressing restarts after installation");
             }
@@ -83,7 +82,7 @@ namespace DeploymentToolkit.Installer.MSI
 
         public override void SequenceEnd()
         {
-            
+
         }
 
         private void OnInstallationEnded(object sender, EventArgs e)
@@ -111,7 +110,7 @@ namespace DeploymentToolkit.Installer.MSI
                 );
                 return;
             }
-            
+
             if(exitCode == MSIReturnCode.ERROR_SUCCESS_REBOOT_REQUIRED && InstallSettings.MSISettings.SuppressReboot)
             {
                 _logger.Info($"MSI returned {MSIReturnCode.ERROR_SUCCESS_REBOOT_REQUIRED} and SuppressReboot specified. Overwriting return code...");
@@ -123,60 +122,60 @@ namespace DeploymentToolkit.Installer.MSI
                 ReturnCode = _installerProcess.ExitCode
             };
 
-            switch (exitCode)
+            switch(exitCode)
             {
                 case MSIReturnCode.ERROR_SUCCESS:
                 case MSIReturnCode.ERROR_SUCCESS_REBOOT_INITIATED:
                 case MSIReturnCode.ERROR_SUCCESS_REBOOT_REQUIRED:
-                    {
-                        _logger.Info($"Installation successful. Return code {exitCode}({_installerProcess.ExitCode})");
-                        installCompletedEventArgs.SequenceSuccessful = true;
+                {
+                    _logger.Info($"Installation successful. Return code {exitCode}({_installerProcess.ExitCode})");
+                    installCompletedEventArgs.SequenceSuccessful = true;
 
-                        if(exitCode == MSIReturnCode.ERROR_SUCCESS_REBOOT_INITIATED)
-                        {
-                            _logger.Warn("MSI initiated a reboot!");
-                            installCompletedEventArgs.SequenceWarnings.Add(new Exception("MSI intiated a reboot"));
-                        }
-                        else if(exitCode == MSIReturnCode.ERROR_SUCCESS_REBOOT_REQUIRED && InstallSettings.MSISettings.SupressMSIRestartReturnCode)
-                        {
-                            _logger.Info($"Replacing return code with {MSIReturnCode.ERROR_SUCCESS}({(int)MSIReturnCode.ERROR_SUCCESS}) because MSISettings->SupressMSIRestartReturnCode was specified");
-                            installCompletedEventArgs.ReturnCode = (int)MSIReturnCode.ERROR_SUCCESS;
-                        }
+                    if(exitCode == MSIReturnCode.ERROR_SUCCESS_REBOOT_INITIATED)
+                    {
+                        _logger.Warn("MSI initiated a reboot!");
+                        installCompletedEventArgs.SequenceWarnings.Add(new Exception("MSI intiated a reboot"));
                     }
-                    break;
+                    else if(exitCode == MSIReturnCode.ERROR_SUCCESS_REBOOT_REQUIRED && InstallSettings.MSISettings.SupressMSIRestartReturnCode)
+                    {
+                        _logger.Info($"Replacing return code with {MSIReturnCode.ERROR_SUCCESS}({(int)MSIReturnCode.ERROR_SUCCESS}) because MSISettings->SupressMSIRestartReturnCode was specified");
+                        installCompletedEventArgs.ReturnCode = (int)MSIReturnCode.ERROR_SUCCESS;
+                    }
+                }
+                break;
 
                 default:
+                {
+                    _logger.Error($"Installation failed. Return code {exitCode}({_installerProcess.ExitCode})");
+                    installCompletedEventArgs.SequenceSuccessful = false;
+                    installCompletedEventArgs.SequenceErrors.Add(new Exception($"Install failed with code {exitCode}({(int)exitCode})"));
+
+                    // Output some more information to the log file for faster troubleshooting
+                    if(
+                        exitCode == MSIReturnCode.ERROR_INSTALL_TRANSFORM_FAILURE ||
+                        exitCode == MSIReturnCode.ERROR_INSTALL_TRANSFORM_REJECTED)
                     {
-                        _logger.Error($"Installation failed. Return code {exitCode}({_installerProcess.ExitCode})");
-                        installCompletedEventArgs.SequenceSuccessful = false;
-                        installCompletedEventArgs.SequenceErrors.Add(new Exception($"Install failed with code {exitCode}({(int)exitCode})"));
-
-                        // Output some more information to the log file for faster troubleshooting
-                        if(
-                            exitCode == MSIReturnCode.ERROR_INSTALL_TRANSFORM_FAILURE ||
-                            exitCode == MSIReturnCode.ERROR_INSTALL_TRANSFORM_REJECTED)
-                        {
-                            _logger.Error("There seems to be a problem with the transform. Please check the transform");
-                        }
-
-                        if(
-                            exitCode == MSIReturnCode.ERROR_INSTALL_PACKAGE_INVALID ||
-                            exitCode == MSIReturnCode.ERROR_INSTALL_PACKAGE_OPEN_FAILED)
-                        {
-                            _logger.Error("There seems to be a problem with the msi package. Please check the msi file");
-                        }
-
-                        if(exitCode == MSIReturnCode.ERROR_INSTALL_PACKAGE_REJECTED)
-                        {
-                            _logger.Error("The msi file was rejected by the system. Please check the msi file (requirements)");
-                        }
-
-                        if(exitCode == MSIReturnCode.ERROR_INSTALL_PACKAGE_VERSION)
-                        {
-                            _logger.Error("The msi file is created for a newer version of Windows Installer. Please update the Windows Installer service");
-                        }
+                        _logger.Error("There seems to be a problem with the transform. Please check the transform");
                     }
-                    break;
+
+                    if(
+                        exitCode == MSIReturnCode.ERROR_INSTALL_PACKAGE_INVALID ||
+                        exitCode == MSIReturnCode.ERROR_INSTALL_PACKAGE_OPEN_FAILED)
+                    {
+                        _logger.Error("There seems to be a problem with the msi package. Please check the msi file");
+                    }
+
+                    if(exitCode == MSIReturnCode.ERROR_INSTALL_PACKAGE_REJECTED)
+                    {
+                        _logger.Error("The msi file was rejected by the system. Please check the msi file (requirements)");
+                    }
+
+                    if(exitCode == MSIReturnCode.ERROR_INSTALL_PACKAGE_VERSION)
+                    {
+                        _logger.Error("The msi file is created for a newer version of Windows Installer. Please update the Windows Installer service");
+                    }
+                }
+                break;
             }
 
             BeforeSequenceComplete(installCompletedEventArgs.SequenceSuccessful);

@@ -8,10 +8,7 @@ namespace DeploymentToolkit.Uninstaller.Executable
 {
     public class ExeUninstaller : Uninstaller
     {
-        public override UninstallerType UninstallerType
-        {
-            get => UninstallerType.Executable;
-        }
+        public override UninstallerType UninstallerType => UninstallerType.Executable;
 
         public override event EventHandler<SequenceCompletedEventArgs> OnSequenceCompleted;
 
@@ -19,19 +16,25 @@ namespace DeploymentToolkit.Uninstaller.Executable
 
         private Process _uninstallerProcess;
 
-        private string _fileName;
-        private string _arguments;
+        private readonly string _fileName;
+        private readonly string _arguments;
 
         public ExeUninstaller(UninstallSettings uninstallSettings) : base(uninstallSettings)
         {
-            if (uninstallSettings.CommandLine.ToLower().EndsWith(".msi"))
+            if(uninstallSettings.CommandLine.ToLower().EndsWith(".msi"))
+            {
                 throw new Exception("ExeUninstaller can only be used with non-MSI installations");
+            }
 
-            if (string.IsNullOrEmpty(uninstallSettings.CommandLine))
+            if(string.IsNullOrEmpty(uninstallSettings.CommandLine))
+            {
                 throw new Exception($"{nameof(uninstallSettings.CommandLine)} can't be empty!");
+            }
 
-            if (string.IsNullOrEmpty(uninstallSettings.Parameters))
+            if(string.IsNullOrEmpty(uninstallSettings.Parameters))
+            {
                 _logger.Warn($"No parameters specified");
+            }
 
             _fileName = uninstallSettings.CommandLine;
             _arguments = uninstallSettings.Parameters;
@@ -72,7 +75,7 @@ namespace DeploymentToolkit.Uninstaller.Executable
             _logger.Info($"Return code is: {exitCode}");
 
             var successful = exitCode == 0;
-            if (exitCode != 0)
+            if(exitCode != 0)
             {
                 _logger.Info($"Return code is not 0. Assuming failed uninstallation");
             }
