@@ -105,25 +105,21 @@ namespace DeploymentToolkit.Deployment
             }
 
             var arguments = args.ToList();
-            var isInstallation = arguments.Any(argument => argument.ToLower() == "--install" || argument.ToLower() == "-i");
-            var isUninstallation = arguments.Any(argument => argument.ToLower() == "--uninstall" || argument.ToLower() == "-x");
-            var isRepair = arguments.Any(argument => argument.ToLower() == "--repair" || argument.ToLower() == "-r");
-            var isUpgrade = arguments.Any(argument => argument.ToLower() == "--upgrade" || argument.ToLower() == "-u");
-            var sequenceType = SequenceType.Unknown;
 
-            if(isInstallation)
+            var sequenceType = SequenceType.Unknown;
+            if(arguments.Any(argument => argument.ToLower() == "--install" || argument.ToLower() == "-i"))
             {
                 sequenceType = SequenceType.Installation;
             }
-            else if(isUninstallation)
+            else if(arguments.Any(argument => argument.ToLower() == "--uninstall" || argument.ToLower() == "-x"))
             {
                 sequenceType = SequenceType.Uninstallation;
             }
-            else if(isRepair)
+            else if(arguments.Any(argument => argument.ToLower() == "--repair" || argument.ToLower() == "-r"))
             {
                 sequenceType = SequenceType.Repair;
             }
-            else if(isUpgrade)
+            else if(arguments.Any(argument => argument.ToLower() == "--upgrade" || argument.ToLower() == "-u"))
             {
                 sequenceType = SequenceType.Upgrade;
             }
