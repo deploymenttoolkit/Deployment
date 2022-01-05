@@ -144,7 +144,7 @@ namespace DeploymentToolkit.Scripting
                     _variables.Add("SystemLanguageID", () => culture.ToString());
                 }
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 _logger.Error(ex, "Failed to add UserVariables");
             }
@@ -157,37 +157,41 @@ namespace DeploymentToolkit.Scripting
             try
             {
                 var variables = Environment.GetEnvironmentVariables();
-                if (variables == null || variables.Count == 0)
+                if(variables == null || variables.Count == 0)
                 {
                     _logger.Trace("No EnvironmentVariables found");
                     return;
                 }
 
-                foreach (DictionaryEntry environmentVariable in variables)
+                foreach(DictionaryEntry environmentVariable in variables)
                 {
                     var name = (string)environmentVariable.Key;
 
-                    if (name.Contains("("))
+                    if(name.Contains("("))
+                    {
                         name = name.Replace("(", "[");
-                    if (name.Contains(")"))
+                    }
+
+                    if(name.Contains(")"))
+                    {
                         name = name.Replace(")", "]");
+                    }
 
                     var value = (string)environmentVariable.Value;
-                    if (_variables.ContainsKey(name))
+                    if(_variables.ContainsKey(name))
                     {
                         _logger.Warn($"Cannot add environmentvariable {name} as it already exists");
                         continue;
                     }
 
-                    _variables.Add(name, delegate ()
-                    {
+                    _variables.Add(name, delegate () {
                         return value;
                     });
                     _logger.Trace($"Added '{name}' with value of '{value}'");
                 }
 
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 _logger.Error(ex, "Failed to add EnvironmentVariables");
             }
@@ -198,19 +202,21 @@ namespace DeploymentToolkit.Scripting
 
         public static bool DisposePowerShellEnvironments()
         {
-            if (_powershellEnvironments.Count == 0)
+            if(_powershellEnvironments.Count == 0)
+            {
                 return true;
+            }
 
             var hadException = false;
-            foreach (var powerShell in _powershellEnvironments)
+            foreach(var powerShell in _powershellEnvironments)
             {
                 _logger.Trace($"Disposing {powerShell.Key}");
                 try
                 {
                     powerShell.Value?.Dispose();
                 }
-                catch (ObjectDisposedException) { }
-                catch (Exception ex)
+                catch(ObjectDisposedException) { }
+                catch(Exception ex)
                 {
                     _logger.Warn(ex, $"Failed to dispose powershell environment ({powerShell.Key})");
                     hadException = true;
@@ -222,25 +228,38 @@ namespace DeploymentToolkit.Scripting
 
         public static bool AddVariable(string name, string script, string environment)
         {
-            if (string.IsNullOrEmpty(name))
+            if(string.IsNullOrEmpty(name))
+            {
                 throw new ArgumentNullException(nameof(name));
-            if (string.IsNullOrEmpty(script))
+            }
+
+            if(string.IsNullOrEmpty(script))
+            {
                 throw new ArgumentNullException(nameof(script));
-            if (string.IsNullOrEmpty(environment))
+            }
+
+            if(string.IsNullOrEmpty(environment))
+            {
                 environment = "UNIQUE";
+            }
 
-            if (name.Contains("("))
+            if(name.Contains("("))
+            {
                 name = name.Replace("(", "[");
-            if (name.Contains(")"))
-                name = name.Replace(")", "]");
+            }
 
-            if (_variables.ContainsKey(name))
+            if(name.Contains(")"))
+            {
+                name = name.Replace(")", "]");
+            }
+
+            if(_variables.ContainsKey(name))
             {
                 _logger.Warn($"Tried to overwrite an already existing variable! ({name})");
                 return false;
             }
 
-            if (environment == "UNIQUE")
+            if(environment == "UNIQUE")
             {
                 environment = GetUniqueEnvironmentName();
             }
@@ -251,13 +270,15 @@ namespace DeploymentToolkit.Scripting
                 Debug.WriteLine($"Running in PowerShell environment '{environment}'");
 #endif
                 PowerShell powershell;
-                if (!_powershellEnvironments.ContainsKey(environment))
+                if(!_powershellEnvironments.ContainsKey(environment))
                 {
                     powershell = PowerShell.Create();
                     _powershellEnvironments.Add(environment, powershell);
                 }
                 else
+                {
                     powershell = _powershellEnvironments[environment];
+                }
 
                 powershell.AddScript(script, false);
                 powershell.Invoke();
@@ -270,14 +291,13 @@ namespace DeploymentToolkit.Scripting
                     string.Empty
                 );
 
-                _variables.Add(name, delegate ()
-                {
+                _variables.Add(name, delegate () {
                     return result;
                 });
 
                 return true;
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 _logger.Error(ex, $"Error while trying to add CustomVariable {name}");
                 return false;
@@ -291,7 +311,7 @@ namespace DeploymentToolkit.Scripting
             {
                 environmentName = $"UNIQUE_{_uniqueEnvironmentCounter++}";
             }
-            while (_powershellEnvironments.ContainsKey(environmentName));
+            while(_powershellEnvironments.ContainsKey(environmentName));
 
             return environmentName;
         }
@@ -300,7 +320,7 @@ namespace DeploymentToolkit.Scripting
         {
             var type = input.BaseObject.GetType();
 
-            if (type == typeof(bool))
+            if(type == typeof(bool))
             {
                 return ((bool)input.BaseObject).ToIntString();
             }

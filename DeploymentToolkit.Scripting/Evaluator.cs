@@ -3,7 +3,6 @@ using DeploymentToolkit.Scripting.Modals;
 using NLog;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace DeploymentToolkit.Scripting
 {
@@ -28,23 +27,27 @@ namespace DeploymentToolkit.Scripting
 
             var endOfThisGroup = 0;
             var toCut = new List<int[]>();
-            if (parentGroup != null)
+            if(parentGroup != null)
+            {
                 parentGroup.SubGroups.Add(group);
+            }
 
             if(condition.StartsWith("("))
+            {
                 condition = condition.Substring(1, condition.Length - 1);
+            }
 
             var lastGroup = default(Group);
             var currentGroup = default(Group);
             var currentCondition = LinkType.None;
 
-            for (var i = 0; i < condition.Length; i++)
+            for(var i = 0; i < condition.Length; i++)
             {
                 var currentCharacter = condition[i];
 #if DEBUG && EVALUTATOR_TRACE
                 Debug.WriteLine($"{currentCharacter}");
 #endif
-                if (currentCharacter == ')')
+                if(currentCharacter == ')')
                 {
                     // End of this group
                     endOfThisGroup = i;
@@ -70,10 +73,12 @@ namespace DeploymentToolkit.Scripting
                     Debug.WriteLine($"Skipping to {i}");
 #endif
 
-                    if (currentCondition != LinkType.None)
+                    if(currentCondition != LinkType.None)
                     {
-                        if (lastGroup == null || currentGroup == null)
+                        if(lastGroup == null || currentGroup == null)
+                        {
                             throw new ScriptingInvalidConditionException("Invalid placed AND or OR");
+                        }
 
                         group.GroupLinks.Add(new GroupLink(lastGroup, currentCondition, currentGroup));
                         currentCondition = LinkType.None;
@@ -120,31 +125,41 @@ namespace DeploymentToolkit.Scripting
             Debug.WriteLine($"EndOfThisGroup: {endOfThisGroup}");
 #endif
 
-            if (parentGroup == null)
+            if(parentGroup == null)
             {
                 // If we are the main group then there can't be text after this group closes
-                if (endOfThisGroup != condition.Length - 1)
+                if(endOfThisGroup != condition.Length - 1)
+                {
                     throw new ScriptingInvalidConditionException("Leftover text after group ended");
+                }
             }
 
             var toEvaluate = condition;
-            if (endOfThisGroup < condition.Length - 1)
+            if(endOfThisGroup < condition.Length - 1)
+            {
                 toEvaluate = condition.Substring(0, endOfThisGroup);
+            }
 
-            foreach (var cut in toCut)
+            foreach(var cut in toCut)
             {
                 toEvaluate = toEvaluate.Substring(0, cut[0]) + toEvaluate.Substring(cut[1] + 1, toEvaluate.Length - cut[1] - 1);
             }
 
             if(toEvaluate.EndsWith(")"))
+            {
                 toEvaluate = toEvaluate.Substring(0, toEvaluate.Length - 1);
+            }
 
             toEvaluate = toEvaluate.Trim();
 
-            if (!string.IsNullOrEmpty(toEvaluate))
+            if(!string.IsNullOrEmpty(toEvaluate))
+            {
                 group.Condition = EvaluateCondition(toEvaluate);
-            else if (group.SubGroups.Count == 0)
+            }
+            else if(group.SubGroups.Count == 0)
+            {
                 throw new ScriptingInvalidGroupException("A group needs to have exactly one conditon or multiple sub-conditions");
+            }
 
             return endOfThisGroup;
         }
@@ -160,46 +175,60 @@ namespace DeploymentToolkit.Scripting
             var result = new Condition();
             do
             {
-                if (currentIndex >= condition.Length)
+                if(currentIndex >= condition.Length)
+                {
                     throw new ScriptingInvalidConditionException($"Invalid condtion {condition}");
+                }
 
                 var currentCharacter = condition[currentIndex++];
 
-                if (currentCharacter == ' ')
+                if(currentCharacter == ' ')
+                {
                     continue;
-                else if (currentCharacter == '\'')
+                }
+                else if(currentCharacter == '\'')
                 {
                     var stringEnd = condition.Substring(currentIndex, condition.Length - currentIndex).IndexOf('\'');
-                    if (stringEnd == -1)
+                    if(stringEnd == -1)
+                    {
                         throw new ScriptingInvalidStringException($"Invalid or incomplete string: {condition.Substring(currentIndex, condition.Length - currentIndex)}");
+                    }
 
                     var name = condition.Substring(currentIndex, stringEnd);
                     currentIndex += stringEnd + 1;
 
-                    if (string.IsNullOrEmpty(result.FirstString))
+                    if(string.IsNullOrEmpty(result.FirstString))
+                    {
                         result.FirstString = name;
-                    else if (string.IsNullOrEmpty(result.SecondString))
+                    }
+                    else if(string.IsNullOrEmpty(result.SecondString))
+                    {
                         result.SecondString = name;
+                    }
                     else
+                    {
                         throw new ScriptingInvalidConditionException($"Invalid condition. Got multiple variables. ({condition})");
+                    }
 
                     continue;
                 }
-                else if (
+                else if(
                     currentCharacter == '=' ||
                     currentCharacter == '!'
                 )
                 {
                     var nextCharacter = condition[currentIndex];
 
-                    if (nextCharacter == '=')
+                    if(nextCharacter == '=')
                     {
                         // == or !=
                         result.Operator = GetOperatorFromString($"{currentCharacter}{nextCharacter}");
                         currentIndex += 2;
                     }
                     else
+                    {
                         throw new ScriptingInvalidOperatorException($"Invalid operator {currentCharacter}{nextCharacter}");
+                    }
 
                     continue;
                 }
@@ -209,7 +238,7 @@ namespace DeploymentToolkit.Scripting
                 )
                 {
                     var nextCharacter = condition[currentIndex];
-                    if (nextCharacter == '=')
+                    if(nextCharacter == '=')
                     {
                         result.Operator = GetOperatorFromString($"{currentCharacter}{nextCharacter}");
                         currentIndex += 2;
@@ -221,7 +250,7 @@ namespace DeploymentToolkit.Scripting
                     }
                 }
             }
-            while (currentIndex < condition.Length);
+            while(currentIndex < condition.Length);
 #if DEBUG && EVALUTATOR_TRACE
             Debug.WriteLine($"Final condition: '{result.FirstString}' {result.Operator} '{result.SecondString}' as {result.CompareType} -> {result.IsTrue()}");
 #endif
@@ -234,7 +263,7 @@ namespace DeploymentToolkit.Scripting
 #if DEBUG && EVALUTATOR_TRACE
             Debug.WriteLine($"Processing {input}");
 #endif
-            switch (input)
+            switch(input)
             {
                 case "==":
                     return Operator.Equal;

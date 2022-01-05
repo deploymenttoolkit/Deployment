@@ -14,14 +14,14 @@ namespace DeploymentToolkit.Scripting
 
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private static object _environmentLock = new object();
+        private static readonly object _environmentLock = new object();
         private static bool _isEnvironmentInitialized = false;
 
         public static string Process(string data)
         {
-            lock (_environmentLock)
+            lock(_environmentLock)
             {
-                if (!_isEnvironmentInitialized)
+                if(!_isEnvironmentInitialized)
                 {
                     _isEnvironmentInitialized = true;
                     _logger.Trace("Initializing Environment ...");
@@ -32,21 +32,25 @@ namespace DeploymentToolkit.Scripting
             var processed = data;
             var toProcess = data;
 
-            while (toProcess.Contains(_separator))
+            while(toProcess.Contains(_separator))
             {
                 var start = toProcess.IndexOf(_separator);
-                if (start == -1)
+                if(start == -1)
+                {
                     break;
+                }
 
                 var part = toProcess.Substring(start + 1, toProcess.Length - start - 1);
                 var end = part.IndexOf(_separator);
-                if (end == -1)
+                if(end == -1)
+                {
                     break;
+                }
 
                 var variableName = part.Substring(0, end);
 
                 var isFunction = false;
-                if (variableName.Contains("("))
+                if(variableName.Contains("("))
                 {
 #if DEBUG && PREPROCESSOR_TRACE
                     Debug.WriteLine("Function detected");
@@ -54,7 +58,7 @@ namespace DeploymentToolkit.Scripting
                     isFunction = true;
 
                     end = part.IndexOf(')');
-                    if (end == -1)
+                    if(end == -1)
                     {
                         end = part.IndexOf(_separator);
                         variableName = part.Substring(0, end);
@@ -76,19 +80,19 @@ namespace DeploymentToolkit.Scripting
 #if DEBUG && PREPROCESSOR_TRACE
                 Debug.WriteLine($"Remaining to Process: {toProcess}");
 #endif
-                if (isFunction)
+                if(isFunction)
                 {
                     var variablesStart = variableName.IndexOf('(');
                     var variablesEnd = variableName.IndexOf(')');
 
-                    if (variablesStart == -1 || variablesEnd == -1)
+                    if(variablesStart == -1 || variablesEnd == -1)
                     {
                         processed = processed.Replace($"${variableName}$", "INCOMPLETE PARAMETERS");
                         continue;
                     }
 
                     var parameterString = variableName.Substring(variablesStart, variablesEnd - variablesStart).TrimStart('(').TrimEnd(')');
-                    if (string.IsNullOrEmpty(parameterString))
+                    if(string.IsNullOrEmpty(parameterString))
                     {
                         processed = processed.Replace($"${variableName}$", "MISSING PARAMETERS");
                         continue;
@@ -99,7 +103,7 @@ namespace DeploymentToolkit.Scripting
                     Debug.WriteLine($"Function: {functionName}");
                     Debug.WriteLine($"Params: {parameterString}");
 #endif
-                    if (_functions.ContainsKey(functionName))
+                    if(_functions.ContainsKey(functionName))
                     {
                         // Trim each variable so you can create better visibility in scripts with spaces
                         var parameters = ProcessVariables(parameterString.Split(','));
@@ -112,17 +116,26 @@ namespace DeploymentToolkit.Scripting
                 }
                 else
                 {
-                    if (_variables.ContainsKey(variableName))
+                    if(_variables.ContainsKey(variableName))
+                    {
                         processed = processed.Replace($"${variableName}$", _variables[variableName].Invoke());
+                    }
                     else
+                    {
                         processed = processed.Replace($"${variableName}$", "VARIABLE NOT FOUND");
+                    }
                 }
             }
 
-            if (processed.Contains(_trueString))
+            if(processed.Contains(_trueString))
+            {
                 processed = processed.Replace(_trueString, _trueInt);
-            if (processed.Contains(_falseString))
+            }
+
+            if(processed.Contains(_falseString))
+            {
                 processed = processed.Replace(_falseString, _falseInt);
+            }
 
 #if DEBUG && PREPROCESSOR_TRACE
             Debug.WriteLine($"Processed: {processed}");
@@ -134,13 +147,13 @@ namespace DeploymentToolkit.Scripting
         {
             var result = new string[variables.Length];
             var trimmed = variables.Select((p) => p.Trim()).ToArray();
-            for (var i = 0; i < variables.Length; i++)
+            for(var i = 0; i < variables.Length; i++)
             {
                 var currentVariable = trimmed[i];
-                if (currentVariable.StartsWith("$") && currentVariable.EndsWith("$"))
+                if(currentVariable.StartsWith("$") && currentVariable.EndsWith("$"))
                 {
                     var variableName = currentVariable.Trim('$');
-                    if (_variables.ContainsKey(variableName))
+                    if(_variables.ContainsKey(variableName))
                     {
                         result[i] = _variables[variableName].Invoke();
 #if DEBUG && PREPROCESSOR_TRACE

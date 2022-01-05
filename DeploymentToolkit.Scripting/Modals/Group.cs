@@ -1,7 +1,6 @@
 ﻿using DeploymentToolkit.Scripting.Exceptions;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace DeploymentToolkit.Scripting.Modals
 {
@@ -21,7 +20,7 @@ namespace DeploymentToolkit.Scripting.Modals
                 var isTrue = false;
 
                 var currentGroup = GroupLinks[0];
-                if (GroupLinks.Count == 1)
+                if(GroupLinks.Count == 1)
                 {
                     return currentGroup.IsTrue();
                 }
@@ -32,12 +31,12 @@ namespace DeploymentToolkit.Scripting.Modals
                     do
                     {
                         var nextGroup = GroupLinks[nextGroupCount++];
-                        if (nextGroup.LinkType == LinkType.Or && isTrue)
+                        if(nextGroup.LinkType == LinkType.Or && isTrue)
                         {
                             // The next connection is an OR connection but we already validated a true result
                             return true;
                         }
-                        else if (nextGroup.LinkType == LinkType.And)
+                        else if(nextGroup.LinkType == LinkType.And)
                         {
                             // The next griup is an AND connection so we need to further validate
                             isTrue = nextGroup.IsTrue();
@@ -47,15 +46,17 @@ namespace DeploymentToolkit.Scripting.Modals
                             // Its an OR connection but our current link didn't return true so validate further
                         }
                     }
-                    while (nextGroupCount < GroupLinks.Count);
+                    while(nextGroupCount < GroupLinks.Count);
 
                     return isTrue;
                 }
             }
             else if(SubGroups.Count > 0)
             {
-                if (SubGroups.Count > 1)
+                if(SubGroups.Count > 1)
+                {
                     throw new ScriptingInvalidGroupException("Got more than 1 subgroup but no conditions linkted to them");
+                }
 
                 return SubGroups[0].IsTrue();
             }

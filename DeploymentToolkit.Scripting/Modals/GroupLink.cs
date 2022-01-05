@@ -13,11 +13,13 @@ namespace DeploymentToolkit.Scripting.Modals
         public LinkType LinkType { get; set; }
         public Group FirstGroup { get; set; }
         public Group SecondGroup { get; set; }
-        
+
         public GroupLink(Group firstGroup, LinkType linkType, Group secondGroup)
         {
-            if (linkType == LinkType.None)
+            if(linkType == LinkType.None)
+            {
                 throw new ScriptingInvalidOperatorException($"{linkType} is not a valid operator");
+            }
 
             this.FirstGroup = firstGroup;
             this.LinkType = linkType;
@@ -26,10 +28,14 @@ namespace DeploymentToolkit.Scripting.Modals
 
         public bool IsTrue()
         {
-            if (LinkType == LinkType.And)
+            if(LinkType == LinkType.And)
+            {
                 return FirstGroup.IsTrue() && SecondGroup.IsTrue();
-            else if (LinkType == LinkType.Or)
+            }
+            else if(LinkType == LinkType.Or)
+            {
                 return FirstGroup.IsTrue() || SecondGroup.IsTrue();
+            }
 
             // Can never happen
             return false;
