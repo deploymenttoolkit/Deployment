@@ -6,7 +6,7 @@ namespace DeploymentToolkit.Util.Structs
     [StructLayout(LayoutKind.Sequential)]
     internal struct SECURITY_ATTRIBUTES
     {
-        public int Length;
+        public Int32 Length;
         public IntPtr lpSecurityDescriptor;
         public bool bInheritHandle;
     }

@@ -6,6 +6,6 @@ namespace DeploymentToolkit.Util.Structs
     internal struct LUID_AND_ATTRIBUTES
     {
         private LUID Luid;
-        private readonly int Attributes;
+        private int Attributes;
     }
 }

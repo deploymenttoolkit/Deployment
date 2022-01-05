@@ -8,7 +8,7 @@ namespace DeploymentToolkit.Util.Structs
     {
         public IntPtr hProcess;
         public IntPtr hThread;
-        public int dwProcessID;
-        public int dwThreadID;
+        public Int32 dwProcessID;
+        public Int32 dwThreadID;
     }
 }

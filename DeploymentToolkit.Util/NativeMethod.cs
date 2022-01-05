@@ -10,7 +10,7 @@ namespace DeploymentToolkit.Util
         [DllImport("advapi32", SetLastError = true), SuppressUnmanagedCodeSecurity]
         internal static extern int OpenProcessToken(
             IntPtr ProcessHandle, // handle to process
-            uint DesiredAccess, // desired access to process
+            UInt32 DesiredAccess, // desired access to process
             ref IntPtr TokenHandle // handle to open access token
         );
 
@@ -54,10 +54,10 @@ namespace DeploymentToolkit.Util
         [DllImport("advapi32.dll", EntryPoint = "DuplicateTokenEx")]
         internal static extern bool DuplicateTokenEx(
             IntPtr hExistingToken,
-            int dwDesiredAccess,
+            Int32 dwDesiredAccess,
             ref SECURITY_ATTRIBUTES lpThreadAttributes,
-            int ImpersonationLevel,
-            int dwTokenType,
+            Int32 ImpersonationLevel,
+            Int32 dwTokenType,
             ref IntPtr phNewToken
         );
 

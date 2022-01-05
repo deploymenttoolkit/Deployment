@@ -14,12 +14,12 @@ namespace DeploymentToolkit.Util
         {
             try
             {
-                if(ajustToken && !TokenAdjuster.EnablePrivilege("SeShutdownPrivilege", true))
+                if (ajustToken && !TokenAdjuster.EnablePrivilege("SeShutdownPrivilege", true))
                 {
                     return false;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.Fatal(ex, "Failed to adjust token");
                 return false;
