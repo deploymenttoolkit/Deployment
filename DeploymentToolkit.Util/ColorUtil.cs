@@ -12,7 +12,7 @@ namespace DeploymentToolkit.Util
             var result = default(Color);
             try
             {
-                if (color.StartsWith("#"))
+                if(color.StartsWith("#"))
                 {
                     result = ColorTranslator.FromHtml(color);
                 }
@@ -21,7 +21,7 @@ namespace DeploymentToolkit.Util
                     result = Color.FromName(color);
                 }
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 _logger.Error(ex, $"Failed to parse color ({color})");
             }

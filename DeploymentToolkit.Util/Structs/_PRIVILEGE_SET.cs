@@ -5,10 +5,10 @@ namespace DeploymentToolkit.Util.Structs
     [StructLayout(LayoutKind.Sequential)]
     internal struct _PRIVILEGE_SET
     {
-        private int PrivilegeCount;
-        private int Control;
+        private readonly int PrivilegeCount;
+        private readonly int Control;
 
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 1)] // ANYSIZE_ARRAY = 1
-        private LUID_AND_ATTRIBUTES[] Privileges;
+        private readonly LUID_AND_ATTRIBUTES[] Privileges;
     }
 }
