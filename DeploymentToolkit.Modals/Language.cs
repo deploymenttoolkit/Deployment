@@ -2,31 +2,31 @@
 
 namespace DeploymentToolkit.Modals
 {
-	[XmlRoot("Messages")]
+    [XmlRoot("Messages")]
     public class Language
     {
-		// Everything below here we add ourselfs
-		public string PathToUpgradeRtf { get; set; }
+        // Everything below here we add ourselfs
+        public string PathToUpgradeRtf { get; set; }
 
-		public string DTK_WindowTitle { get; set; }
-		public string DTK_BrandingTitle { get; set; }
+        public string DTK_WindowTitle { get; set; }
+        public string DTK_BrandingTitle { get; set; }
 
-		// Upgrade Messages
-		public string UpgradePrompt_ButtonStartNow { get; set; }
-		public string UpgradePrompt_ButtonSchedule { get; set; }
-		public string UpgradePrompt_ButtonMinimize { get; set; }
+        // Upgrade Messages
+        public string UpgradePrompt_ButtonStartNow { get; set; }
+        public string UpgradePrompt_ButtonSchedule { get; set; }
+        public string UpgradePrompt_ButtonMinimize { get; set; }
 
-		// Upgrade Schedule Dialog
-		public string UpgradePrompt_ButtonConfirm { get; set; }
-		public string UpgradePrompt_ButtonCancel { get; set; }
-		public string UpgradePrompt_ScheduleTitle { get; set; }
-		public string UpgradePrompt_ScheduleOptionOne { get; set; }
-		public string UpgradePrompt_ScheduleOptionTwo { get; set; }
-		public string UpgradePrompt_ScheduleReminder { get; set; }
+        // Upgrade Schedule Dialog
+        public string UpgradePrompt_ButtonConfirm { get; set; }
+        public string UpgradePrompt_ButtonCancel { get; set; }
+        public string UpgradePrompt_ScheduleTitle { get; set; }
+        public string UpgradePrompt_ScheduleOptionOne { get; set; }
+        public string UpgradePrompt_ScheduleOptionTwo { get; set; }
+        public string UpgradePrompt_ScheduleReminder { get; set; }
 
 
-		// Everything below this comment is from PSADT
-		public string DiskSpace_Message { get; set; }
+        // Everything below this comment is from PSADT
+        public string DiskSpace_Message { get; set; }
 
         public string ClosePrompt_ButtonContinue { get; set; }
         public string ClosePrompt_ButtonContinueTooltip { get; set; }

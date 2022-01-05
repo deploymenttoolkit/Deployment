@@ -12,10 +12,13 @@ namespace DeploymentToolkit.Modals.Settings
             {
                 return DeadlineAsDate.ToShortDateString();
             }
-            set 
+            set
             {
                 if(!DateTime.TryParse(value, out var date))
+                {
                     DeadlineAsDate = DateTime.MinValue;
+                }
+
                 DeadlineAsDate = date;
             }
         }

@@ -1,9 +1,9 @@
 ﻿namespace DeploymentToolkit.Modals.Settings.Tray
 {
-	public enum Alignment
+    public enum Alignment
     {
         Disabled,
-		Automatic,
+        Automatic,
         Right,
         Left,
         Center
