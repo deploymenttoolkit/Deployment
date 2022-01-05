@@ -12,7 +12,7 @@ namespace DeploymentToolkit.Registry.Modals
     public class WinRegistryKey : IDisposable
     {
         [DllImport("advapi32.dll")]
-        static extern int RegQueryValueEx(
+        private static extern int RegQueryValueEx(
             UIntPtr hKey,
             string lpValueName,
             int lpReserved,
@@ -22,7 +22,7 @@ namespace DeploymentToolkit.Registry.Modals
         );
 
         [DllImport("advapi32.dll", SetLastError = true)]
-        static extern int RegSetValueEx(
+        private static extern int RegSetValueEx(
             UIntPtr hKey,
             [MarshalAs(UnmanagedType.LPStr)] string lpValueName,
             int Reserved,
@@ -32,13 +32,13 @@ namespace DeploymentToolkit.Registry.Modals
         );
 
         [DllImport("advapi32.dll")]
-        static extern int RegDeleteValue(
+        private static extern int RegDeleteValue(
             UIntPtr hKey,
             [MarshalAs(UnmanagedType.VBByRefStr)] ref string lpValueName
         );
 
         [DllImport("advapi32.dll")]
-        extern private static int RegQueryInfoKey(
+        private static extern int RegQueryInfoKey(
             UIntPtr hkey,
             StringBuilder lpClass,
             ref uint lpcbClass,
@@ -54,7 +54,7 @@ namespace DeploymentToolkit.Registry.Modals
         );
 
         [DllImport("advapi32.dll")]
-        static extern int RegEnumKeyEx(
+        private static extern int RegEnumKeyEx(
             UIntPtr hKey,
             uint dwIndex,
             StringBuilder lpName,
@@ -87,8 +87,10 @@ namespace DeploymentToolkit.Registry.Modals
             var error = RegDeleteValue(RegPointer, ref key);
             _logger.Trace($"Errorlevel: {error}");
 
-            if (error == 0)
+            if(error == 0)
+            {
                 return true;
+            }
 
             throw new Win32Exception(error);
         }
@@ -100,47 +102,51 @@ namespace DeploymentToolkit.Registry.Modals
             var data = IntPtr.Zero;
             try
             {
-                switch (type)
+                switch(type)
                 {
                     case RegistryValueKind.String:
-                        {
-                            _logger.Trace("Allocating string ...");
-                            size = ((string)value).Length + 1;
-                            data = Marshal.StringToHGlobalAnsi((string)value);
-                        }
-                        break;
+                    {
+                        _logger.Trace("Allocating string ...");
+                        size = ((string)value).Length + 1;
+                        data = Marshal.StringToHGlobalAnsi((string)value);
+                    }
+                    break;
 
                     case RegistryValueKind.DWord:
-                        {
-                            _logger.Trace("Allocating int ...");
-                            size = Marshal.SizeOf(typeof(Int32));
-                            data = Marshal.AllocHGlobal(size);
-                            Marshal.WriteInt32(data, (int)value);
-                        }
-                        break;
+                    {
+                        _logger.Trace("Allocating int ...");
+                        size = Marshal.SizeOf(typeof(int));
+                        data = Marshal.AllocHGlobal(size);
+                        Marshal.WriteInt32(data, (int)value);
+                    }
+                    break;
 
                     case RegistryValueKind.QWord:
-                        {
-                            _logger.Trace("Allocating long ...");
-                            size = Marshal.SizeOf(typeof(Int64));
-                            data = Marshal.AllocHGlobal(size);
-                            Marshal.WriteInt64(data, (int)value);
-                        }
-                        break;
+                    {
+                        _logger.Trace("Allocating long ...");
+                        size = Marshal.SizeOf(typeof(long));
+                        data = Marshal.AllocHGlobal(size);
+                        Marshal.WriteInt64(data, (int)value);
+                    }
+                    break;
                 }
 
                 var error = RegSetValueEx(RegPointer, key, 0, type, data, size);
                 _logger.Trace($"Errorlevel: {error}");
 
-                if (error == 0)
-                        return true;
+                if(error == 0)
+                {
+                    return true;
+                }
 
                 throw new Win32Exception(error);
             }
             finally
             {
-                if (data != IntPtr.Zero)
+                if(data != IntPtr.Zero)
+                {
                     Marshal.FreeHGlobal(data);
+                }
             }
         }
 
@@ -153,16 +159,18 @@ namespace DeploymentToolkit.Registry.Modals
             {
                 var error = RegQueryValueEx(RegPointer, key, 0, ref type, IntPtr.Zero, ref size);
                 _logger.Trace($"Errorlevel: {error}");
-                if (error != 0)
+                if(error != 0)
+                {
                     throw new Win32Exception(error);
+                }
 
                 result = Marshal.AllocHGlobal(size);
                 error = RegQueryValueEx(RegPointer, key, 0, ref type, result, ref size);
                 _logger.Trace($"Errorlevel: {error}");
-                if (error == 0)
+                if(error == 0)
                 {
                     var resultObject = default(T);
-                    switch (type)
+                    switch(type)
                     {
                         case RegistryValueKind.String:
                             _logger.Trace("Fetching string ...");
@@ -187,8 +195,10 @@ namespace DeploymentToolkit.Registry.Modals
             }
             finally
             {
-                if (result != IntPtr.Zero)
+                if(result != IntPtr.Zero)
+                {
                     Marshal.FreeHGlobal(result);
+                }
             }
         }
 
@@ -231,7 +241,7 @@ namespace DeploymentToolkit.Registry.Modals
                 {
                     //var subKeyCount = Marshal.ReadInt32(subKeyCountAddress);
                     _logger.Trace($"Found {subKeyCount} subkeys");
-                    
+
                     if(subKeyCount > 0)
                     {
                         for(uint i = 0; i < subKeyCount; i++)

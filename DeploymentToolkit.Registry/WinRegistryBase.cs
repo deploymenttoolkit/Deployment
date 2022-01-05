@@ -11,7 +11,7 @@ namespace DeploymentToolkit.Registry
     public abstract class WinRegistryBase
     {
         [DllImport("advapi32.dll")]
-        static extern int RegOpenKeyEx(
+        private static extern int RegOpenKeyEx(
             RegistryHive hKey,
             [MarshalAs(UnmanagedType.VBByRefStr)] ref string subKey,
             int options,
@@ -20,12 +20,12 @@ namespace DeploymentToolkit.Registry
         );
 
         [DllImport("advapi32.dll")]
-        static extern int RegCloseKey(
+        private static extern int RegCloseKey(
             UIntPtr hKey
         );
 
         [DllImport("advapi32.dll")]
-        static extern int RegCreateKeyEx(
+        private static extern int RegCreateKeyEx(
                 RegistryHive hKey,
                 string lpSubKey,
                 int Reserved,
@@ -52,24 +52,31 @@ namespace DeploymentToolkit.Registry
         public WinRegistryKey OpenKey(string path, bool write = false)
         {
             _logger.Trace($"OpenKey({path}, {write})");
-            if (string.IsNullOrEmpty(path))
+            if(string.IsNullOrEmpty(path))
+            {
                 throw new ArgumentNullException(nameof(path));
+            }
 
             var hive = GetHiveFromString(path, out var newPath);
             _logger.Trace($"Hive: {hive}");
             var error = RegOpenKeyEx(hive, ref newPath, 0, write ? RegAccess.KEY_ALL_ACCESS : RegAccess.KEY_READ | RegAccess, out var key);
             _logger.Trace($"Errorlevel: {error}");
 
-            if (error == 0)
+            if(error == 0)
+            {
                 return new WinRegistryKey(this, key, newPath, hive);
+            }
+
             throw new Win32Exception(error);
         }
 
         public WinRegistryKey CreateOrOpenKey(string path)
         {
             _logger.Trace($"CreateKey({path})");
-            if (string.IsNullOrEmpty(path))
+            if(string.IsNullOrEmpty(path))
+            {
                 throw new ArgumentNullException(nameof(path));
+            }
 
             var hive = GetHiveFromString(path, out var newPath);
             return InternalCreateOrOpenKey(newPath, hive);
@@ -82,7 +89,7 @@ namespace DeploymentToolkit.Registry
                 hive,
                 path,
                 0,
-                String.Empty,
+                string.Empty,
                 RegOption.NonVolatile,
                 RegSAM.Write | (RegAccess == RegAccess.KEY_WOW64_64KEY ? RegSAM.WOW64_64Key : RegSAM.WOW64_32Key),
                 new SECURITY_ATTRIBUTES(),
@@ -91,8 +98,10 @@ namespace DeploymentToolkit.Registry
             );
             _logger.Trace($"Errorlevel: {error}");
 
-            if (error == 0)
+            if(error == 0)
+            {
                 return new WinRegistryKey(this, key, path, hive);
+            }
 
             throw new Win32Exception(error);
         }
@@ -100,8 +109,10 @@ namespace DeploymentToolkit.Registry
         public bool DeleteKey(WinRegistryKey key, string subKey)
         {
             _logger.Trace($"DeleteKey({key.Key}, {subKey})");
-            if (string.IsNullOrEmpty(subKey))
+            if(string.IsNullOrEmpty(subKey))
+            {
                 throw new ArgumentNullException(nameof(subKey));
+            }
 
             var error = RegDeleteKeyEx(
                 key.RegPointer,
@@ -111,8 +122,11 @@ namespace DeploymentToolkit.Registry
             );
             _logger.Trace($"Errorlevel: {error}");
 
-            if (error == 0)
+            if(error == 0)
+            {
                 return true;
+            }
+
             throw new Win32Exception(error);
         }
 
@@ -122,8 +136,11 @@ namespace DeploymentToolkit.Registry
             var error = RegCloseKey(key.RegPointer);
             _logger.Trace($"Errorlevel: {error}");
 
-            if (error == 0)
+            if(error == 0)
+            {
                 return true;
+            }
+
             throw new Win32Exception(error);
         }
 
@@ -131,8 +148,10 @@ namespace DeploymentToolkit.Registry
         {
             _logger.Trace($"GetHiveFromString({path})");
             var split = path.Split('\\');
-            if (split.Length == 0)
+            if(split.Length == 0)
+            {
                 throw new ArgumentOutOfRangeException(nameof(path));
+            }
 
             var hive = split[0].ToUpper();
             _logger.Trace($"Hive: {hive}");
