@@ -49,16 +49,21 @@ namespace DeploymentToolkit.RegistryWrapper
         public static void CreateSubKey(RegistryHive hive, string path, string subKeyName)
         {
             _logger.Trace($"CreateSubKey({hive}, {path}, {subKeyName})");
-            if (string.IsNullOrEmpty(path))
+            if(string.IsNullOrEmpty(path))
+            {
                 throw new ArgumentNullException(nameof(path));
-            if (string.IsNullOrEmpty(subKeyName))
+            }
+
+            if(string.IsNullOrEmpty(subKeyName))
+            {
                 throw new ArgumentNullException(nameof(subKeyName));
+            }
 
             var hives = GetBaseKey(hive);
             foreach(var regHive in hives)
             {
                 var subKey = regHive.OpenSubKey(path, true);
-                if (subKey != null)
+                if(subKey != null)
                 {
                     subKey.CreateSubKey(subKeyName);
                 }
@@ -72,10 +77,15 @@ namespace DeploymentToolkit.RegistryWrapper
         public static void DeleteSubKey(RegistryHive hive, string path, string subKeyName)
         {
             _logger.Trace($"DeleteSubKey({hive}, {path}, {subKeyName})");
-            if (string.IsNullOrEmpty(path))
+            if(string.IsNullOrEmpty(path))
+            {
                 throw new ArgumentNullException(nameof(path));
-            if (string.IsNullOrEmpty(subKeyName))
+            }
+
+            if(string.IsNullOrEmpty(subKeyName))
+            {
                 throw new ArgumentNullException(nameof(subKeyName));
+            }
 
             var hives = GetBaseKey(hive);
             foreach(var reghive in hives)
@@ -91,10 +101,15 @@ namespace DeploymentToolkit.RegistryWrapper
         public static void SetValue(RegistryHive hive, string path, string subKeyName, string name, object value)
         {
             _logger.Trace($"SetValue({hive}, {path}, {subKeyName}, {name}, {value})");
-            if (string.IsNullOrEmpty(path))
+            if(string.IsNullOrEmpty(path))
+            {
                 throw new ArgumentNullException(nameof(path));
-            if (string.IsNullOrEmpty(subKeyName))
+            }
+
+            if(string.IsNullOrEmpty(subKeyName))
+            {
                 throw new ArgumentNullException(nameof(subKeyName));
+            }
 
             SetValue(hive, Path.Combine(path, subKeyName), name, value);
         }
@@ -102,10 +117,15 @@ namespace DeploymentToolkit.RegistryWrapper
         public static void SetValue(RegistryHive hive, string path, string name, object value)
         {
             _logger.Trace($"SetValue({hive}, {path}, {name}, {value})");
-            if (string.IsNullOrEmpty(path))
+            if(string.IsNullOrEmpty(path))
+            {
                 throw new ArgumentNullException(nameof(path));
-            if (string.IsNullOrEmpty(name))
+            }
+
+            if(string.IsNullOrEmpty(name))
+            {
                 throw new ArgumentNullException(nameof(name));
+            }
 
             var hives = GetBaseKey(hive);
             foreach(var regHive in hives)

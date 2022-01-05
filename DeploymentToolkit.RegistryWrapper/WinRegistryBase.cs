@@ -10,64 +10,43 @@ namespace DeploymentToolkit.RegistryWrapper
     {
         public abstract RegistryView View { get; }
 
-        internal RegistryKey HKEY_LOCAL_MACHINE
-        {
-            get
-            {
-                return RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, View);
-            }
-        }
+        internal RegistryKey HKEY_LOCAL_MACHINE => RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, View);
 
-        internal RegistryKey HKEY_USERS
-        {
-            get
-            {
-                return RegistryKey.OpenBaseKey(RegistryHive.Users, View);
-            }
-        }
+        internal RegistryKey HKEY_USERS => RegistryKey.OpenBaseKey(RegistryHive.Users, View);
 
-        internal RegistryKey HKEY_CLASSES_ROOT
-        {
-            get
-            {
-                return RegistryKey.OpenBaseKey(RegistryHive.ClassesRoot, View);
-            }
-        }
+        internal RegistryKey HKEY_CLASSES_ROOT => RegistryKey.OpenBaseKey(RegistryHive.ClassesRoot, View);
 
-        internal RegistryKey HKEY_CURRENT_CONFIG
-        {
-            get
-            {
-                return RegistryKey.OpenBaseKey(RegistryHive.CurrentConfig, View);
-            }
-        }
+        internal RegistryKey HKEY_CURRENT_CONFIG => RegistryKey.OpenBaseKey(RegistryHive.CurrentConfig, View);
 
-        internal RegistryKey HKEY_CURRENT_USER
-        {
-            get
-            {
-                return RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, View);
-            }
-        }
+        internal RegistryKey HKEY_CURRENT_USER => RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, View);
 
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         private RegistryKey GetBaseKey(string path, out string newPath)
         {
-            if (string.IsNullOrEmpty(path))
+            if(string.IsNullOrEmpty(path))
+            {
                 throw new ArgumentNullException(nameof(path));
+            }
 
             var split = path.Split('\\');
-            if (split.Length == 0)
+            if(split.Length == 0)
+            {
                 throw new ArgumentOutOfRangeException(nameof(path), "Invalid path supplied");
+            }
 
             var hive = split[0].Trim().ToUpperInvariant();
             newPath = string.Empty;
-            if (split.Length == 2)
+            if(split.Length == 2)
+            {
                 newPath = split[1];
-            else if (split.Length > 2)
+            }
+            else if(split.Length > 2)
+            {
                 newPath = split.Skip(1).Aggregate((i, j) => i + @"\" + j);
-            switch (hive)
+            }
+
+            switch(hive)
             {
                 case "HKCR":
                 case "HKEY_CLASSES_ROOT":
@@ -96,14 +75,19 @@ namespace DeploymentToolkit.RegistryWrapper
 
         public bool SubKeyExists(string path, string subKeyName)
         {
-            if (string.IsNullOrEmpty(path))
+            if(string.IsNullOrEmpty(path))
+            {
                 throw new ArgumentNullException(nameof(path));
-            if (string.IsNullOrEmpty(subKeyName))
+            }
+
+            if(string.IsNullOrEmpty(subKeyName))
+            {
                 throw new ArgumentNullException(nameof(subKeyName));
+            }
 
             var key = GetBaseKey(path, out var newPath);
             var subKey = key.OpenSubKey(newPath);
-            if (subKey != null)
+            if(subKey != null)
             {
                 return subKey.GetSubKeyNames().Contains(subKeyName);
             }
@@ -114,12 +98,14 @@ namespace DeploymentToolkit.RegistryWrapper
 
         public string[] GetSubKeys(string path)
         {
-            if (string.IsNullOrEmpty(path))
+            if(string.IsNullOrEmpty(path))
+            {
                 throw new ArgumentNullException(nameof(path));
+            }
 
             var key = GetBaseKey(path, out var newPath);
             var subKey = key.OpenSubKey(newPath);
-            if (subKey != null)
+            if(subKey != null)
             {
                 return subKey.GetSubKeyNames();
             }
@@ -130,14 +116,19 @@ namespace DeploymentToolkit.RegistryWrapper
 
         public bool CreateSubKey(string path, string subKeyName)
         {
-            if (string.IsNullOrEmpty(path))
+            if(string.IsNullOrEmpty(path))
+            {
                 throw new ArgumentNullException(nameof(path));
-            if (string.IsNullOrEmpty(nameof(subKeyName)))
+            }
+
+            if(string.IsNullOrEmpty(nameof(subKeyName)))
+            {
                 throw new ArgumentNullException(nameof(subKeyName));
+            }
 
             var key = GetBaseKey(path, out var newPath);
             var subKey = key.OpenSubKey(newPath, true);
-            if (subKey != null)
+            if(subKey != null)
             {
                 subKey.CreateSubKey(subKeyName);
                 return true;
@@ -148,8 +139,10 @@ namespace DeploymentToolkit.RegistryWrapper
 
         public RegistryKey CreateSubKey(string path)
         {
-            if (string.IsNullOrEmpty(path))
+            if(string.IsNullOrEmpty(path))
+            {
                 throw new ArgumentNullException(nameof(path));
+            }
 
             var key = GetBaseKey(path, out var newPath);
             return key.CreateSubKey(newPath, true);
@@ -157,18 +150,25 @@ namespace DeploymentToolkit.RegistryWrapper
 
         public RegistryKey OpenSubKey(string path, string subKeyName, bool writeable = true)
         {
-            if (string.IsNullOrEmpty(path))
+            if(string.IsNullOrEmpty(path))
+            {
                 throw new ArgumentNullException(nameof(path));
-            if (string.IsNullOrEmpty(nameof(subKeyName)))
+            }
+
+            if(string.IsNullOrEmpty(nameof(subKeyName)))
+            {
                 throw new ArgumentNullException(nameof(subKeyName));
+            }
 
             return OpenSubKey(Path.Combine(path, subKeyName), writeable);
         }
 
         public RegistryKey OpenSubKey(string path, bool writeable = true)
         {
-            if (string.IsNullOrEmpty(path))
+            if(string.IsNullOrEmpty(path))
+            {
                 throw new ArgumentNullException(nameof(path));
+            }
 
             var key = GetBaseKey(path, out var newPath);
             _logger.Trace($"Opening '{key}\\{newPath}'");
@@ -177,18 +177,25 @@ namespace DeploymentToolkit.RegistryWrapper
 
         public bool DeleteSubKey(string path, string subKeyName)
         {
-            if (string.IsNullOrEmpty(path))
+            if(string.IsNullOrEmpty(path))
+            {
                 throw new ArgumentNullException(nameof(path));
-            if (string.IsNullOrEmpty(nameof(subKeyName)))
+            }
+
+            if(string.IsNullOrEmpty(nameof(subKeyName)))
+            {
                 throw new ArgumentNullException(nameof(subKeyName));
+            }
 
             return DeleteSubKey(Path.Combine(path, subKeyName));
         }
 
         public bool DeleteSubKey(string path)
         {
-            if (string.IsNullOrEmpty(path))
+            if(string.IsNullOrEmpty(path))
+            {
                 throw new ArgumentNullException(nameof(path));
+            }
 
             var key = GetBaseKey(path, out var newPath);
             key.DeleteSubKeyTree(newPath, false);
@@ -197,14 +204,19 @@ namespace DeploymentToolkit.RegistryWrapper
 
         public bool HasValue(string path, string value)
         {
-            if (string.IsNullOrEmpty(path))
+            if(string.IsNullOrEmpty(path))
+            {
                 throw new ArgumentNullException(nameof(path));
-            if (string.IsNullOrEmpty(value))
+            }
+
+            if(string.IsNullOrEmpty(value))
+            {
                 throw new ArgumentNullException(nameof(value));
+            }
 
             var key = GetBaseKey(path, out var newPath);
             var subKey = key.OpenSubKey(newPath);
-            if (subKey != null)
+            if(subKey != null)
             {
                 return subKey.GetValue(value) != null;
             }
@@ -214,14 +226,19 @@ namespace DeploymentToolkit.RegistryWrapper
 
         public bool SetValue(string path, string name, object value, RegistryValueKind valueKind)
         {
-            if (string.IsNullOrEmpty(path))
+            if(string.IsNullOrEmpty(path))
+            {
                 throw new ArgumentNullException(nameof(path));
-            if (string.IsNullOrEmpty(name))
+            }
+
+            if(string.IsNullOrEmpty(name))
+            {
                 throw new ArgumentNullException(nameof(name));
+            }
 
             var key = GetBaseKey(path, out var newPath);
             var subKey = key.OpenSubKey(newPath, true);
-            if (subKey != null)
+            if(subKey != null)
             {
                 subKey.SetValue(name, value, valueKind);
                 return true;
@@ -232,14 +249,19 @@ namespace DeploymentToolkit.RegistryWrapper
 
         public object GetValue(string path, string value)
         {
-            if (string.IsNullOrEmpty(path))
+            if(string.IsNullOrEmpty(path))
+            {
                 throw new ArgumentNullException(nameof(path));
-            if (string.IsNullOrEmpty(value))
+            }
+
+            if(string.IsNullOrEmpty(value))
+            {
                 throw new ArgumentNullException(nameof(value));
+            }
 
             var key = GetBaseKey(path, out var newPath);
             var subKey = key.OpenSubKey(newPath);
-            if (subKey != null)
+            if(subKey != null)
             {
                 return subKey.GetValue(value);
             }
@@ -249,14 +271,19 @@ namespace DeploymentToolkit.RegistryWrapper
 
         public bool DeleteValue(string path, string value)
         {
-            if (string.IsNullOrEmpty(path))
+            if(string.IsNullOrEmpty(path))
+            {
                 throw new ArgumentNullException(nameof(path));
-            if (string.IsNullOrEmpty(value))
+            }
+
+            if(string.IsNullOrEmpty(value))
+            {
                 throw new ArgumentNullException(nameof(value));
+            }
 
             var key = GetBaseKey(path, out var newPath);
             var subKey = key.OpenSubKey(newPath, true);
-            if (subKey != null)
+            if(subKey != null)
             {
                 subKey.DeleteValue(value);
                 return true;
