@@ -16,30 +16,48 @@ namespace DeploymentToolkit.Actions.Utils
         private static List<string> _userFolders;
         public static List<string> GetUserFolders(bool includeDefaultProfile, bool includePublicProfile)
         {
-            if (_userFolders == null)
+            if(_userFolders == null)
             {
                 var userDirectories = Directory.GetDirectories(@"C:\Users").ToList();
 
-                if (userDirectories.Contains(_defaultUserProfile))
+                if(userDirectories.Contains(_defaultUserProfile))
+                {
                     userDirectories.Remove(_defaultUserProfile);
-                if (userDirectories.Contains(_publicUserProfile))
+                }
+
+                if(userDirectories.Contains(_publicUserProfile))
+                {
                     userDirectories.Remove(_publicUserProfile);
-                if (userDirectories.Contains(_compatibilityAllUserProfile))
+                }
+
+                if(userDirectories.Contains(_compatibilityAllUserProfile))
+                {
                     userDirectories.Remove(_compatibilityAllUserProfile);
-                if (userDirectories.Contains(_compatibilityDefaultUserProfile))
+                }
+
+                if(userDirectories.Contains(_compatibilityDefaultUserProfile))
+                {
                     userDirectories.Remove(_compatibilityDefaultUserProfile);
+                }
 
                 _userFolders = userDirectories;
             }
 
-            if (!includeDefaultProfile && !includePublicProfile)
+            if(!includeDefaultProfile && !includePublicProfile)
+            {
                 return _userFolders;
+            }
 
             var copy = _userFolders.ToList();
-            if (includeDefaultProfile)
+            if(includeDefaultProfile)
+            {
                 copy.Add(_defaultUserProfile);
-            if (includePublicProfile)
+            }
+
+            if(includePublicProfile)
+            {
                 copy.Add(_publicUserProfile);
+            }
 
             return copy;
         }
@@ -48,7 +66,7 @@ namespace DeploymentToolkit.Actions.Utils
         private static List<string> _specialUserRegistry;
         public static List<string> GetUserRegistry(bool includeDefaultProfile, bool includeSpecialProfiles)
         {
-            if (_userRegisty == null)
+            if(_userRegisty == null)
             {
                 var registry = new Win64Registry();
 
@@ -65,14 +83,21 @@ namespace DeploymentToolkit.Actions.Utils
                     .ToList();
             }
 
-            if (!includeDefaultProfile && !includeSpecialProfiles)
+            if(!includeDefaultProfile && !includeSpecialProfiles)
+            {
                 return _userRegisty;
+            }
 
             var copy = _userRegisty.ToList();
-            if (includeDefaultProfile)
+            if(includeDefaultProfile)
+            {
                 copy.Add(".DEFAULT");
-            if (includeSpecialProfiles)
+            }
+
+            if(includeSpecialProfiles)
+            {
                 copy.AddRange(_specialUserRegistry);
+            }
 
             return copy;
         }

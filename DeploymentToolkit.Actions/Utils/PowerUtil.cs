@@ -14,7 +14,7 @@ namespace DeploymentToolkit.Actions.Utils
         {
             try
             {
-                if (ajustToken && !TokenAdjuster.EnablePrivilege("SeShutdownPrivilege", true))
+                if(ajustToken && !TokenAdjuster.EnablePrivilege("SeShutdownPrivilege", true))
                 {
                     return false;
                 }

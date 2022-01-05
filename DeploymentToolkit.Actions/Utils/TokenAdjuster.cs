@@ -58,7 +58,7 @@ namespace DeploymentToolkit.Actions.Utils
             };
             var tLUID = new LUID();
             tokenPrivileges.PrivilegeCount = 1;
-            if (bEnablePrivilege)
+            if(bEnablePrivilege)
             {
                 tokenPrivileges.Privileges[2] = SE_PRIVILEGE_ENABLED;
             }
@@ -67,12 +67,12 @@ namespace DeploymentToolkit.Actions.Utils
                 tokenPrivileges.Privileges[2] = 0;
             }
 
-            if (LookupPrivilegeValue(null, lpszPrivilege, ref tLUID))
+            if(LookupPrivilegeValue(null, lpszPrivilege, ref tLUID))
             {
                 var proc = Process.GetCurrentProcess();
-                if (proc.Handle != IntPtr.Zero)
+                if(proc.Handle != IntPtr.Zero)
                 {
-                    if (OpenProcessToken(proc.Handle, TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY,
+                    if(OpenProcessToken(proc.Handle, TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY,
                         ref hToken) != 0)
                     {
                         tokenPrivileges.PrivilegeCount = 1;
@@ -82,10 +82,10 @@ namespace DeploymentToolkit.Actions.Utils
                         const int bufLength = 256;
                         var tu = Marshal.AllocHGlobal(bufLength);
                         Marshal.StructureToPtr(tokenPrivileges, tu, true);
-                        if (AdjustTokenPrivileges(hToken, 0, tu, bufLength, IntPtr.Zero, ref ltkpOld) != 0)
+                        if(AdjustTokenPrivileges(hToken, 0, tu, bufLength, IntPtr.Zero, ref ltkpOld) != 0)
                         {
                             // successful AdjustTokenPrivileges doesn't mean privilege could be changed
-                            if (Marshal.GetLastWin32Error() == 0)
+                            if(Marshal.GetLastWin32Error() == 0)
                             {
                                 retval = true; // Token changed
                             }
@@ -94,7 +94,7 @@ namespace DeploymentToolkit.Actions.Utils
                     }
                 }
             }
-            if (hToken != IntPtr.Zero)
+            if(hToken != IntPtr.Zero)
             {
                 CloseHandle(hToken);
             }
@@ -112,7 +112,7 @@ namespace DeploymentToolkit.Actions.Utils
         private struct LUID_AND_ATTRIBUTES
         {
             private LUID Luid;
-            private int Attributes;
+            private readonly int Attributes;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -126,11 +126,11 @@ namespace DeploymentToolkit.Actions.Utils
         [StructLayout(LayoutKind.Sequential)]
         private struct _PRIVILEGE_SET
         {
-            private int PrivilegeCount;
-            private int Control;
+            private readonly int PrivilegeCount;
+            private readonly int Control;
 
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 1)] // ANYSIZE_ARRAY = 1
-            private LUID_AND_ATTRIBUTES[] Privileges;
+            private readonly LUID_AND_ATTRIBUTES[] Privileges;
         }
     }
 }

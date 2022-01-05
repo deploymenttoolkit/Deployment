@@ -25,14 +25,14 @@ namespace DeploymentToolkit.Actions.Modals
         {
             _logger.Trace($"Starting execution of {Actions.Count} actions ...");
 
-            foreach (var action in Actions)
+            foreach(var action in Actions)
             {
                 _logger.Trace($"Executing {action.GetType().Name} ...");
                 try
                 {
                     action.Execute();
                 }
-                catch (Exception ex)
+                catch(Exception ex)
                 {
                     _logger.Warn(ex, "Exeuction of action failed");
                 }
