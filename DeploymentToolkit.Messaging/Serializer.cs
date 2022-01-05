@@ -6,7 +6,7 @@ namespace DeploymentToolkit.Messaging
 {
     internal static class Serializer
     {
-        private static Logger _logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         public static string SerializeMessage(IMessage message)
         {

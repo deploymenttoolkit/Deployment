@@ -14,11 +14,11 @@ namespace DeploymentToolkit.Messaging
     {
         public event EventHandler<NewMessageEventArgs> OnNewMessage;
 
-        private Logger _logger = LogManager.GetCurrentClassLogger();
+        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private CancellationTokenSource _cancellationToken = new CancellationTokenSource();
-        private NamedPipeServerStream _receiverPipe;
-        private NamedPipeServerStream _senderPipe;
+        private readonly CancellationTokenSource _cancellationToken = new CancellationTokenSource();
+        private readonly NamedPipeServerStream _receiverPipe;
+        private readonly NamedPipeServerStream _senderPipe;
 
         private StreamReader _reader;
         private StreamWriter _writer;
@@ -28,14 +28,14 @@ namespace DeploymentToolkit.Messaging
         public PipeServer(NotifyIcon notifyIcon)
         {
             _notifyIcon = notifyIcon;
-            
+
             var process = Process.GetCurrentProcess();
             var processId = process.Id;
 
             var pipeName = $"DT_{processId}";
 
             try
-            { 
+            {
                 _senderPipe = new NamedPipeServerStream($"{pipeName}_In", PipeDirection.InOut, 1, PipeTransmissionMode.Message);
                 _receiverPipe = new NamedPipeServerStream($"{pipeName}_Out", PipeDirection.InOut, 1, PipeTransmissionMode.Message);
 
@@ -52,8 +52,11 @@ namespace DeploymentToolkit.Messaging
 
         public void Dispose()
         {
-            if (!_cancellationToken.IsCancellationRequested)
+            if(!_cancellationToken.IsCancellationRequested)
+            {
                 _cancellationToken.Cancel();
+            }
+
             _senderPipe?.Dispose();
             _receiverPipe?.Dispose();
         }
@@ -67,14 +70,14 @@ namespace DeploymentToolkit.Messaging
                     await _senderPipe.WaitForConnectionAsync(_cancellationToken.Token);
                     await _receiverPipe.WaitForConnectionAsync(_cancellationToken.Token);
                 }
-                catch (IOException ex)
+                catch(IOException ex)
                 {
                     _senderPipe.Disconnect();
                     _receiverPipe.Disconnect();
                     _logger.Info(ex, "Disconnecting pipe");
                 }
             }
-            while (!_cancellationToken.IsCancellationRequested && (!_senderPipe.IsConnected || !_receiverPipe.IsConnected));
+            while(!_cancellationToken.IsCancellationRequested && (!_senderPipe.IsConnected || !_receiverPipe.IsConnected));
             _logger.Info($"Client connected");
 
             _reader = new StreamReader(_receiverPipe);
@@ -125,12 +128,14 @@ namespace DeploymentToolkit.Messaging
             do
             {
                 var message = await _reader.ReadLineAsync();
-                if (string.IsNullOrEmpty(message))
+                if(string.IsNullOrEmpty(message))
+                {
                     continue;
+                }
 
                 ProcessMessage(message);
             }
-            while (_receiverPipe.IsConnected);
+            while(_receiverPipe.IsConnected);
             _logger.Info("Client disconnected");
             _senderPipe.Disconnect();
             _receiverPipe.Disconnect();
@@ -143,118 +148,120 @@ namespace DeploymentToolkit.Messaging
             try
             {
                 var simpleMessage = Serializer.DeserializeMessage<BasicMessage>(data);
-                if (simpleMessage == null)
+                if(simpleMessage == null)
+                {
                     return;
+                }
 
                 _logger.Info($"Received new message {simpleMessage.MessageId}");
 
-                
 
-                switch (simpleMessage.MessageId)
+
+                switch(simpleMessage.MessageId)
                 {
                     case MessageId.DeploymentInformationMessage:
-                        {
-                            var message = Serializer.DeserializeMessage<DeploymentInformationMessage>(data);
-                            OnNewMessage?.BeginInvoke(
-                                this,
-                                new NewMessageEventArgs()
-                                {
-                                    MessageId = simpleMessage.MessageId,
-                                    Message = message
-                                },
-                                OnNewMessage.EndInvoke,
-                                null
-                            );
-                        }
-                        break;
+                    {
+                        var message = Serializer.DeserializeMessage<DeploymentInformationMessage>(data);
+                        OnNewMessage?.BeginInvoke(
+                            this,
+                            new NewMessageEventArgs()
+                            {
+                                MessageId = simpleMessage.MessageId,
+                                Message = message
+                            },
+                            OnNewMessage.EndInvoke,
+                            null
+                        );
+                    }
+                    break;
 
                     case MessageId.DeploymentStarted:
                     case MessageId.DeploymentSuccess:
                     case MessageId.DeploymentError:
-                        {
-                            // We don't need special parsing of these messages so just straight send them through
-                            OnNewMessage?.BeginInvoke(
-                                this,
-                                new NewMessageEventArgs()
-                                {
-                                    MessageId = simpleMessage.MessageId,
-                                    Message = simpleMessage
-                                },
-                                OnNewMessage.EndInvoke,
-                                null
-                            );
-                        }
-                        break;
+                    {
+                        // We don't need special parsing of these messages so just straight send them through
+                        OnNewMessage?.BeginInvoke(
+                            this,
+                            new NewMessageEventArgs()
+                            {
+                                MessageId = simpleMessage.MessageId,
+                                Message = simpleMessage
+                            },
+                            OnNewMessage.EndInvoke,
+                            null
+                        );
+                    }
+                    break;
 
                     case MessageId.DeploymentRestart:
-                        {
-                            var message = Serializer.DeserializeMessage<DeploymentRestartMessage>(data);
-                            OnNewMessage?.BeginInvoke(
-                                this,
-                                new NewMessageEventArgs()
-                                {
-                                    MessageId = simpleMessage.MessageId,
-                                    Message = message
-                                },
-                                OnNewMessage.EndInvoke,
-                                null
-                            );
-                        }
-                        break;
+                    {
+                        var message = Serializer.DeserializeMessage<DeploymentRestartMessage>(data);
+                        OnNewMessage?.BeginInvoke(
+                            this,
+                            new NewMessageEventArgs()
+                            {
+                                MessageId = simpleMessage.MessageId,
+                                Message = message
+                            },
+                            OnNewMessage.EndInvoke,
+                            null
+                        );
+                    }
+                    break;
 
                     case MessageId.DeploymentLogoff:
-                        {
-                            var message = Serializer.DeserializeMessage<DeploymentLogoffMessage>(data);
-                            OnNewMessage?.BeginInvoke(
-                                this,
-                                new NewMessageEventArgs()
-                                {
-                                    MessageId = simpleMessage.MessageId,
-                                    Message = message
-                                },
-                                OnNewMessage.EndInvoke,
-                                null
-                            );
-                        }
-                        break;
+                    {
+                        var message = Serializer.DeserializeMessage<DeploymentLogoffMessage>(data);
+                        OnNewMessage?.BeginInvoke(
+                            this,
+                            new NewMessageEventArgs()
+                            {
+                                MessageId = simpleMessage.MessageId,
+                                Message = message
+                            },
+                            OnNewMessage.EndInvoke,
+                            null
+                        );
+                    }
+                    break;
 
                     case MessageId.CloseApplications:
-                        {
-                            var message = Serializer.DeserializeMessage<CloseApplicationsMessage>(data);
-                            OnNewMessage?.BeginInvoke(
-                                this,
-                                new NewMessageEventArgs()
-                                {
-                                    MessageId = simpleMessage.MessageId,
-                                    Message = message
-                                },
-                                OnNewMessage.EndInvoke,
-                                null
-                            );
-                        }
-                        break;
+                    {
+                        var message = Serializer.DeserializeMessage<CloseApplicationsMessage>(data);
+                        OnNewMessage?.BeginInvoke(
+                            this,
+                            new NewMessageEventArgs()
+                            {
+                                MessageId = simpleMessage.MessageId,
+                                Message = message
+                            },
+                            OnNewMessage.EndInvoke,
+                            null
+                        );
+                    }
+                    break;
 
                     case MessageId.DeferDeployment:
-                        {
-                            var message = Serializer.DeserializeMessage<DeferMessage>(data);
-                            OnNewMessage?.BeginInvoke(
-                                this,
-                                new NewMessageEventArgs()
-                                {
-                                    MessageId = simpleMessage.MessageId,
-                                    Message = message
-                                },
-                                OnNewMessage.EndInvoke,
-                                null
-                            );
-                        }
-                        break;
+                    {
+                        var message = Serializer.DeserializeMessage<DeferMessage>(data);
+                        OnNewMessage?.BeginInvoke(
+                            this,
+                            new NewMessageEventArgs()
+                            {
+                                MessageId = simpleMessage.MessageId,
+                                Message = message
+                            },
+                            OnNewMessage.EndInvoke,
+                            null
+                        );
+                    }
+                    break;
 
                     default:
-                        {
-                            _logger.Warn($"Unknown message type: {simpleMessage.MessageId}");
-                        }
-                        break;
+                    {
+                        _logger.Warn($"Unknown message type: {simpleMessage.MessageId}");
+                    }
+                    break;
                 }
             }
             catch(Exception ex)
