@@ -22,7 +22,7 @@ namespace DeploymentToolkit.Util
             var trayAppSessions = trayApps.Select((p) => p.SessionId);
 
             var session = GetLoggedOnUserTokens(trayAppSessions);
-            if (session.Count == 0)
+            if(session.Count == 0)
             {
                 _logger.Info("No session found to spawn Tray App");
                 return;
@@ -37,17 +37,17 @@ namespace DeploymentToolkit.Util
             var result = new List<IntPtr>();
 
             var process = Process.GetProcessesByName("explorer");
-            if (process == null || process.Length == 0)
+            if(process == null || process.Length == 0)
             {
                 _logger.Debug("No instances of explorer.exe found. Assuming no logged on users");
                 return result;
             }
 
             var grouped = process.GroupBy((p) => p.SessionId);
-            foreach (var group in grouped)
+            foreach(var group in grouped)
             {
                 var sessionId = group.Key;
-                if (excludeSessions.Contains(sessionId))
+                if(excludeSessions.Contains(sessionId))
                 {
                     _logger.Trace($"Skipping session {sessionId}");
                     continue;
@@ -56,7 +56,7 @@ namespace DeploymentToolkit.Util
                 var handle = group.First().Handle;
                 var token = IntPtr.Zero;
 
-                if (NativeMethod.OpenProcessToken(handle, TokenAdjuster.TOKEN_READ | TokenAdjuster.TOKEN_QUERY | TokenAdjuster.TOKEN_DUPLICATE | TokenAdjuster.TOKEN_ASSIGN_PRIMARY, ref token) == 0)
+                if(NativeMethod.OpenProcessToken(handle, TokenAdjuster.TOKEN_READ | TokenAdjuster.TOKEN_QUERY | TokenAdjuster.TOKEN_DUPLICATE | TokenAdjuster.TOKEN_ASSIGN_PRIMARY, ref token) == 0)
                 {
                     _logger.Warn($"Failed to open token from {sessionId} ({Marshal.GetLastWin32Error()}). Skipping ...");
                     continue;
@@ -70,12 +70,14 @@ namespace DeploymentToolkit.Util
 
         private static void StartProcessInSessions(List<IntPtr> tokens, string path, string arguments)
         {
-            if (tokens == null || tokens.Count == 0)
+            if(tokens == null || tokens.Count == 0)
+            {
                 throw new ArgumentNullException(nameof(tokens));
+            }
 
             // Adjust token
             _logger.Trace("Adjusting token ...");
-            if (!TokenAdjuster.EnablePrivilege("SeAssignPrimaryTokenPrivilege", true))
+            if(!TokenAdjuster.EnablePrivilege("SeAssignPrimaryTokenPrivilege", true))
             {
                 _logger.Error("Failed to enable required privilege (SeAssignPrimaryTokenPrivilege)");
                 return;
@@ -83,7 +85,7 @@ namespace DeploymentToolkit.Util
 
             _logger.Trace($"Trying to start '{path}' with arguments '{arguments}' for {tokens.Count} sessions ...");
 
-            foreach (var token in tokens)
+            foreach(var token in tokens)
             {
                 var duplicatedToken = IntPtr.Zero;
                 var environment = IntPtr.Zero;
@@ -94,7 +96,7 @@ namespace DeploymentToolkit.Util
                     var securityAttributes = new SECURITY_ATTRIBUTES();
                     securityAttributes.Length = Marshal.SizeOf(securityAttributes);
 
-                    if (!NativeMethod.DuplicateTokenEx(
+                    if(!NativeMethod.DuplicateTokenEx(
                             token,
                             GENERIC_ALL_ACCESS,
                             ref securityAttributes,
@@ -108,7 +110,7 @@ namespace DeploymentToolkit.Util
                         continue;
                     }
 
-                    if (!NativeMethod.CreateEnvironmentBlock(out environment, duplicatedToken, false))
+                    if(!NativeMethod.CreateEnvironmentBlock(out environment, duplicatedToken, false))
                     {
                         _logger.Error($"Failed to get environment ({Marshal.GetLastWin32Error()})");
                         continue;
@@ -119,7 +121,7 @@ namespace DeploymentToolkit.Util
                     startupInfo.lpDesktop = @"winsta0\default";
                     startupInfo.wShowWindow = 5; // SW_SHOW
 
-                    if (!NativeMethod.CreateProcessAsUser(
+                    if(!NativeMethod.CreateProcessAsUser(
                             duplicatedToken,
                             path,
                             arguments,
@@ -140,22 +142,36 @@ namespace DeploymentToolkit.Util
 
                     _logger.Info($"Process started as {processInformation.dwProcessID} ({Marshal.GetLastWin32Error()})");
                 }
-                catch (Exception ex)
+                catch(Exception ex)
                 {
                     _logger.Warn(ex, "Error while trying to start process as user");
                 }
                 finally
                 {
-                    if (processInformation.hProcess != IntPtr.Zero)
+                    if(processInformation.hProcess != IntPtr.Zero)
+                    {
                         NativeMethod.CloseHandle(processInformation.hProcess);
-                    if (processInformation.hThread != IntPtr.Zero)
+                    }
+
+                    if(processInformation.hThread != IntPtr.Zero)
+                    {
                         NativeMethod.CloseHandle(processInformation.hThread);
-                    if (duplicatedToken != IntPtr.Zero)
+                    }
+
+                    if(duplicatedToken != IntPtr.Zero)
+                    {
                         NativeMethod.CloseHandle(duplicatedToken);
-                    if (environment != IntPtr.Zero)
+                    }
+
+                    if(environment != IntPtr.Zero)
+                    {
                         NativeMethod.DestroyEnvironmentBlock(environment);
-                    if (token != IntPtr.Zero)
+                    }
+
+                    if(token != IntPtr.Zero)
+                    {
                         NativeMethod.CloseHandle(token);
+                    }
                 }
             }
         }

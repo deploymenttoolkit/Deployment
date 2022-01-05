@@ -42,7 +42,7 @@ namespace DeploymentToolkit.Util
             };
             var tLUID = new LUID();
             tokenPrivileges.PrivilegeCount = 1;
-            if (bEnablePrivilege)
+            if(bEnablePrivilege)
             {
                 tokenPrivileges.Privileges[2] = SE_PRIVILEGE_ENABLED;
             }
@@ -54,21 +54,21 @@ namespace DeploymentToolkit.Util
             var unmanagedTokenPrivileges = IntPtr.Zero;
             try
             {
-                if (!NativeMethod.LookupPrivilegeValue(null, privilegeName, ref tLUID))
+                if(!NativeMethod.LookupPrivilegeValue(null, privilegeName, ref tLUID))
                 {
                     _logger.Warn($"Failed to Lookup {privilegeName}");
                     return false;
                 }
 
                 var process = Process.GetCurrentProcess();
-                if (process.Handle == IntPtr.Zero)
+                if(process.Handle == IntPtr.Zero)
                 {
                     _logger.Warn($"Failed to get process handle");
                     return false;
                 }
 
 
-                if (NativeMethod.OpenProcessToken(process.Handle, TOKEN_ALL_ACCESS, ref token) == 0)
+                if(NativeMethod.OpenProcessToken(process.Handle, TOKEN_ALL_ACCESS, ref token) == 0)
                 {
                     _logger.Warn($"Failed to open process token ({Marshal.GetLastWin32Error()})");
                     return false;
@@ -81,14 +81,14 @@ namespace DeploymentToolkit.Util
                 const int bufLength = 256;
                 unmanagedTokenPrivileges = Marshal.AllocHGlobal(bufLength);
                 Marshal.StructureToPtr(tokenPrivileges, unmanagedTokenPrivileges, true);
-                if (NativeMethod.AdjustTokenPrivileges(token, 0, unmanagedTokenPrivileges, bufLength, IntPtr.Zero, ref returnLength) == 0)
+                if(NativeMethod.AdjustTokenPrivileges(token, 0, unmanagedTokenPrivileges, bufLength, IntPtr.Zero, ref returnLength) == 0)
                 {
                     _logger.Warn($"Failed to adjust privileges ({Marshal.GetLastWin32Error()})");
                     _logger.Warn(new Win32Exception(Marshal.GetLastWin32Error()));
                     return false;
                 }
 
-                if (Marshal.GetLastWin32Error() != 0)
+                if(Marshal.GetLastWin32Error() != 0)
                 {
                     _logger.Warn($"Failed to adjust privileges ({Marshal.GetLastWin32Error()})");
                     return false;
@@ -97,17 +97,22 @@ namespace DeploymentToolkit.Util
                 _logger.Debug($"Successfully enabled privilege {privilegeName}");
                 return true;
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 _logger.Error(ex, $"Error while trying to enable {privilegeName}");
                 return false;
             }
             finally
             {
-                if (token != IntPtr.Zero)
+                if(token != IntPtr.Zero)
+                {
                     NativeMethod.CloseHandle(token);
-                if (unmanagedTokenPrivileges != IntPtr.Zero)
+                }
+
+                if(unmanagedTokenPrivileges != IntPtr.Zero)
+                {
                     Marshal.FreeHGlobal(unmanagedTokenPrivileges);
+                }
             }
         }
     }
